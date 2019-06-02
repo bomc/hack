@@ -1,0 +1,38 @@
+{
+    "provider": {
+        "name": "UsermanagementV1FindAllRolesByUsernameRestProvider"
+    },
+    "consumer": {
+        "name": "AuthUserManagementRestEndpoint"
+    },
+    "interactions": [
+        {
+            "providerState": "Describe the state the provider needs to be in for the pact test to be verified",
+            "description": "Description of the request that is expected to be received",
+            "request": {
+                "method": "POST",
+                "path": "/auth-microservice/auth-api/usermanagement/roles-by-username",
+                "headers": {
+                    "X-BOMC-AUTHORIZATION": "BOMC_USER",
+                    "Content-Type": "application/vnd.usermanagement-v1+xml"
+                },
+                "body": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><requestObjectDTO><parameters><entry><key xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xsi:type=\"xs:string\">username</key><value xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"parameter\" name=\"username\"><type xsi:type=\"stringType\" value=\"Default-System_user\"/></value></entry></parameters></requestObjectDTO>"
+            },
+            "response": {
+                "status": 299,
+                "headers": {
+                    "Content-Type": "application/vnd.usermanagement-v1+xml"
+                },
+                "body": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><generic-entity><collection><ResponseObjectDTO><parameters><entry><key xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xsi:type=\"xs:string\">roleId</key><value xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"parameter\" name=\"roleId\"><type xsi:type=\"longType\" value=\"3\"/></value></entry><entry><key xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xsi:type=\"xs:string\">roleName</key><value xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"parameter\" name=\"roleName\"><type xsi:type=\"stringType\" value=\"Default-System_user\"/></value></entry><entry><key xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xsi:type=\"xs:string\">roleDescription</key><value xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"parameter\" name=\"roleDescription\"><type xsi:type=\"stringType\" value=\"This role allows restricted access to the system\"/></value></entry></parameters></ResponseObjectDTO></collection></generic-entity>"
+            }
+        }
+    ],
+    "metadata": {
+        "pact-specification": {
+            "version": "2.0.0"
+        },
+        "pact-jvm": {
+            "version": "3.2.2"
+        }
+    }
+}

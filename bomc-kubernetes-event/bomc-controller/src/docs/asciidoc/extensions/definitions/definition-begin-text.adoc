@@ -1,0 +1,3 @@
+== Document begin hook (definition)
+
+Dummy text in document begin hook

@@ -1,0 +1,10 @@
+T_PRIVATE_USER:
+ - C_ID: 3
+   C_CREATEDATE: '2016-11-04'
+   C_CREATEUSER: '[null]'
+   C_MODIFYDATE: '[null]'
+   C_MODIFYUSER: '[null]'
+   C_VERSION: 0
+   C_USERNAME: 'USER_USERNAME_new'
+   C_BIRTH_DATE: '2011-11-13'
+   

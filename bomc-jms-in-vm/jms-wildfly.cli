@@ -1,0 +1,42 @@
+# To run this script run: $JBOSS_HOME/bin>jboss-cli.bat --file=../standalone/configuration/cli/jms-wildfly.cli
+
+# ____________________________________________________________________________________________________________
+echo .
+echo *********************************************************************************************************
+echo ** Add a queue/topic																					**
+echo ** http://wildfly.org/news/2017/10/03/Messaging-features/						                        **
+echo *********************************************************************************************************
+echo .
+# ____________________________________________________________________________________________________________
+# Enter here ip and port of the running wildfly instance.
+connect --controller=127.0.0.1.1:10090
+
+# Batch script to add queue/topic to wildfly configuration.
+
+# Start batching commands
+batch
+
+# Enable jms statistics.
+/subsystem=messaging-activemq/server=default/pooled-connection-factory=activemq-ra:write-attribute(name=statistics-enabled, value=true)
+
+try 
+	/subsystem=messaging-activemq/server=default/jms-queue=BomcMessageQueue:add(entries=[queue/BomcMessageQueue])
+	/subsystem=messaging-activemq/server=default/address-setting=jms.queue.BomcMessageQueue:add(redelivery-delay=1500, redelivery-multiplier=1.5, max-redelivery-delay=5000, max-delivery-attempts=3)
+
+	/subsystem=messaging-activemq/server=default/jms-topic=BomcTopic:add(entries=[topic/BomcTopic])
+	
+catch
+	/subsystem=messaging-activemq/server=default/jms-queue=BomcMessageQueue:remove
+	/subsystem=messaging-activemq/server=default/address-setting=jms.queue.BomcMessageQueue:remove
+	
+	/subsystem=messaging-activemq/server=default/jms-topic=BomcTopic:remove
+	
+finally
+
+end-try
+
+# Run the batch commands
+run-batch
+
+# Reload the server configuration.
+#:reload

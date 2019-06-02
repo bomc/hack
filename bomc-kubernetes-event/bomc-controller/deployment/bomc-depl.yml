@@ -1,0 +1,25 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bomc-controller
+  namespace: bomc-app
+  labels:
+    app: bomc-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bomc-controller
+  template:
+    metadata:
+      labels:
+        app: bomc-controller
+    spec:
+      containers:
+      - name: bomc-controller
+        image: bomc/bomc-controller:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          protocol: TCP

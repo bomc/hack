@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.bomc.poc</groupId>
+		<artifactId>bomc-parent-pom</artifactId>
+		<version>1.00.00-SNAPSHOT</version>
+	</parent>
+
+    <artifactId>bomc-upload-mock-web</artifactId>
+
+    <version>1.00.00-SNAPSHOT</version>
+
+    <packaging>war</packaging>
+
+    <name>${project.artifactId}         ::This is a mock project that mocks a upload service.</name>
+
+    <description>A bomcs project that contains a REST interface.</description>
+
+	<properties>
+		<version.rest-lib>1.00.00-SNAPSHOT</version.rest-lib>
+		<version.logging-lib>1.00.00-SNAPSHOT</version.logging-lib>
+		<version.bomc-upload-lagacy-api>1.00.00-SNAPSHOT</version.bomc-upload-lagacy-api>
+		<version.cdi-api>1.2</version.cdi-api>
+		<version.resteasy-multipart-provider>3.0.19.Final</version.resteasy-multipart-provider>
+		<version.log4j>1.2.17</version.log4j>
+        <version.jboss-jaxrs-api_2.0_spec>1.0.0.Final</version.jboss-jaxrs-api_2.0_spec>
+		
+		<version.war.plugin>2.5</version.war.plugin>
+	</properties>		
+
+    <dependencies>
+        <!-- First declare the APIs we depend on and need for compilation. All
+            of them are provided by JBoss WildFly -->
+
+        <dependency>
+            <groupId>de.bomc.poc</groupId>
+            <artifactId>logging-lib</artifactId>
+			<version>${version.logging-lib}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.bomc.poc</groupId>
+            <artifactId>bomc-upload-lagacy-api</artifactId>
+			<version>${version.bomc-upload-lagacy-api}</version>
+        </dependency>
+
+        <!-- Import the CDI API, we use provided scope as the API is included in
+            JBoss WildFly -->
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+			<version>${version.cdi-api}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-multipart-provider</artifactId>
+			<version>${version.resteasy-multipart-provider}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+			<version>${version.log4j}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jboss.spec.javax.ws.rs</groupId>
+          <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+          <version>${version.jboss-jaxrs-api_2.0_spec}</version>
+          <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!-- Maven will append the version to the finalName (which is the name
+            given to the generated war, and hence the context root) -->
+        <finalName>${project.artifactId}</finalName>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${version.war.plugin}</version>
+                <configuration>
+                    <!-- Java EE 7 doesn't require web.xml, Maven needs to catch up! -->
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>analyze</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>false</failOnWarning>
+                            <outputXML>true</outputXML>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <!-- Dies ist das Default-Profile bei dem Junit Tests IMMER ausgeführt werden. 'mvn clean install'. -->
+            <!-- Damit Testabdeckung ausgeführt wird, Befehl 'mvn clean test jacoco:report' auf Kommandozeile ausführen. -->
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <runOrder>alphabetical</runOrder>
+                            <!-- Excludes integration tests when unit tests are running. -->
+                            <excludes>
+                                <exclude>**/*IT.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-property</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireProperty>
+                                            <property>maven.test.skip</property>
+                                            <message>*** Property 'maven.test.skip' muss definiert werden. ***</message>
+                                            <regex>false</regex>
+                                            <regexMessage>*** Autsch, bei Ausfuehrung des 'default'-Profils, koennen die Tests NICHT ge-'skipped' werden!</regexMessage>
+                                        </requireProperty>
+                                    </rules>
+                                    <fail>true</fail>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- Ein Profil bei dem die Tests ge-'skipped' werden, 'mvn clean install -PskipTest'. -->
+            <id>skipTest</id>
+            <activation>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

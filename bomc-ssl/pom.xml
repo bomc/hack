@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.bomc.poc</groupId>
+		<artifactId>bomc-parent-pom</artifactId>
+		<version>1.00.00-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>bomc-ssl</artifactId>
+
+	<packaging>war</packaging>
+
+	<name>${project.artifactId}</name>
+	<description>A project that shows using resteasy with ssl.</description>
+
+	<properties>
+		<!-- JBoss dependency versions -->
+		<version.wildfly.maven.plugin>1.1.0.Final</version.wildfly.maven.plugin>
+
+		<!-- Define the version of the JBoss BOMs we want to import to specify 
+			tested stacks. -->
+		<version.jboss.bom>8.2.2.Final</version.jboss.bom>
+
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+
+		<!-- other plugin versions <version.compiler.plugin>3.1</version.compiler.plugin> 
+			<version.surefire.plugin>2.16</version.surefire.plugin> -->
+		<version.war.plugin>2.5</version.war.plugin>
+
+		<!-- maven-compiler-plugin -->
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+
+		<!-- Property verhindert, dass be Ausfuehrung von 'mvn clean install' die 
+			Unit-Tests ge-'skipped' werden. -->
+		<maven.test.skip>false</maven.test.skip>
+
+		<version.javaee.api>7.0</version.javaee.api>
+		<version.httpcomponents.httpclient>4.5</version.httpcomponents.httpclient>
+		<version.httpcomponents.fluent.hc>4.5.1</version.httpcomponents.fluent.hc>
+		<version.pact.consumer.junit>3.2.2</version.pact.consumer.junit>
+		<version.pact.provider.maven>3.2.2</version.pact.provider.maven>
+
+		<version.cargo.maven2.plugin>1.4.16</version.cargo.maven2.plugin>
+
+		<version.slf4j-api>1.7.15</version.slf4j-api>
+		<version.logback-classic>1.1.3</version.logback-classic>
+		<version.logback-core>1.1.3</version.logback-core>
+
+		<version.logging-lib>1.00.00-SNAPSHOT</version.logging-lib>
+		<version.rest-lib>1.00.00-SNAPSHOT</version.rest-lib>
+
+		<!-- Used Wildfly version -->
+		<wildfly.version>10.1.0.Final</wildfly.version>
+		<wildfly.mgtPort>10090</wildfly.mgtPort>
+		<!-- Server profile -->
+		<server.profile>standalone-full.xml</server.profile>
+		<!-- Root directory of the server -->
+		<server.root>${project.build.directory}/wildfly-${wildfly.version}</server.root>
+
+		<version.mockito>1.10.19</version.mockito>
+		<version.tjws>3.0.19.Final</version.tjws>
+		<version.log4j>1.2.17</version.log4j>
+		<version.hamcrest-all>1.3</version.hamcrest-all>
+		<!-- <version.maven.enforcer>1.4.1</version.maven.enforcer> -->
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- JBoss distributes a complete set of Java EE 7 APIs including a Bill 
+				of Materials (BOM). A BOM specifies the versions of a "stack" (or a collection) 
+				of artifacts. We use this here so that we always get the correct versions 
+				of artifacts. Here we use the jboss-javaee-7.0-with-tools stack (you can 
+				read this as the JBoss stack of the Java EE 7 APIs, with some extras tools 
+				for your project, such as Arquillian for testing) and the jboss-javaee-7.0-with-hibernate 
+				stack you can read this as the JBoss stack of the Java EE 7 APIs, with extras 
+				from the Hibernate family of projects) -->
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>jboss-javaee-7.0-with-tools</artifactId>
+				<version>${version.jboss.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>jboss-javaee-7.0-with-hibernate</artifactId>
+				<version>${version.jboss.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>jboss-javaee-7.0-with-resteasy</artifactId>
+				<version>${version.jboss.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax</groupId>
+				<artifactId>javaee-api</artifactId>
+				<version>${version.javaee.api}</version>
+			</dependency>
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>${version.log4j}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>${version.httpcomponents.httpclient}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-all</artifactId>
+				<version>${version.hamcrest-all}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${version.mockito}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>tjws</artifactId>
+				<version>${version.tjws}</version>
+			</dependency>
+			<dependency>
+				<groupId>au.com.dius</groupId>
+				<artifactId>pact-jvm-consumer-junit_2.11</artifactId>
+				<version>${version.pact.consumer.junit}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>fluent-hc</artifactId>
+				<version>${version.httpcomponents.fluent.hc}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${version.slf4j-api}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${version.logback-classic}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-core</artifactId>
+				<version>${version.logback-core}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>rest-lib</artifactId>
+				<version>${version.rest-lib}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>logging-lib</artifactId>
+				<version>${version.rest-lib}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>rest-lib</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>logging-lib</artifactId>
+		</dependency>
+
+		<!-- First declare the APIs we depend on and need for compilation. All 
+			of them are provided by JBoss WildFly -->
+
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the CDI API, we use provided scope as the API is included in 
+			JBoss WildFly -->
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the Common Annotations API (JSR-250), we use provided scope 
+			as the API is included in JBoss WildFly -->
+		<dependency>
+			<groupId>org.jboss.spec.javax.annotation</groupId>
+			<artifactId>jboss-annotations-api_1.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the JAX-RS API, we use provided scope as the API is included 
+			in JBoss WildFly -->
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>jaxrs-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.spec.javax.servlet</groupId>
+			<artifactId>jboss-servlet-api_3.1_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+
+		<!-- Import the LOG4J , we use provided scope as the API is included in 
+			WildFly 8. Dependency in explicitly defined in jboss-deployment-structure.xml -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Now we declare any tools needed -->
+
+		<!-- Annotation processor that raising compilation errors whenever constraint 
+			annotations are incorrectly used. -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator-annotation-processor</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- JSR-303 (Bean Validation) Implementation -->
+		<!-- Provides portable constraints such as @Email -->
+		<!-- Hibernate Validator is shipped in JBoss WildFly -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- RESTEasy implementation of JAX-RS Client API -->
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-client</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Needed for creating ResteasyClient with HttpClient and pact testing -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+
+		<!-- Needed for running tests (you may also use TestNG) -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Optional, but highly recommended -->
+		<!-- Arquillian allows you to test enterprise code such as EJBs and Transactional(JTA) 
+			JPA from JUnit/TestNG -->
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-container</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.protocol</groupId>
+			<artifactId>arquillian-protocol-servlet</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-depchain</artifactId>
+			<type>pom</type>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Mockito für InMemory REST-Tests -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>tjws</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- For consumer contract tests -->
+		<dependency>
+			<groupId>au.com.dius</groupId>
+			<artifactId>pact-jvm-consumer-junit_2.11</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>fluent-hc</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Is for logback logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<!-- Maven will append the version to the finalName (which is the name 
+			given to the generated war, and hence the context root) <finalName>${project.artifactId}</finalName> -->
+		<finalName>bomc-ssl</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${version.war.plugin}</version>
+				<configuration>
+					<!-- Java EE 7 doesn't require web.xml, Maven needs to catch up! -->
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+			<!-- The WildFly plugin deploys your war to a local WildFly container -->
+			<!-- To use, run: mvn package wildfly:deploy -->
+			<plugin>
+				<groupId>org.wildfly.plugins</groupId>
+				<artifactId>wildfly-maven-plugin</artifactId>
+				<version>${version.wildfly.maven.plugin}</version>
+			</plugin>
+		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>version.properties</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+
+	<profiles>
+		<profile>
+			<!-- Dies ist das Default-Profile bei dem Junit Tests IMMER ausgeführt 
+				werden. 'mvn clean install'. -->
+			<!-- Damit Testabdeckung ausgeführt wird, Befehl 'mvn clean test jacoco:report' 
+				auf Kommandozeile ausführen. -->
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<runOrder>alphabetical</runOrder>
+							<!-- Excludes integration tests when instances tests are run. -->
+							<excludes>
+								<exclude>**/*IT.java</exclude>
+								<exclude>**/EchoClientSSLWildflyTest.java</exclude>
+							</excludes>
+							<!-- System properties for pact cdc -->
+							<systemPropertyVariables>
+								<pact.rootDir>${project.basedir}/src/pacts</pact.rootDir>
+								<buildDirectory>${project.build.directory}</buildDirectory>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+					<plugin>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>analyze</id>
+								<goals>
+									<goal>analyze-only</goal>
+								</goals>
+								<configuration>
+									<failOnWarning>false</failOnWarning>
+									<outputXML>true</outputXML>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-enforcer-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>enforce-property</id>
+								<goals>
+									<goal>enforce</goal>
+								</goals>
+								<configuration>
+									<rules>
+										<requireProperty>
+											<property>maven.test.skip</property>
+											<message>*** Property 'maven.test.skip' muss definiert
+												werden. ***
+											</message>
+											<regex>false</regex>
+											<regexMessage>*** Autsch, bei Ausführung des
+												'default'-Profils, können die Tests NICHT ge-'skipped'
+												werden!
+											</regexMessage>
+										</requireProperty>
+									</rules>
+									<fail>true</fail>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.eclipse.m2e</groupId>
+						<artifactId>lifecycle-mapping</artifactId>
+						<version>1.0.0</version>
+						<configuration>
+							<lifecycleMappingMetadata>
+								<pluginExecutions>
+									<pluginExecution>
+										<pluginExecutionFilter>
+											<groupId>org.apache.maven.plugins</groupId>
+											<artifactId>maven-enforcer-plugin</artifactId>
+											<versionRange>[1.0.0,)</versionRange>
+											<goals>
+												<goal>enforce</goal>
+											</goals>
+										</pluginExecutionFilter>
+										<action>
+											<ignore />
+										</action>
+									</pluginExecution>
+								</pluginExecutions>
+							</lifecycleMappingMetadata>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- Ein Profil bei dem die Tests ge-'skipped' werden, 'mvn clean install 
+				-PskipTest'. -->
+			<id>skipTest</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- NOTE: To run this test, the application server with the Echo-Service 
+				must be running. -->
+			<id>cdc-tests</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${version.surefire.plugin}</version>
+						<configuration>
+							<systemPropertyVariables>
+								<pact.rootDir>${project.basedir}/src/pacts</pact.rootDir>
+								<buildDirectory>${project.build.directory}</buildDirectory>
+							</systemPropertyVariables>
+							<skip>false</skip>
+							<runOrder>alphabetical</runOrder>
+							<!-- Excludes integration tests when instances tests are run. -->
+							<excludes>
+								<exclude>**/*IT.java</exclude>
+								<exclude>**/EchoClientSSLWildflyTest.java</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>au.com.dius</groupId>
+						<artifactId>pact-jvm-provider-maven_2.11</artifactId>
+						<version>${version.pact.provider.maven}</version>
+						<configuration>
+							<serviceProviders>
+								<serviceProvider>
+									<name>EchoRestProvider</name>
+									<protocol>http</protocol>
+									<host>192.168.4.1</host>
+									<port>8180</port>
+									<path>/</path>
+									<consumers>
+										<!-- Again, you can define as many consumers for each provider 
+											as you need, but each must have a unique name -->
+										<consumer>
+											<name>EchoRestResource</name>
+											<!-- currently supports a file path using pactFile or a URL using 
+												pactUrl -->
+											<pactFile>${project.basedir}/src/pacts/EchoRestResource-EchoRestProvider.json</pactFile>
+										</consumer>
+									</consumers>
+									<!-- Verifying all pact files in a directory for a provider -->
+									<!--<pactFileDirectory>${project.basedir}/src/pacts</pactFileDirectory> -->
+								</serviceProvider>
+							</serviceProviders>
+							<configuration>
+								<pact.showStacktrace>true</pact.showStacktrace>
+							</configuration>
+						</configuration>
+						<executions>
+							<execution>
+								<id>verify-pacts</id>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

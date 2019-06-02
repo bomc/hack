@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+
+<installation xmlns="urn:jboss:galleon:provisioning:1.0">
+    <feature-pack groupId="org.wildfly" artifactId="wildfly-galleon-pack" version="13.0.0.Final">
+        <packages>
+            <include name="docs.examples.configs"/>
+        </packages>
+    </feature-pack>
+</installation>

@@ -1,0 +1,3 @@
+cor_role_user_join:
+ - role_id: 3
+   user_id: 1

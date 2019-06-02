@@ -1,0 +1,51 @@
+*/bin/*
+
+*.class
+
+# Package Files #
+*.war
+*.ear
+
+
+# Eclipse
+.settings/
+*.project
+*.classpath
+.prefs
+*.prefs
+.metadata/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+out/
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+# Gradle
+.gradle/
+
+
+.factorypath
+dependency-reduced-pom.xml
+*.so
+*.dylib
+*.dll
+
+
+**/node_modules/
+**/dist
+**/tmp
+**/out-tsc
+**/nbproject/
+**/nb-configuration.xml
+core-scala/.cache-main
+core-scala/.cache-tests
+
+

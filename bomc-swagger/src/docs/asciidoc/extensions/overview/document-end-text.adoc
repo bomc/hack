@@ -1,0 +1,19 @@
+== Release Notes
+
+=== Version
+
+* History of application.
+
+[cols="1m,2" options="header"]
+|===
+|Version
+|Description
+
+|1.00.00-SNAPSHOT
+|Initial version with support for AsciiDoc and Markdown.
+
+|1.00.01-SNAPSHOT
+|...
+|===
+
+

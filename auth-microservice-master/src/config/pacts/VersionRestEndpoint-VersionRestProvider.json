@@ -1,0 +1,35 @@
+{
+    "provider": {
+        "name": "VersionRestProvider"
+    },
+    "consumer": {
+        "name": "VersionRestEndpoint"
+    },
+    "interactions": [
+        {
+            "providerState": "Describe the state the provider needs to be in for the pact test to be verified",
+            "description": "Description of the request that is expected to be received",
+            "request": {
+                "method": "GET",
+                "path": "/auth-microservice/auth-api/version/current-version",
+                "headers": {
+                    "X-BOMC-AUTHORIZATION": "BOMC_USER"
+                }
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/vnd.version-v1+json"
+                }
+            }
+        }
+    ],
+    "metadata": {
+        "pact-specification": {
+            "version": "2.0.0"
+        },
+        "pact-jvm": {
+            "version": "3.2.2"
+        }
+    }
+}

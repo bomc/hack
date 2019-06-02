@@ -1,0 +1,50 @@
+{
+    "provider": {
+        "name": "UploadEndpointProvider_V1"
+    },
+    "consumer": {
+        "name": "UploadEndpoint"
+    },
+    "interactions": [
+        {
+            "description": "A upload request with requestId as query parameter.",
+            "request": {
+                "method": "POST",
+                "path": "/bomc-upload/rest/api/upload",
+                "headers": {
+                    "Accept": "application/vnd.bomc-v1+json",
+                    "Accept-Encoding": "gzip, deflate",
+                    "Content-Type": "multipart/form-data"
+                },
+                "query": "requestId=28b81fea-03b4-4bf2-8a5f-ae3077cb6122",
+                "body": "--5b385fba-f60a-4ea9-9863-ad56ba933bee\nContent-Disposition: form-data; name=\"attachment\"; filename=\"upload.csv\"\nContent-Type: multipart/form-data\n\nSeason,Episode,Character,Line\n10,1,Stan,\"You guys, you guys! Chef is going away.\n\n--5b385fba-f60a-4ea9-9863-ad56ba933bee--"
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/vnd.bomc-v1+json"
+                },
+                "body": {
+                    "duration": 361190098,
+                    "requestId": "28b81fea-03b4-4bf2-8a5f-ae3077cb6122",
+                    "statusCode": "10100",
+                    "statusText": "UPLOAD_SUCCESS"
+                },
+                "matchingRules": {
+                    "$.body.duration": {
+                        "match": "type"
+                    }
+                }
+            },
+            "providerState": "Describe the state the provider needs to be in for the pact test to be verified"
+        }
+    ],
+    "metadata": {
+        "pact-specification": {
+            "version": "2.0.0"
+        },
+        "pact-jvm": {
+            "version": "3.3.4"
+        }
+    }
+}

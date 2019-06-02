@@ -1,0 +1,6 @@
+cor_role_role_join:
+ - role_id: 3
+   grant_id: 1
+ - role_id: 3
+   grant_id: 2
+

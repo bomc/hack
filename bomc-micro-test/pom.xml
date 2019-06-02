@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+	<parent>
+        <groupId>de.bomc.poc</groupId>
+        <artifactId>bomc-parent-pom</artifactId>
+        <version>1.00.00-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>micro-test</artifactId>
+	
+    <version>1.00.00-SNAPSHOT</version>
+	
+    <packaging>war</packaging>
+	
+    <name>WildFly Quickstarts: ${project.artifactId}</name>
+    <description>A starter Java EE 7 webapp project for use on JBoss WildFly / WildFly, generated from the jboss-javaee6-webapp archetype</description>
+
+    <properties>
+        <!-- Explicitly declaring the source encoding eliminates the following 
+            message: -->
+        <!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered 
+            resources, i.e. build is platform dependent! -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- JBoss dependency versions -->
+        <version.wildfly.maven.plugin>1.0.2.Final</version.wildfly.maven.plugin>
+
+        <!-- Define the version of the JBoss BOMs we want to import to specify 
+            tested stacks. -->
+        <version.jboss.bom>8.2.1.Final</version.jboss.bom>
+
+        <!-- other plugin versions -->
+        <version.compiler.plugin>3.1</version.compiler.plugin>
+        <version.surefire.plugin>2.16</version.surefire.plugin>
+        <version.war.plugin>2.5</version.war.plugin>
+        
+        
+        <version.jacoco.core>0.7.7.201606060606</version.jacoco.core>
+        <version.asm-util>3.3.1</version.asm-util>
+        <version.harmcrest-core>1.3</version.harmcrest-core>
+        <version.hamcrest-library>1.3</version.hamcrest-library>
+        <version.jaxrs-api>3.0.12.Final</version.jaxrs-api>
+        <version.resteasy-client>3.0.14.Final</version.resteasy-client>
+        <version.hibernate-validator-annotation-processor>5.1.3.Final</version.hibernate-validator-annotation-processor>
+        <version.hibernate-validator>5.2.3.Final</version.hibernate-validator>
+        <version.commons-lang>2.6</version.commons-lang>
+        <version.javax.json>1.0.3</version.javax.json>
+        <version.arquillian-jacoco>1.0.0.Alpha8</version.arquillian-jacoco>
+        <version.curator-framework>2.10.0</version.curator-framework>
+        <version.curator-recipes>2.10.0</version.curator-recipes>
+        <version.curator-client>2.10.0</version.curator-client>
+        <version.curator-x-discovery>2.10.0</version.curator-x-discovery>
+        <version.zookeeper>3.4.8</version.zookeeper>
+        <version.guava>18.0</version.guava>
+        <version.javax.enterprise.concurrent-api>1.0</version.javax.enterprise.concurrent-api>
+        <version.curator-test>1.3.3</version.curator-test>
+        <version.mockito-core>1.10.19</version.mockito-core>
+        <version.jackson-annotations>2.5.4</version.jackson-annotations>
+    </properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- JBoss distributes a complete set of Java EE 7 APIs including a Bill
+                of Materials (BOM). A BOM specifies the versions of a "stack" (or a collection) 
+                of artifacts. We use this here so that we always get the correct versions 
+                of artifacts. Here we use the jboss-javaee-7.0-with-tools stack (you can
+                read this as the JBoss stack of the Java EE 7 APIs, with some extras tools
+                for your project, such as Arquillian for testing) and the jboss-javaee-7.0-with-hibernate
+                stack you can read this as the JBoss stack of the Java EE 7 APIs, with extras
+                from the Hibernate family of projects) -->
+            <dependency>
+                <groupId>org.wildfly.bom</groupId>
+                <artifactId>jboss-javaee-7.0-with-tools</artifactId>
+                <version>${version.jboss.bom}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.bom</groupId>
+                <artifactId>jboss-javaee-7.0-with-hibernate</artifactId>
+                <version>${version.jboss.bom}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+        <!-- First declare the APIs we depend on and need for compilation. All 
+            of them are provided by JBoss WildFly -->
+
+        <!-- Import the CDI API, we use provided scope as the API is included in 
+            JBoss WildFly -->
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Import the Common Annotations API (JSR-250), we use provided scope 
+            as the API is included in JBoss WildFly -->
+        <dependency>
+            <groupId>org.jboss.spec.javax.annotation</groupId>
+            <artifactId>jboss-annotations-api_1.2_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Import the JAX-RS API, we use provided scope as the API is included 
+            in JBoss WildFly -->
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>jaxrs-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Import the JPA API, we use provided scope as the API is included in 
+            JBoss WildFly -->
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Import the EJB API, we use provided scope as the API is included in 
+            JBoss WildFly -->
+        <dependency>
+            <groupId>org.jboss.spec.javax.ejb</groupId>
+            <artifactId>jboss-ejb-api_3.2_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- JSR-303 (Bean Validation) Implementation -->
+        <!-- Provides portable constraints such as @Email -->
+        <!-- Hibernate Validator is shipped in JBoss WildFly -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Import the JSF API, we use provided scope as the API is included in 
+            JBoss WildFly -->
+        <dependency>
+            <groupId>org.jboss.spec.javax.faces</groupId>
+            <artifactId>jboss-jsf-api_2.2_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Now we declare any tools needed -->
+
+        <!-- Annotation processor to generate the JPA 2.0 metamodel classes for 
+            typesafe criteria queries -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Annotation processor that raising compilation errors whenever constraint 
+            annotations are incorrectly used. -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator-annotation-processor</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>zk-lib</artifactId>
+			<version>1.00.00-SNAPSHOT</version>
+		</dependency>
+
+        <!-- Zookeeper interface -->
+        <!-- The are currently two released versions of Curator, 2.x.x and 3.x.x: -->
+        <!-- Curator 2.x.x - compatible with both ZooKeeper 3.4.x and ZooKeeper 3.5.x  -->
+        <!-- Curator 3.x.x - compatible only with ZooKeeper 3.5.x and includes support for new features such as dynamic reconfiguration, etc.  -->
+        <!-- ZooKeeper 3.5.x adds a number of new features including dynamic reconfiguration, watcher removal and others. -->
+        <!-- The Curator 3.x.x Jira issues tracking these features are here: https://issues.apache.org/jira/browse/CURATOR-159. -->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>${version.curator-framework}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-recipes</artifactId>
+            <version>${version.curator-recipes}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-client</artifactId>
+            <version>${version.curator-client}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-x-discovery</artifactId>
+            <version>${version.curator-x-discovery}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>${version.zookeeper}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${version.guava}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Used for concurrency in ejb's executor -->
+        <dependency>
+            <groupId>javax.enterprise.concurrent</groupId>
+            <artifactId>javax.enterprise.concurrent-api</artifactId>
+            <version>${version.javax.enterprise.concurrent-api}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Used for concurrency in ejb's executor -->
+        <dependency>
+            <groupId>org.jboss.spec.javax.transaction</groupId>
+            <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Used for creating JsonObject instances. -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>${version.javax.json}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${version.jackson-annotations}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- Needed for running tests (you may also use TestNG) -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Optional, but highly recommended -->
+        <!-- Arquillian allows you to test enterprise code such as EJBs and Transactional(JTA) 
+            JPA from JUnit/TestNG -->
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.arquillian.protocol</groupId>
+            <artifactId>arquillian-protocol-servlet</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <!-- Maven will append the version to the finalName (which is the name 
+            given to the generated war, and hence the context root) -->
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${version.war.plugin}</version>
+                <configuration>
+                    <!-- Java EE 7 doesn't require web.xml, Maven needs to catch up! -->
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+            <!-- The WildFly plugin deploys your war to a local WildFly container -->
+            <!-- To use, run: mvn package wildfly:deploy -->
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>${version.wildfly.maven.plugin}</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <!-- The default profile skips all tests, though you can tune it to run 
+                just unit tests based on a custom pattern -->
+            <!-- Seperate profiles are provided for running all tests, including Arquillian 
+                tests that execute in the specified container -->
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${version.surefire.plugin}</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+
+            <!-- An optional Arquillian testing profile that executes tests
+                in your WildFly instance -->
+            <!-- This profile will start a new WildFly instance, and execute the
+                test, shutting it down when done -->
+            <!-- Run with: mvn clean test -Parq-wildfly-managed -->
+            <id>arq-wildfly-managed</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-arquillian-container-managed</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <!-- An optional Arquillian testing profile that executes tests
+                in a remote WildFly instance -->
+            <!-- Run with: mvn clean test -Parq-wildfly-remote -->
+            <id>arq-wildfly-remote</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-arquillian-container-remote</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+    </profiles>
+</project>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="poc-flyway-h2-pu" transaction-type="JTA">
+<!--     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider> -->
+        <jta-data-source>java:jboss/datasources/${datasource.name}</jta-data-source>
+        <properties>
+<!--             <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/> -->
+            <!-- Using the annotation metadata specified in the application entities. -->
+<!--             <property name="javax.persistence.schema-generation.create-source" value="metadata"/> -->
+            <!-- Using the annotation metadata specified in the application entities. -->
+<!--             <property name="javax.persistence.schema-generation.drop-source" value="metadata"/> -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+			<property name="hibernate.use_sql_comments" value="true" />
+			<property name="hibernate.generate_statistics" value="true" />
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+        </properties>
+    </persistence-unit>
+</persistence>

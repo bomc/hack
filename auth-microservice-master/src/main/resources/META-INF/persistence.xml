@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xsi:schemaLocation="
+        http://xmlns.jcp.org/xml/ns/persistence
+        http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+
+	<persistence-unit name="poc-auth-mysql-pu">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<jta-data-source>java:jboss/datasources/poc-auth-mysql-ds</jta-data-source>
+
+		<!-- Caching is enabled for all entities except those for which Cacheable(false) 
+			is specified. -->
+		<shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode>
+
+		<properties>
+			<!-- Properties for Hibernate -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />
+			<!-- Um die Validierung auszuschalten muss der Parameter auf 'none' gesetzt 
+				werden.\n" 'create-drop' sollte nur fuer Testfaelle eingesetzt werden. -->
+			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
+			<!-- Im produktiv-Betrieb MUESSEN diese Properties auf jeden Fall auf 
+				'false' stehen -> Ansonsten Performance issues. -->
+			<property name="hibernate.show_sql" value="false" />
+			<property name="hibernate.format_sql" value="false" />
+			<property name="hibernate.use_sql_comments" value="false" />
+
+			<property name="hibernate.generate_statistics" value="true" />
+
+			<property name="hibernate.cache.use_second_level_cache" value="true" />
+			<property name="hibernate.cache.use_query_cache" value="true" />
+		</properties>
+	</persistence-unit>
+
+	<persistence-unit name="poc-auth-h2-pu">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<jta-data-source>java:jboss/datasources/poc-auth-h2-ds</jta-data-source>
+
+		<properties>
+			<property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" />
+			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
+			
+			<property name="hibernate.show_sql" value="false" />
+			<property name="hibernate.format_sql" value="false" />
+			<property name="hibernate.use_sql_comments" value="false" />
+
+<!-- 			<property name="hibernate.archive.autodetection" value="class" /> -->
+
+			<property name="hibernate.generate_statistics" value="true" />
+		</properties>
+	</persistence-unit>
+</persistence>

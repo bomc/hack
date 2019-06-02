@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.bomc.poc</groupId>
+	<artifactId>bomc-invoice</artifactId>
+
+	<name>${project.artifactId}</name>
+
+	<version>1.00.00-SNAPSHOT</version>
+
+	<packaging>war</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<failOnMissingWebXml>false</failOnMissingWebXml>
+
+<!-- 		<version.json-api>1.0</version.json-api> -->
+
+		<!-- Properties set in version.properties file. -->
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+
+		<!-- All used dependencies -->
+		<version.exception-lib-ext>1.00.00-SNAPSHOT</version.exception-lib-ext>
+		<version.rest-lib>1.00.00-SNAPSHOT</version.rest-lib>
+		
+		<version.thorntail>2.3.0.Final</version.thorntail>
+		<version.javaee-api>8.0</version.javaee-api>
+<!-- 		<version.arquillian-bom>1.1.12.Final</version.arquillian-bom> -->
+		
+		<!-- Other plugins -->
+<!-- 		<version.maven-clean-plugin>3.0.0</version.maven-clean-plugin> -->
+<!-- 		<version.maven-compiler-plugin>3.5.1</version.maven-compiler-plugin> -->
+<!-- 		<version.maven-failsafe-plugin>2.19.1</version.maven-failsafe-plugin> -->
+<!-- 		<version.maven-surefire-plugin>2.19.1</version.maven-surefire-plugin> -->
+<!-- 		<version.maven-war-plugin>2.6</version.maven-war-plugin> -->
+<!-- 		<version.build-helper-maven-plugin>1.10</version.build-helper-maven-plugin> -->
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.thorntail</groupId>
+				<artifactId>bom-all</artifactId>
+				<version>${version.thorntail}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+			<dependency>
+				<groupId>javax</groupId>
+				<artifactId>javaee-api</artifactId>
+				<version>${version.javaee-api}</version>
+				<scope>provided</scope>
+			</dependency>
+<!-- 			<dependency> -->
+<!-- 				<groupId>org.jboss.arquillian</groupId> -->
+<!-- 				<artifactId>arquillian-bom</artifactId> -->
+<!-- 				<version>${version.arquillian-bom}</version> -->
+<!-- 				<type>pom</type> -->
+<!-- 				<scope>import</scope> -->
+<!-- 			</dependency> -->
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+
+		<!-- Used to write version and build timestamp to version.properties. -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>project-defaults.yml</include>
+					<include>META-INF/microprofile-config.properties</include>
+					<include>META-INF/beans.xml</include>
+				</includes>
+			</resource>
+		</resources>
+		
+<!-- 		<pluginManagement> -->
+			<plugins>
+				<plugin>
+					<groupId>io.thorntail</groupId>
+					<artifactId>thorntail-maven-plugin</artifactId>
+					<version>${version.thorntail}</version>
+					<configuration>
+						<properties>
+							<swarm.port.offset>100</swarm.port.offset>
+							<swarm.jaeger.service-name>bomc-invoice</swarm.jaeger.service-name>
+							
+	                        <thorntail.jaeger.remote-reporter-http-endpoint>http://localhost:14268/api/traces</thorntail.jaeger.remote-reporter-http-endpoint>
+	                        <thorntail.jaeger.reporter-log-spans>true</thorntail.jaeger.reporter-log-spans>
+	                        <thorntail.jaeger.sampler-type>const</thorntail.jaeger.sampler-type>
+	                        <thorntail.jaeger.sampler-parameter>1</thorntail.jaeger.sampler-parameter>
+	                        <thorntail.jaeger.enable-b3-header-propagation>true</thorntail.jaeger.enable-b3-header-propagation>
+						</properties>
+<!-- 						<jvmArguments> -->
+<!-- 							<jvmArgument>-Xmx256m</jvmArgument> -->
+<!-- 						</jvmArguments> -->
+					</configuration>
+					<executions>
+						<execution>
+<!-- 							<id>package</id> -->
+							<goals>
+								<goal>package</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+<!-- 				<plugin> -->
+<!-- 					<artifactId>maven-clean-plugin</artifactId> -->
+<!-- 					<version>${version.maven-clean-plugin}</version> -->
+<!-- 				</plugin> -->
+<!-- 				<plugin> -->
+<!-- 					<artifactId>maven-compiler-plugin</artifactId> -->
+<!-- 					<version>${version.maven-compiler-plugin}</version> -->
+<!-- 				</plugin> -->
+<!-- 				<plugin> -->
+<!-- 					<artifactId>maven-failsafe-plugin</artifactId> -->
+<!-- 					<version>${version.maven-failsafe-plugin}</version> -->
+<!-- 				</plugin> -->
+<!-- 				<plugin> -->
+<!-- 					<artifactId>maven-surefire-plugin</artifactId> -->
+<!-- 					<version>${version.maven-surefire-plugin}</version> -->
+<!-- 					<configuration> -->
+<!-- 						<systemPropertyVariables> -->
+<!-- 							<org.apache.maven.user-settings>${session.request.userSettingsFile.path}</org.apache.maven.user-settings> -->
+<!-- 						</systemPropertyVariables> -->
+<!-- 					</configuration> -->
+<!-- 				</plugin> -->
+<!-- 				<plugin> -->
+<!-- 					<artifactId>maven-war-plugin</artifactId> -->
+<!-- 					<version>${version.maven-war-plugin}</version> -->
+<!-- 					<configuration> -->
+<!-- 						<failOnMissingWebXml>false</failOnMissingWebXml> -->
+<!-- 					</configuration> -->
+<!-- 				</plugin> -->
+<!-- 				<plugin> -->
+<!-- 					<groupId>org.codehaus.mojo</groupId> -->
+<!-- 					<artifactId>build-helper-maven-plugin</artifactId> -->
+<!-- 					<version>${version.build-helper-maven-plugin}</version> -->
+<!-- 				</plugin> -->
+			</plugins>
+<!-- 		</pluginManagement> -->
+<!-- 		<plugins> -->
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.codehaus.mojo</groupId> -->
+<!-- 				<artifactId>build-helper-maven-plugin</artifactId> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>add-source</id> -->
+<!-- 						<phase>generate-sources</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>add-test-source</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<sources> -->
+<!-- 							TODO: check path -->
+<!-- 								<source>src/it/java</source> -->
+<!-- 							</sources> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
+<!-- 					<execution> -->
+<!-- 						<id>add-resource</id> -->
+<!-- 						<phase>generate-sources</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>add-test-resource</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<resources> -->
+<!-- 								<resource> -->
+<!-- 									TODO: editing path -->
+<!-- 									<directory>src/it/resources</directory> -->
+<!-- 								</resource> -->
+<!-- 							</resources> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
+<!-- 			<plugin> -->
+<!-- 				<artifactId>maven-failsafe-plugin</artifactId> -->
+<!-- 				<configuration> -->
+<!-- 					<includes> -->
+<!-- 						<include>**/*IT.java</include> -->
+<!-- 					</includes> -->
+<!-- 					<systemPropertyVariables> -->
+<!-- 						<phantomjs.binary.version>2.1.1</phantomjs.binary.version> -->
+<!-- 						<org.apache.maven.user-settings>${session.request.userSettingsFile.path}</org.apache.maven.user-settings> -->
+<!-- 					</systemPropertyVariables> -->
+<!-- 				</configuration> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<goals> -->
+<!-- 							<goal>integration-test</goal> -->
+<!-- 							<goal>verify</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
+<!-- 		</plugins> -->
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>exception-lib-ext</artifactId>
+			<version>${version.exception-lib-ext}</version>
+		</dependency>		
+			
+        <dependency>
+            <groupId>io.thorntail</groupId>
+            <artifactId>microprofile</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.thorntail</groupId>
+            <artifactId>ejb</artifactId>
+        </dependency>
+		<dependency>
+  			<groupId>io.thorntail</groupId>
+  			<artifactId>logging</artifactId>
+		</dependency>
+<!--         <dependency> -->
+<!--     		<groupId>io.thorntail</groupId> -->
+<!--     		<artifactId>microprofile-restclient</artifactId> -->
+<!-- 		</dependency> -->
+<!--         <dependency> -->
+<!--             <groupId>io.thorntail</groupId> -->
+<!--             <artifactId>microprofile-openapi</artifactId> -->
+<!--         </dependency> -->
+<!--         <dependency> -->
+<!-- 			<groupId>io.thorntail</groupId> -->
+<!-- 			<artifactId>swagger</artifactId> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>io.thorntail</groupId> -->
+<!-- 			<artifactId>swagger-webapp</artifactId> -->
+<!-- 		</dependency> -->
+        <dependency>
+            <groupId>io.thorntail</groupId>
+            <artifactId>microprofile-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.thorntail</groupId>
+            <artifactId>microprofile-health</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.thorntail</groupId>
+            <artifactId>microprofile-metrics</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.thorntail</groupId>
+            <artifactId>microprofile-fault-tolerance</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.thorntail</groupId>
+            <artifactId>hystrix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.thorntail</groupId>
+            <artifactId>microprofile-jwt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+<!--         <dependency> -->
+<!--             <groupId>io.thorntail</groupId> -->
+<!--             <artifactId>microprofile-opentracing</artifactId> -->
+<!--         </dependency> -->
+<!--         <dependency> -->
+<!--             <groupId>io.thorntail</groupId> -->
+<!--             <artifactId>jaeger</artifactId> -->
+<!--         </dependency> -->
+	</dependencies>
+</project>

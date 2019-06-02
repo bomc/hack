@@ -1,0 +1,1 @@
+mvn clean install & copy target\lra-order-controller-1.00.00-SNAPSHOT.war D:\Middleware\wildfly\wildfly-13.0.0.Final\standalone\deployments

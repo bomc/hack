@@ -1,0 +1,8 @@
+== Einführung
+
+Das Application Programming Interface (API) ist eine Programmierschnittstelle, die den Zugriff auf Daten und Methoden dieses Microservices ermöglicht. Die Schnittstelle erlaubt die Abfrage im Rahmen von Daten bezogen auf den Microservice.
+
+=== Benutzung der API
+
+Das API des Microservice bietet lesenden und schreibenden Zugriff. Über die folgenden Methoden können die unterschiedlichen Daten und -bestandteile abgerufen werden. Die Dokumentation der API-Methoden wurde, abweichend von der übrigen Dokumentation und wie allgemein in der Entwickler Community üblich, in englischer Sprache verfasst.
+

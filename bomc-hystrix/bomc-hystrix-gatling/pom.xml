@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.bomc.poc</groupId>
+		<artifactId>bomc-parent-pom</artifactId>
+		<version>1.00.00-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>bomc-hystrix-gatling</artifactId>
+
+	<properties>
+		<encoding>UTF-8</encoding>
+
+		<testSourceDirectory>src/test/scala</testSourceDirectory>
+
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<version.scala-library>2.11.7</version.scala-library>
+
+		<version.gatling-app>2.2.2</version.gatling-app>
+		<version.gatling-recorder>2.2.2</version.gatling-recorder>
+		<version.gatling-charts-highcharts>2.2.2</version.gatling-charts-highcharts>
+
+		<version.gatling-maven-plugin>2.2.1</version.gatling-maven-plugin>
+		<version.scala-maven-plugin>3.2.2</version.scala-maven-plugin>		
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.gatling</groupId>
+				<artifactId>gatling-app</artifactId>
+				<version>${version.gatling-app}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.gatling</groupId>
+				<artifactId>gatling-recorder</artifactId>
+				<version>${version.gatling-recorder}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.gatling.highcharts</groupId>
+				<artifactId>gatling-charts-highcharts</artifactId>
+				<version>${version.gatling-charts-highcharts}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-library</artifactId>
+				<version>${version.scala-library}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>io.gatling.highcharts</groupId>
+			<artifactId>gatling-charts-highcharts</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.gatling</groupId>
+			<artifactId>gatling-app</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.gatling</groupId>
+			<artifactId>gatling-recorder</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>gatling</id>
+			<build>
+				
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>net.alchim31.maven</groupId>
+							<artifactId>scala-maven-plugin</artifactId>
+							<version>${version.scala-maven-plugin}</version>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+				<plugins>
+					<plugin>
+						<groupId>net.alchim31.maven</groupId>
+						<artifactId>scala-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>compile</goal>
+									<goal>testCompile</goal>
+								</goals>
+								<configuration>
+									<args>
+										<arg>-Ybackend:GenBCode</arg>
+										<arg>-Ydelambdafy:method</arg>
+										<arg>-target:jvm-1.8</arg>
+										<arg>-deprecation</arg>
+										<arg>-feature</arg>
+										<arg>-unchecked</arg>
+										<arg>-language:implicitConversions</arg>
+										<arg>-language:postfixOps</arg>
+									</args>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>io.gatling</groupId>
+						<artifactId>gatling-maven-plugin</artifactId>
+						<version>${version.gatling-maven-plugin}</version>
+						<executions>
+							<execution>
+								<phase>test</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

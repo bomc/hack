@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.bomc.poc</groupId>
+		<artifactId>bomc-parent-pom</artifactId>
+		<version>1.00.00-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>bomc-swagger</artifactId>
+
+	<packaging>war</packaging>
+
+	<name>${project.artifactId}::This is a test project that handles running swagger ui.</name>
+
+	<description>A bomc project that handles running swagger ui.</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<version.wildfly-javaee7>10.1.0.Final</version.wildfly-javaee7>
+		<version.rest-lib>1.00.00-SNAPSHOT</version.rest-lib>
+		<version.logging-lib>1.00.00-SNAPSHOT</version.logging-lib>
+		<!-- <version.cdi-api>1.2</version.cdi-api> -->
+		<version.log4j>1.2.17</version.log4j>
+		<version.javaee-api>7.0</version.javaee-api>
+        <version.arquillian-performance-impl>1.0.0.CR1</version.arquillian-performance-impl>
+        <version.arquillian-performance-api>1.0.0.CR1</version.arquillian-performance-api>
+        
+		<!-- Dependencies for using swagger -->
+		<version.swagger-jaxrs>1.5.16</version.swagger-jaxrs>
+		<version.swagger-ui>3.2.2</version.swagger-ui>
+		<version.replacer>1.5.3</version.replacer>
+		<version.swagger2markup-import-files-ext>1.3.1</version.swagger2markup-import-files-ext>
+		<version.swagger2markup-spring-restdocs-ext>1.3.1</version.swagger2markup-spring-restdocs-ext>
+		<version.asciidoctorj-pdf>1.5.0-alpha.16</version.asciidoctorj-pdf>
+		<version.asciidoctorj-epub3>1.5.0-alpha.7</version.asciidoctorj-epub3>
+
+		<!-- Other plugins. -->
+		<version.war.plugin>2.5</version.war.plugin>
+		<version.maven-clean-plugin>3.0.0</version.maven-clean-plugin>
+
+		<!-- Plugins for using swagger -->
+		<version.swagger-maven-plugin>3.1.5</version.swagger-maven-plugin>
+		<version.swagger2markup>1.3.1</version.swagger2markup>
+		<version.swagger2markup-maven-plugin>1.3.3</version.swagger2markup-maven-plugin>
+		<version.asciidoctor-maven-plugin>1.5.6</version.asciidoctor-maven-plugin>
+
+		<!-- Properties for swagger and asciiDoc documentation -->
+		<generated.asciidoc.directory>${project.build.directory}/asciidoc/generated</generated.asciidoc.directory>
+		<asciidoctor.input.directory>${project.basedir}/src/docs/asciidoc</asciidoctor.input.directory>
+		<asciidoctor.html.output.directory>${project.build.directory}/asciidoc/html</asciidoctor.html.output.directory>
+		<asciidoctor.pdf.output.directory>${project.build.directory}/asciidoc/pdf</asciidoctor.pdf.output.directory>
+		<asciidoctor.epub3.output.directory>${project.build.directory}/asciidoc/epub3</asciidoctor.epub3.output.directory>
+		<asciidoctor.docbook.output.directory>${project.build.directory}/asciidoc/docbook</asciidoctor.docbook.output.directory>
+		<swagger.ui.host>192.168.4.1:8180</swagger.ui.host>
+		<application.context.root>/bomc-swagger</application.context.root>
+
+		<!-- Properties for arquillian tests. -->
+		<!-- Example for start vm-wildfly parameter. -->
+		<version.wildfly>10.1.0.Final</version.wildfly>
+		<wildfly.management.address>192.168.4.1</wildfly.management.address>
+		<wildfly.port>10090</wildfly.port>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>wildfly-javaee7-with-tools</artifactId>
+				<version>${version.wildfly-javaee7}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<!-- First declare the APIs we depend on and need for compilation. All 
+			of them are provided by JBoss WildFly -->
+
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>logging-lib</artifactId>
+			<version>${version.logging-lib}</version>
+		</dependency>
+
+		<!-- JavaEE API -->
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>${version.javaee-api}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Swagger -->
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-jaxrs</artifactId>
+			<version>${version.swagger-jaxrs}</version>
+		</dependency>
+
+		<!-- Resteasy client proxy framework -->
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+		<!-- Logging -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Needed for running tests (you may also use TestNG) -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Optional, but highly recommended -->
+		<!-- Arquillian allows you to test enterprise code -->
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-container</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.container</groupId>
+			<artifactId>arquillian-container-test-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.protocol</groupId>
+			<artifactId>arquillian-protocol-servlet</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-performance-api</artifactId>
+			<version>${version.arquillian-performance-api}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-performance-impl</artifactId>
+			<version>${version.arquillian-performance-impl}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- Maven resolver api -->
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-depchain</artifactId>
+			<type>pom</type>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-api-maven</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.descriptors</groupId>
+			<artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap</groupId>
+			<artifactId>shrinkwrap-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<!-- Maven will append the version to the finalName (which is the name 
+			given to the generated war, and hence the context root) -->
+		<finalName>${project.artifactId}</finalName>
+
+		<!-- Enable resource filter to get necessary resources. -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>version.properties</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${version.war.plugin}</version>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>analyze</id>
+						<goals>
+							<goal>analyze-only</goal>
+						</goals>
+						<configuration>
+							<failOnWarning>false</failOnWarning>
+							<outputXML>true</outputXML>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${version.maven-clean-plugin}</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <!-- avoids possible NPEs -->
+                            <directory>arq-perf</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<!-- Dies ist das Default-Profile bei dem Junit Tests IMMER ausgeführt 
+				werden. 'mvn clean install'. -->
+			<!-- Damit Testabdeckung ausgeführt wird, Befehl 'mvn clean test jacoco:report' 
+				auf Kommandozeile ausführen. -->
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<runOrder>alphabetical</runOrder>
+							<!-- Excludes integration tests when unit tests are running. -->
+							<excludes>
+								<exclude>**/*IT.java</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-enforcer-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>enforce-property</id>
+								<goals>
+									<goal>enforce</goal>
+								</goals>
+								<configuration>
+									<rules>
+										<requireProperty>
+											<property>maven.test.skip</property>
+											<message>*** Property 'maven.test.skip' muss definiert
+												werden. ***</message>
+											<regex>false</regex>
+											<regexMessage>*** Autsch, bei Ausfuehrung des
+												'default'-Profils, koennen die Tests NICHT ge-'skipped'
+												werden!</regexMessage>
+										</requireProperty>
+									</rules>
+									<fail>true</fail>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- Ein Profil bei dem die Tests ge-'skipped' werden, 'mvn clean install 
+				-PskipTest'. -->
+			<id>skipTest</id>
+			<activation>
+			</activation>
+
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- An optional Arquillian testing profile that executes tests in a remote 
+				WildFly instance -->
+			<!-- Run with: mvn clean test -Parq-wildfly-remote with code coverage 
+				'mvn clean verify -Parq-wildfly-remote' -->
+			<id>arq-wildfly-remote</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly.arquillian</groupId>
+					<artifactId>wildfly-arquillian-container-remote</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<includes>
+								<include>**/*TestIT.java</include>
+							</includes>
+							<systemProperties>
+								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+								<arquillian.launch>wildfly-remote</arquillian.launch>
+								<arq.wildfly.management.address>${wildfly.management.address}</arq.wildfly.management.address>
+								<arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+							</systemProperties>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+							<execution>
+								<!-- We need to verify the content of jacoco.exec after the 'test' 
+									JVM has shutdown and flushed the data to disk. -->
+								<id>verify-output-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+        <!-- A profile that generates a war-archive with swagger-ui. -->
+        <!-- Use it with 'http://192.168.4.1:8180/bomc-swagger/swagger-ui'. -->
+        <profile>
+            <id>apidocs-ui</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <runOrder>alphabetical</runOrder>
+                            <!-- Excludes integration tests when unit tests are running. -->
+                            <excludes>
+                                <exclude>**/*IT.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.kongchen</groupId>
+                        <artifactId>swagger-maven-plugin</artifactId>
+                        <version>${version.swagger-maven-plugin}</version>
+                        <configuration>
+                            <apiSources>
+                                <apiSource>
+                                    <locations>de.bomc.poc.rest.endpoints.v1</locations>
+                                    <schemes>http</schemes>
+                                    <host>${swagger.ui.host}</host>
+                                    <basePath>${application.context.root}/rest</basePath>
+                                    <info>
+                                        <title>API Dokumentation for bomc-swagger poc.</title>
+                                        <version>${project.version}</version>
+                                        <description>API Reference Documentation</description>
+                                        <contact>
+                                            <email>bomc@bomc.org</email>
+                                            <name>Michael Boerner</name>
+                                        </contact>
+                                    </info>
+                                    <swaggerDirectory>${project.build.directory}/swagger-ui/META-INF/resources/webjars/swagger-ui/${version.swagger-ui}</swaggerDirectory>
+                                    <outputFormats>json</outputFormats>
+                                </apiSource>
+                            </apiSources>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Step 1. - Download Swagger UI webjar -->
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>swagger ui</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.webjars</groupId>
+                                            <artifactId>swagger-ui</artifactId>
+                                            <version>${version.swagger-ui}</version>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${project.build.directory}/swagger-ui</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Step 2. Add Swagger-ui Resources to the WAR -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <configuration>
+                            <webResources combine.children="append">
+                                <resource>
+                                    <directory>${project.build.directory}/swagger-ui/META-INF/resources/webjars/swagger-ui/${version.swagger-ui}</directory>
+                                    <includes>
+                                        <include>**/*.*</include>
+                                    </includes>
+                                    <targetPath>swagger-ui</targetPath>
+                                </resource>
+                            </webResources>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <version>${version.replacer}</version>
+                        <executions>
+                            <execution>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <file>${project.build.directory}/swagger-ui/META-INF/resources/webjars/swagger-ui/${version.swagger-ui}/index.html</file>
+                            <replacements>
+                                <replacement>
+                                    <token>http://petstore.swagger.io/v2/swagger.json</token>
+                                    <value>http://${swagger.ui.host}${application.context.root}/swagger-ui/swagger.json</value>
+                                </replacement>
+                            </replacements>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>apidocs-doc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.kongchen</groupId>
+                        <artifactId>swagger-maven-plugin</artifactId>
+                        <version>${version.swagger-maven-plugin}</version>
+                        <configuration>
+                            <apiSources>
+                                <apiSource>
+                                    <locations>de.bomc.poc.rest.endpoints.v1</locations>
+                                    <schemes>http</schemes>
+                                    <host>${swagger.ui.host}</host>
+                                    <basePath>${application.context.root}/rest</basePath>
+                                    <info>
+                                        <title>API Dokumentation for the bomc-swagger Service</title>
+                                        <version>${project.version}</version>
+                                        <description>API Reference Documentation</description>
+                                        <contact>
+                                            <email>bomc@bomc.org</email>
+                                            <name>Michael Boerner</name>
+                                        </contact>
+                                    </info>
+                                    <swaggerDirectory>${project.build.directory}/swagger-doc</swaggerDirectory>
+                                    <outputFormats>json</outputFormats>
+                                </apiSource>
+                            </apiSources>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- First, use the swagger2markup plugin to generate asciidoc -->
+                    <plugin>
+                        <groupId>io.github.swagger2markup</groupId>
+                        <artifactId>swagger2markup-maven-plugin</artifactId>
+                        <version>${version.swagger2markup-maven-plugin}</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>io.github.swagger2markup</groupId>
+                                <artifactId>swagger2markup-import-files-ext</artifactId>
+                                <version>${version.swagger2markup-import-files-ext}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>io.github.swagger2markup</groupId>
+                                <artifactId>swagger2markup-spring-restdocs-ext</artifactId>
+                                <version>${version.swagger2markup-spring-restdocs-ext}</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <swaggerInput>${project.build.directory}/swagger-doc/swagger.json</swaggerInput>
+                            <outputDir>${generated.asciidoc.directory}</outputDir>
+                            <config>
+                                <swagger2markup.markupLanguage>ASCIIDOC</swagger2markup.markupLanguage>
+                                <swagger2markup.pathsGroupedBy>TAGS</swagger2markup.pathsGroupedBy>
+                                <swagger2markup.outputLanguage>DE</swagger2markup.outputLanguage>
+                                <swagger2markup.generatedExamplesEnabled>true</swagger2markup.generatedExamplesEnabled>
+                                <swagger2markup.extensions.dynamicOverview.contentPath>${project.basedir}/src/docs/asciidoc/extensions/overview</swagger2markup.extensions.dynamicOverview.contentPath>
+                                <swagger2markup.extensions.dynamicDefinitions.contentPath>${project.basedir}/src/docs/asciidoc/extensions/definitions</swagger2markup.extensions.dynamicDefinitions.contentPath>
+                                <swagger2markup.extensions.dynamicPaths.contentPath>${project.basedir}/src/docs/asciidoc/extensions/paths</swagger2markup.extensions.dynamicPaths.contentPath>
+                                <swagger2markup.extensions.dynamicSecurity.contentPath>${project.basedir}src/docs/asciidoc/extensions/security/</swagger2markup.extensions.dynamicSecurity.contentPath>
+                            </config>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>convertSwagger2markup</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Run the generated asciidoc through Asciidoctor to generate
+                         other documentation types, such as PDFs or HTML5 -->
+                    <plugin>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctor-maven-plugin</artifactId>
+                        <version>${version.asciidoctor-maven-plugin}</version>
+                        <!-- Include Asciidoctor PDF for pdf generation -->
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.asciidoctor</groupId>
+                                <artifactId>asciidoctorj-pdf</artifactId>
+                                <version>${version.asciidoctorj-pdf}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.asciidoctor</groupId>
+                                <artifactId>asciidoctorj-epub3</artifactId>
+                                <version>${version.asciidoctorj-epub3}</version>
+                            </dependency>
+                        </dependencies>
+                        <!-- Configure generic document generation settings -->
+                        <configuration>
+                            <!-- defaults to ${basedir}/src/main/asciidoc -->
+                            <sourceDirectory>${asciidoctor.input.directory}</sourceDirectory>
+                            <!-- an override to process a single source file; defaults to all files in ${sourceDirectory} -->
+                            <sourceDocumentName>apiDocBomc.adoc</sourceDocumentName>
+                            <!-- enables and sets the source highlighter; currently coderay and highlightjs are supported -->
+                            <sourceHighlighter>coderay</sourceHighlighter>
+                            <!-- a Map<String,String> of attributes to pass to Asciidoctor, defaults to null -->
+                            <attributes>
+                                <doctype>book</doctype>
+                                <toc>left</toc>
+                                <toclevels>3</toclevels>
+                                <numbered></numbered>
+                                <hardbreaks></hardbreaks>
+                                <sectlinks></sectlinks>
+                                <sectanchors></sectanchors>
+                                <generated>${generated.asciidoc.directory}</generated>
+                            </attributes>
+                        </configuration>
+                        <!-- Since each execution can only handle one backend, run
+                             separate executions for each desired output type -->
+                        <executions>
+                            <execution>
+                                <id>output-html</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>html5</backend>
+                                    <outputDirectory>${asciidoctor.html.output.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>output-pdf</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>pdf</backend>
+                                    <outputDirectory>${asciidoctor.pdf.output.directory}</outputDirectory>
+                                    <attributes>
+                                        <pdf-stylesdir>${project.basedir}/src/docs/asciidoc/theme</pdf-stylesdir>
+                                        <pdf-style>custom</pdf-style>
+                                        <!--<pdf-fontsdir>${project.basedir}/src/docs/asciidoc/fonts</pdf-fontsdir>-->
+                                        <icons>font</icons>
+                                        <pagenums/>
+                                        <toc/>
+                                        <idprefix/>
+                                        <idseparator>-</idseparator>
+                                        <sectnums>true</sectnums>
+                                    </attributes>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>output-epub3</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>epub3</backend>
+                                    <outputDirectory>${asciidoctor.epub3.output.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>output-docbook</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>docbook</backend>
+                                    <outputDirectory>${asciidoctor.docbook.output.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+	</profiles>
+</project>

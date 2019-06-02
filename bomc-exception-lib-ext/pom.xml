@@ -1,0 +1,734 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+	<parent>
+        <groupId>de.bomc.poc</groupId>
+        <artifactId>bomc-parent-pom</artifactId>
+        <version>1.00.00-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>exception-lib-ext</artifactId>
+
+    <packaging>jar</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>A project that provides functionality for exception handling in bomc projects as shared library in a Java EE7 context.</description>
+
+    <properties>
+        <!-- Define the version of the JBoss BOMs we want to import to specify
+            tested stacks. -->
+        <version.jboss.bom>8.2.2.Final</version.jboss.bom>
+
+        <version.log4j>1.2.17</version.log4j>
+
+        <version.jacoco.core>0.7.9</version.jacoco.core>
+        <version.asm-util>3.3.1</version.asm-util>
+        <version.ejb-api>3.0</version.ejb-api>
+        <version.harmcrest-core>1.3</version.harmcrest-core>
+        <version.hamcrest-library>1.3</version.hamcrest-library>
+        <version.jaxrs-api>3.0.12.Final</version.jaxrs-api>
+        <version.resteasy-jaxrs>3.5.1.Final</version.resteasy-jaxrs>
+        <version.resteasy-client>3.5.1.Final</version.resteasy-client>
+        <version.resteasy-validator-provider-11>3.5.1.Final</version.resteasy-validator-provider-11>
+        <version.hibernate-validator-annotation-processor>5.3.6.Final</version.hibernate-validator-annotation-processor>
+        <version.hibernate-validator>5.3.6.Final</version.hibernate-validator>
+        <version.commons-lang>2.6</version.commons-lang>
+        <version.javax.json>1.0.3</version.javax.json>
+        <version.arquillian-jacoco>1.0.0.Alpha10</version.arquillian-jacoco>
+
+        <!-- Defines the Wildfly-dist version from nexus. -->
+        <version.bomc.wildfly.dist>1-00-00-SNAPSHOT</version.bomc.wildfly.dist>
+
+        <!-- embedded arquillian testing -->
+        <version.jboss-javaee-70>1.1.0.Final</version.jboss-javaee-70>
+        <version.arquillian-weld-ee-embedded-11>1.0.0.CR9</version.arquillian-weld-ee-embedded-11>
+        <version.weld-core>2.4.6.Final</version.weld-core>
+
+        <!-- other plugin versions -->
+        <version.jacoco-maven-plugin>0.8.2</version.jacoco-maven-plugin>
+        <version.wildfly-maven-plugin>2.0.0.Final</version.wildfly-maven-plugin>
+
+        <!-- Properties for arquillian tests. -->
+        <!-- Example for start vm-wildfly parameter. -->
+        <version.wildfly>10.1.0.Final</version.wildfly>
+        <wildfly.server.config>standalone.xml</wildfly.server.config>
+        <wildfly.management.address>127.0.0.1</wildfly.management.address>
+        <wildfly.address>127.0.0.1</wildfly.address>
+        <wildfly.port>10090</wildfly.port>
+        <wildfly.port.offset>100</wildfly.port.offset>
+        <!-- IMPORTANT: These properties must be adapted to a available local Wildfly instance. -->
+        <!-- These properties are necessary for the managed profiles. -->
+        <wildfly.home>${project.basedir}/wildfly-run/wildfly-${version.wildfly}</wildfly.home>
+        <arq.wildfly.java.vm.arg.managed>
+            -Djboss.bind.address=${wildfly.address}
+            -Djboss.socket.binding.port-offset=${wildfly.port.offset}
+            -Djboss.bind.address.management=${wildfly.management.address}
+            -Djboss.node.name=local.node0
+            -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n
+        </arq.wildfly.java.vm.arg.managed>
+
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- JBoss distributes a complete set of Java EE 7 APIs including a Bill
+                of Materials (BOM). A BOM specifies the versions of a "stack" (or a collection)
+                of artifacts. We use this here so that we always get the correct versions
+                of artifacts. Here we use the jboss-javaee-7.0-with-tools stack (you can
+                read this as the JBoss stack of the Java EE 7 APIs, with some extras tools
+                for your project, such as Arquillian for testing) and the jboss-javaee-7.0-with-hibernate
+                stack you can read this as the JBoss stack of the Java EE 7 APIs, with extras
+                from the Hibernate family of projects) -->
+            <dependency>
+                <groupId>org.wildfly.bom</groupId>
+                <artifactId>jboss-javaee-7.0-with-tools</artifactId>
+                <version>${version.jboss.bom}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.bom</groupId>
+                <artifactId>jboss-javaee-7.0-with-hibernate</artifactId>
+                <version>${version.jboss.bom}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.bom</groupId>
+                <artifactId>jboss-javaee-7.0-with-resteasy</artifactId>
+                <version>${version.jboss.bom}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+        <!-- First declare the APIs we depend on and need for compilation. All
+            of them are provided by JBoss WildFly -->
+
+        <!-- Import the CDI API, we use provided scope as the API is included in
+            JBoss WildFly -->
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Import the JAX-RS API, we use provided scope as the API is included
+            in JBoss WildFly -->
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- JSR-303 (Bean Validation) Implementation -->
+        <!-- Provides portable constraints such as @Email -->
+        <!-- Hibernate Validator is shipped in JBoss WildFly -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Now we declare any tools needed -->
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${version.log4j}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.ejb</groupId>
+            <artifactId>ejb-api</artifactId>
+            <version>${version.ejb-api}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Needed for running tests (you may also use TestNG) -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>${version.harmcrest-core}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>${version.hamcrest-library}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Used for exception handling, ExceptionUtils. -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${version.commons-lang}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>${version.javax.json}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-validator-provider-11</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Optional, but highly recommended -->
+        <!-- Arquillian allows you to test enterprise code -->
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.arquillian.protocol</groupId>
+            <artifactId>arquillian-protocol-servlet</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-jacoco</artifactId>
+            <version>${version.arquillian-jacoco}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>org.jacoco.core</artifactId>
+            <version>${version.jacoco.core}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <version>${version.asm-util}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+					<include>**/META-INF/beans.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <!-- This plugin provides the capability to build and sign jars, so other projects can use it. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${version.jacoco-maven-plugin}</version>
+                <configuration>
+                    <destFile>${basedir}/target/coverage-reports/jacoco.exec</destFile>
+                    <dataFile>${basedir}/target/coverage-reports/jacoco.exec</dataFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>jacoco-initialize</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-site</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>analyze</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>false</failOnWarning>
+                            <outputXML>true</outputXML>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <!-- Dies ist das Default-Profile bei dem Junit Tests IMMER ausgeführt werden. 'mvn clean install'. -->
+            <!-- Damit Testabdeckung ausgeführt wird, Befehl 'mvn clean test jacoco:report' auf Kommandozeile ausführen. -->
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <runOrder>alphabetical</runOrder>
+                            <!-- Excludes integration tests when unit tests are running. -->
+                            <excludes>
+                                <exclude>**/*IT.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-property</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireProperty>
+                                            <property>maven.test.skip</property>
+                                            <message>*** Property 'maven.test.skip' muss definiert werden. ***</message>
+                                            <regex>false</regex>
+                                            <regexMessage>*** Autsch, bei Ausfuehrung des 'default'-Profils, koennen die Tests NICHT ge-'skipped' werden!</regexMessage>
+                                        </requireProperty>
+                                    </rules>
+                                    <fail>true</fail>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- Ein Profil bei dem die Tests ge-'skipped' werden, 'mvn clean install -PskipTest'. -->
+            <id>skipTest</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- The 'mvn clean test jacoco:report -Pjacoco' profile run all module instances tests.
+                with jacoco use 'mvn clean test jacoco:report -Pjacoco' -->
+            <id>jacoco</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <runOrder>alphabetical</runOrder>
+                            <!-- Excludes integration tests when instances tests are run. -->
+                            <excludes>
+                                <exclude>**/*IT*.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- The 'mvn clean test -Parq-cdi-embedded' run cdi embedded tests. -->
+            <id>arq-cdi-embedded</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <runOrder>alphabetical</runOrder>
+                            <!-- Excludes integration tests when instances tests are run. -->
+                            <includes>
+                                <include>**/*IT.java</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.spec</groupId>
+                    <artifactId>jboss-javaee-7.0</artifactId>
+                    <version>${version.jboss-javaee-70}</version>
+                    <type>pom</type>
+                    <scope>provided</scope>
+                </dependency>
+
+                <!-- Arquillian container adapter for the target container -->
+                <dependency>
+                    <groupId>org.jboss.arquillian.container</groupId>
+                    <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
+                    <version>${version.arquillian-weld-ee-embedded-11}</version>
+                    <scope>test</scope>
+                </dependency>
+
+                <!-- CDI dependency for container -->
+                <dependency>
+                    <groupId>org.jboss.weld</groupId>
+                    <artifactId>weld-core</artifactId>
+                    <version>${version.weld-core}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!-- Profile zum Starten und Stoppen von Wildfly. -->
+        <!-- Start: 'mvn wildfly:start -Pwildfly-local' -->
+        <!-- Stop: 'mvn wildfly:shutdown -Pwildfly-local' -->
+        <profile>
+            <id>wildfly-local</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <runOrder>alphabetical</runOrder>
+                            <!-- Excludes integration tests when unit tests are running. -->
+                            <excludes>
+                                <exclude>**/*IT.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.wildfly.plugins</groupId>
+                        <artifactId>wildfly-maven-plugin</artifactId>
+                        <version>${version.wildfly-maven-plugin}</version>
+                        <configuration>
+                            <!-- Get the custom wildfly 10.0.0.Final. -->
+                            <groupId>de.bomc.poc</groupId>
+                            <artifactId>bomc-wildfly-dist</artifactId>
+                            <version>${version.bomc.wildfly.dist}</version>
+                            <!-- Set the server-configuration. -->
+                            <serverConfig>${wildfly.server.config}</serverConfig>
+                            <!-- Target directory for deployable artefacts. -->
+                            <targetDir>${project.basedir}/target</targetDir>
+                            <jbossHome>${project.basedir}/wildfly-run/wildfly-${version.wildfly}</jbossHome>
+                            <add-user>
+                                <users>
+                                    <user>
+                                        <username>admin</username>
+                                        <password>admin.1234</password>
+                                    </user>
+                                    <user>
+                                        <username>admin-user</username>
+                                        <password>user.1234</password>
+                                        <groups>
+                                            <group>admin</group>
+                                            <group>user</group>
+                                        </groups>
+                                        <application-user>true</application-user>
+                                    </user>
+                                    <user>
+                                        <username>default-user</username>
+                                        <password>user.1234</password>
+                                        <groups>
+                                            <group>user</group>
+                                        </groups>
+                                        <application-user>true</application-user>
+                                    </user>
+                                </users>
+                            </add-user>
+                            <serverArgs>
+                                <serverArg>-Djboss.bind.address=${wildfly.address}</serverArg>
+                                <serverArg>-Djboss.bind.address.management=${wildfly.management.address}</serverArg>
+                                <serverArg>-Djboss.socket.binding.port-offset=${wildfly.port.offset}</serverArg>
+                            </serverArgs>
+                            <!-- Set additional jvm args, is optional. -->
+                            <javaOpts>
+                                <javaOpt>-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n</javaOpt>
+                                <javaOpt>-Xms64m</javaOpt>
+                                <javaOpt>-Xmx512m</javaOpt>
+                                <javaOpt>-Xss256k</javaOpt>
+                                <javaOpt>-Djava.net.preferIPv4Stack=true</javaOpt>
+                                <javaOpt>-Dsun.rmi.dgc.client.gcInterval=3600000</javaOpt>
+                                <javaOpt>-Dsun.rmi.dgc.server.gcInterval=3600000</javaOpt>
+                                <!-- The given directory must be available.
+                                <javaOpt>-Djboss.server.config.dir=${project.parent.basedir}/conf</javaOpt>
+                                -->
+                            </javaOpts>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Profile zum initialen Download vom Wildfly. -->
+        <!-- Der Wildfly wird in das Verzeichnis 'project.parent.basedir' runtergeladen und gestartet. -->
+        <!-- Dieses Profil sollte nur zum Runterladen ausgefuehrt werden. -->
+        <!-- Zum Starten, Stoppen und Deployen sollte das Profile 'wildfly-local-download' benutzt werden. -->
+        <!-- Download mit anschliessendem Start von Wildfly: 'mvn wildfly:start -Pwildfly-local-download' -->
+        <profile>
+            <id>wildfly-local-download</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.wildfly.plugins</groupId>
+                        <artifactId>wildfly-maven-plugin</artifactId>
+                        <version>${version.wildfly-maven-plugin}</version>
+                        <configuration>
+                            <!-- Get the custom wildfly 10.0.0.Final. -->
+                            <groupId>de.bomc.poc</groupId>
+                            <artifactId>bomc-wildfly-dist</artifactId>
+                            <version>${version.bomc.wildfly.dist}</version>
+                            <!-- Set the server-configuration. -->
+                            <serverConfig>${wildfly.server.config}</serverConfig>
+                            <targetDir>${project.basedir}</targetDir>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- An optional Arquillian testing profile that executes tests in a remote WildFly instance -->
+            <!-- Run with: mvn clean test -Parq-wildfly-remote with code coverage 'mvn clean verify -Parq-wildfly-remote' -->
+            <id>arq-wildfly-remote</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-arquillian-container-remote</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <includes>
+                                <include>**/*TestIT.java</include>
+                            </includes>
+                            <systemProperties>
+                                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                                <arquillian.launch>wildfly-remote</arquillian.launch>
+                                <arq.wildfly.management.address>${wildfly.management.address}</arq.wildfly.management.address>
+                                <arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+                            </systemProperties>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>integration-tests</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>false</skip>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <!-- We need to verify the content of jacoco.exec after the 'test'
+                                    JVM has shutdown and flushed the data to disk. -->
+                                <id>verify-output-tests</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>false</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- Dieses Profile wird soll auf dem Jenkins ausgeführt werden. Der Unterschied zu den anderen Profilen ist die Verwendung des
+                 Failsafe Plugins. Dies ermöglicht das separate Ausführen von Unit tests und Arq-Integrations Test in einem Jenkins Job.    -->
+            <!-- Run with: mvn clean test '-Parq-wildfly-managed-dist' with code coverage 'mvn clean verify -Parq-wildfly-managed-dist'
+                 auf Jenkins: 'mvn clean install jacoco:report -Pjacoco,arq-wildfly-managed-dist' -->
+            <id>arq-wildfly-managed-dist</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-arquillian-container-managed</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <!-- Junit tests werden hier nicht ausgeführt. -->
+                            <skip>false</skip>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <!--<phase>process-test-classes</phase>-->
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+											<groupId>de.bomc.poc</groupId>
+											<artifactId>bomc-wildfly-dist</artifactId>
+											<version>${version.bomc.wildfly.dist}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                            <overWrite>false</overWrite>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <!-- Für jeden Test wird eine VM gestartet, in dieser VM wird jeweils ein separater Wildfly gestartet,
+                                 das Test-Artefakt deployed und Wildfly anschliessend gestoppt. -->
+                            <forkCount>1</forkCount>
+                            <reuseForks>false</reuseForks>
+                            <!--<argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>-->
+                            <includes>
+                                <include>**/*IT.java</include>
+                            </includes>
+                            <systemProperties>
+                                <arquillian.launch>wildfly-managed-dist</arquillian.launch>
+                                <arq.wildfly.home>${project.build.directory}/wildfly-${version.wildfly}</arq.wildfly.home>
+                                <arq.wildfly.java.vm.arg>${arq.wildfly.java.vm.arg.managed}</arq.wildfly.java.vm.arg>
+                                <arq.wildfly.server.config.file.name>${wildfly.server.config}</arq.wildfly.server.config.file.name>
+                                <arq.wildfly.management.address>${wildfly.management.address}</arq.wildfly.management.address>
+                                <arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+                            </systemProperties>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>integration-tests</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>false</skip>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>verify</id>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

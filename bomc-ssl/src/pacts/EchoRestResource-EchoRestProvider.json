@@ -1,0 +1,39 @@
+{
+    "provider": {
+        "name": "EchoRestProvider"
+    },
+    "consumer": {
+        "name": "EchoRestResource"
+    },
+    "interactions": [
+        {
+            "providerState": "Describe the state the provider needs to be in for the pact test to be verified",
+            "description": "Description of the request that is expected to be received",
+            "request": {
+                "method": "GET",
+                "path": "/egov/rest/echo/info",
+                "headers": {
+                    "Cookie": "token=\"the cookie token!\"",
+                    "Accept": "application/xml",
+                    "egov_userId": "egov_userId"
+                }
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "content-type": "application/xml",
+                    "set-Cookie": "token=the cookie token!; Version=1; Discard",
+                    "egov_userId": "egov_userId"
+                }
+            }
+        }
+    ],
+    "metadata": {
+        "pact-specification": {
+            "version": "2.0.0"
+        },
+        "pact-jvm": {
+            "version": "3.2.2"
+        }
+    }
+}

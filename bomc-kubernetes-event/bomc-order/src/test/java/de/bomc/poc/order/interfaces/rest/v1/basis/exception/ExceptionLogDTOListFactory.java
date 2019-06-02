@@ -1,0 +1,88 @@
+/**
+ * Project: bomc-onion-architecture
+ * <pre>
+ *
+ * Last change:
+ *
+ *  by: $Author: bomc $
+ *
+ *  date: $Date: $
+ *
+ *  revision: $Revision: $
+ *
+ * </pre>
+ */
+package de.bomc.poc.order.interfaces.rest.v1.basis.exception;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.core.Response.Status;
+
+import org.apache.log4j.Logger;
+
+import de.bomc.poc.order.interfaces.rest.v1.basis.exception.dto.ExceptionLogDTO;
+
+/**
+ * A factory that creates a {@link ExceptionLogDTO} list for test cases.
+ * 
+ * @author <a href="mailto:bomc@bomc.org">bomc</a>
+ * @since 11.12.2018
+ */
+public final class ExceptionLogDTOListFactory {
+
+    public static final Logger LOGGER = Logger.getLogger(ExceptionLogDTOListFactory.class);
+    public static final String LOG_PREFIX = "ExceptionLogDTOListFactory#";
+    // _______________________________________________
+    // Member variables
+    // -----------------------------------------------
+    public static final int YEAR = 2018;
+    public static final int MONTH = 11;
+    public static final int CREATE_DAY_OF_MONTH = 4;
+    public static final int MODIFY_DAY_OF_MONTH = 11;
+    public static final String CATEGORY = "category";
+    public static final LocalDateTime CREATE_DATE_TIME = LocalDateTime.of(LocalDate.of(YEAR, MONTH, CREATE_DAY_OF_MONTH), LocalTime.now());
+    public static final LocalDateTime MODIFY_DATE_TIME = LocalDateTime.of(LocalDate.of(YEAR, MONTH, CREATE_DAY_OF_MONTH), LocalTime.now());
+    public static final String CREATE_USER = "createUser";
+    public static final String MODIFY_USER = "modifyUser";
+    public static final String EXCEPTION_UUID = "exceptionUuid";
+    public static final Long ID = 42L;
+    public static final String RESPONSE_STATUS = Status.ACCEPTED.name();
+    public static final String SHORT_ERROR_CODE_DESCRIPTION = "Describes an error";
+    
+    /**
+     * Prevents instantiation.
+     */
+    private ExceptionLogDTOListFactory() {
+        //
+    }
+
+    /**
+     * Creates the given number of ExceptionLogDTOs.
+     * 
+     * @param countOfStoredDtos
+     *            the given count.
+     * @return the given number of ExceptionLogDTOs as list.
+     */
+    public static List<ExceptionLogDTO> createExceptionLogDTOList(final int countOfStoredEntites) {
+        LOGGER.debug(LOG_PREFIX + "createExceptionLogDTOList#createExceptionLogDTOList");
+
+        final List<ExceptionLogDTO> list = new ArrayList<ExceptionLogDTO>();
+
+        for (int i = 0; i < countOfStoredEntites; i++) {
+            final ExceptionLogDTO exceptionLogDTO = new ExceptionLogDTO();
+            exceptionLogDTO.setCategory(CATEGORY);
+            exceptionLogDTO.setCreateDateTime(CREATE_DATE_TIME);
+            exceptionLogDTO.setExceptionUuid(EXCEPTION_UUID + i);
+            exceptionLogDTO.setResponseStatus(RESPONSE_STATUS);
+            exceptionLogDTO.setShortErrorCodeDescription(SHORT_ERROR_CODE_DESCRIPTION);
+
+            list.add(exceptionLogDTO);
+        }
+
+        return list;
+    }
+}

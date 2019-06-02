@@ -1,0 +1,22 @@
+t_role:
+ - type: 'Grant'
+   c_id: 1
+   c_entity_uid: '3813c1aa-d329-4043-997f-1f94e7b3cef4'
+   c_version: 0
+   c_description: 'description to myGrant1'
+   c_name: 'myGrant1'
+   c_immutable: 0
+ - type: 'Grant'
+   c_id: 2
+   c_entity_uid: '446d1b33-4b79-428d-8afe-99ec11fb4c94'
+   c_version: 0
+   c_description: 'description to myGrant2'
+   c_name: 'myGrant2'
+   c_immutable: 0
+ - type: 'Role'
+   c_id: 3
+   c_entity_uid: '8ad8bd00-3d91-4164-9d45-1ceb9d9eeda0'
+   c_version: 0
+   c_description: 'description to role'
+   c_name: 'myRole'
+   c_immutable: 0

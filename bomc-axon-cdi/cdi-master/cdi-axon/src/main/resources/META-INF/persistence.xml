@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence              http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="bomcOrderPU">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+		
+		<!-- TODO Eliminate this using provider-specific programmatic registration 
+			APIs. This will confuse most users. -->
+		<!-- TODO Double-check that this is a complete list -->
+		<class>org.axonframework.eventsourcing.eventstore.AbstractEventEntry</class>
+		<class>org.axonframework.eventsourcing.eventstore.AbstractDomainEventEntry</class>
+		<class>org.axonframework.eventsourcing.eventstore.AbstractSequencedDomainEventEntry</class>
+		<class>org.axonframework.eventsourcing.eventstore.jpa.DomainEventEntry</class>
+		<class>org.axonframework.eventsourcing.eventstore.AbstractSnapshotEventEntry</class>
+		<class>org.axonframework.eventsourcing.eventstore.jpa.SnapshotEventEntry</class>
+		<class>org.axonframework.eventhandling.saga.repository.jpa.AssociationValueEntry</class>
+		<class>org.axonframework.eventhandling.saga.repository.jpa.AbstractSagaEntry</class>
+		<class>org.axonframework.eventhandling.saga.repository.jpa.SagaEntry</class>
+
+		<properties>
+			<!--<property name="javax.persistence.schema-generation.database.action" 
+				value="drop-and-create"/> -->
+			<!--<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema"/> -->
+			<!--<property name="eclipselink.logging.level.sql" value="FINE"/> -->
+			<!--<property name="eclipselink.logging.parameters" value="true"/> -->
+			<!--<property name="hibernate.show_sql" value="true"/> -->
+			
+			<!-- Properties for Hibernate -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" />
+			<!-- Um die Validierung auszuschalten muss der Parameter auf 'none' gesetzt 
+				werden. 'create-drop' sollte nur fuer Testfaelle eingesetzt werden. -->
+			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
+
+			<!--&lt;!&ndash; Im produktiv-Betrieb MUESSEN diese Properties auf jeden 
+				Fall auf 'false' stehen -> Ansonsten Performance issues. &ndash;&gt; -->
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+			<property name="hibernate.use_sql_comments" value="true" />
+
+			<!--<property name="hibernate.generate_statistics" value="true"/> -->
+		</properties>
+	</persistence-unit>
+</persistence>

@@ -1,0 +1,5 @@
+== Release Notes
+
+=== Version 1-00-000
+
+* Initial version with support for AsciiDoc and Markdown

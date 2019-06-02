@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: registrator-wf
+  namespace: bomc-app
+  labels:
+    app: registrator-wf
+spec:
+  containers:
+    - name: registrator-wf
+      image: bomc/registrator-wf:v1.0.0
+      imagePullPolicy: IfNotPresent
+#  imagePullSecrets:
+#    - name: regsecret

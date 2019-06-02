@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.bomc.poc</groupId>
+	<artifactId>wildfly-config</artifactId>
+	<version>1.00.00-SNAPSHOT</version>
+	<name>wildfly-config</name>
+	<packaging>war</packaging>
+
+	<properties>
+		<version.mysql.connector>5.1.40</version.mysql.connector>
+		<version.bomc-wildfly-dist>1.00.00-SNAPSHOT</version.bomc-wildfly-dist>
+
+		<version.maven-resources-plugin>2.6</version.maven-resources-plugin>
+		<version.wildfly-maven-plugin>1.0.2.Final</version.wildfly-maven-plugin>
+		
+		<wildfly.version>10.0.0.Final</wildfly.version>
+		<wildfly.server.config>standalone.xml</wildfly.server.config>
+		<wildfly.management.address>192.168.4.1</wildfly.management.address>
+		<wildfly.address>192.168.4.1</wildfly.address>
+		<wildfly.port>10090</wildfly.port>
+		<wildfly.port.offset>100</wildfly.port.offset>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.wildfly.plugins</groupId>
+				<artifactId>wildfly-maven-plugin</artifactId>
+				<version>${version.wildfly-maven-plugin}</version>
+				<configuration>
+					<hostname>${wildfly.address}</hostname>
+                    <port>${wildfly.port}</port>
+                    <serverConfig>${wildfly.server.config}</serverConfig>
+					<serverArgs>
+						<serverArg>-Djboss.bind.address=${wildfly.address}</serverArg>
+						<serverArg>-Djboss.bind.address.management=${wildfly.management.address}</serverArg>
+						<serverArg>-Djboss.socket.binding.port-offset=${wildfly.port.offset}</serverArg>
+					</serverArgs>				
+					<executeCommands>
+						<batch>false</batch>
+						<scripts>
+							<script>target/scripts/mysql/${cli.file}</script>
+						</scripts>
+					</executeCommands>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>mysql</groupId>
+						<artifactId>mysql-connector-java</artifactId>
+						<version>${version.mysql.connector}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${version.maven-resources-plugin}</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/scripts</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources/scripts</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+							<filters>
+								<filter>${basedir}/src/main/resources/configuration.properties</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<!-- Run 'mvn process-resources wildfly:execute-commands -P "config"' -->
+		<profile>
+			<id>config</id>
+			<properties>
+				<cli.file>wildfly-install-mysql-driver.cli</cli.file>
+			</properties>
+		</profile>
+	</profiles>
+</project>

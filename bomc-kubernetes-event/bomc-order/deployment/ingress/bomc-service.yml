@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bomc-order-service
+  namespace: bomc-app
+  labels:
+    app: bomc-order
+spec:
+  selector:
+    app: bomc-order
+  ports:
+  - protocol: TCP
+    port: 80
+    name: http
+    targetPort: 8080
+---

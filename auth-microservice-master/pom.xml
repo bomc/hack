@@ -1,0 +1,1496 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.bomc</groupId>
+	<artifactId>auth-microservice</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>bomc-poc: auth-microservice</name>
+	<description>A microservice that supports authentication and authorisation features.</description>
+	<url>http://bomc.org</url>
+
+	<properties>
+		<!-- Explicitly declaring the source encoding eliminates the following 
+			message: -->
+		<!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered 
+			resources, i.e. build is platform dependent! -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- Property verhindert, dass be Ausführung von 'mvn clean install' die 
+			Unit-Tests ge-'skipped' werden. -->
+		<maven.test.skip>false</maven.test.skip>
+
+		<version.org.eclipse.m2e.lifecycle.mapping>1.0.0</version.org.eclipse.m2e.lifecycle.mapping>
+
+		<!-- Properties set in version.properties file. -->
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+
+		<!-- JBoss dependency versions -->
+		<!--<version.wildfly.maven.plugin>1.0.2.Final</version.wildfly.maven.plugin> -->
+		<version.wildfly.maven.plugin>1.1.0.Alpha7</version.wildfly.maven.plugin>
+
+		<!-- Define the version of the JBoss BOMs we want to import to specify 
+			tested stacks. -->
+		<version.jboss.bom>8.2.2.Final</version.jboss.bom>
+
+		<version.javaee.api>7.0</version.javaee.api>
+
+		<version.javax.interceptor.api>1.2</version.javax.interceptor.api>
+		<version.hibernate.jpamodelgen>5.1.0.Final</version.hibernate.jpamodelgen>
+		<version.mapstruct>1.0.0.Final</version.mapstruct>
+		<version.log4j>1.2.16</version.log4j>
+		<version.arquillian.performance>1.0.0.CR1</version.arquillian.performance>
+		<version.hamcrest>1.3</version.hamcrest>
+		<version.hamcrest.date>2.0.1</version.hamcrest.date>
+		<version.hsqldb>2.3.2</version.hsqldb>
+		<version.jacoco>0.7.4.201502262128</version.jacoco>
+		<version.jacoco.arquillian>1.0.0.Alpha8</version.jacoco.arquillian>
+		<version.asm>3.3.1</version.asm>
+		<version.mockito>1.10.19</version.mockito>
+		<version.tjws>3.0.10.Final</version.tjws>
+		<version.hibernate.c3p0>5.0.7.Final</version.hibernate.c3p0>
+		<version.javax.el.api>3.0.1-b04</version.javax.el.api>
+		<version.glassfish.el.impl>2.2.1-b05</version.glassfish.el.impl>
+		<version.javax.json>1.0.3</version.javax.json>
+		<version.logback>1.1.3</version.logback>
+		<version.javax.enterprise.concurrent.api>1.0</version.javax.enterprise.concurrent.api>
+		<version.curator>2.10.0</version.curator>
+		<version.curator.test>1.3.3</version.curator.test>
+		<version.zookeeper>3.4.8</version.zookeeper>
+		<version.resteasy>3.0.14.Final</version.resteasy>
+		<version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
+		<version.com.google.guava>18.0</version.com.google.guava>
+		<version.org.hibernate.entitymanager>4.3.6.Final</version.org.hibernate.entitymanager>
+
+		<!-- Dependencies for running curator-zookeeper in ... profile. -->
+		<version.org.osgi.core>6.0.0</version.org.osgi.core>
+		<version.npn-api>1.1.1.v20141010</version.npn-api>
+		<version.jboss.marshalling.river>1.4.10.Final</version.jboss.marshalling.river>
+		<version.org.osgi.enterprise>4.2.0</version.org.osgi.enterprise>
+		<version.io.netty>3.10.0.Final</version.io.netty>
+		
+		<!-- Arquillian dbunit testing -->
+		<version.arquillian.persistence>1.0.0.Alpha7</version.arquillian.persistence>
+
+		<!-- embedded arquillian cdi testing -->
+		<version.jboss.javaee.7.0>1.0.3.Final</version.jboss.javaee.7.0>
+		<version.arquillian.weld.ee.embedded.1.1>1.0.0.CR9</version.arquillian.weld.ee.embedded.1.1>
+		<version.weld.core>2.1.2.Final</version.weld.core>
+
+		<version.pact.consumer.junit>3.2.2</version.pact.consumer.junit>
+		<version.httpcomponents.httpclient>4.5</version.httpcomponents.httpclient>
+  		<version.httpcomponents.fluent.hc>4.5.1</version.httpcomponents.fluent.hc>
+
+		<version.swagger.doclet>1.1.2</version.swagger.doclet>
+		<version.slf4j.api>1.7.15</version.slf4j.api>
+		<version.mysql.connector.java>5.1.33</version.mysql.connector.java>
+		<version.org.hibernate>4.3.11.Final</version.org.hibernate>
+
+		<!-- other plugin versions -->
+		<version.compiler.plugin>2.5.1</version.compiler.plugin>
+		<version.surefire.plugin>2.19.1</version.surefire.plugin>
+		<version.war.plugin>2.6</version.war.plugin>
+		<version.enforcer.plugin>1.4.1</version.enforcer.plugin>
+		<version.processor.plugin>3.1.0</version.processor.plugin>
+		<version.resources.plugin>2.7</version.resources.plugin>
+		<version.pact.provider.maven>3.2.2</version.pact.provider.maven>
+		<version.maven.javadoc>2.10.3</version.maven.javadoc>
+		<version.jackson.databind>2.5.4</version.jackson.databind>
+		<version.hibernate.validator>5.2.3.Final</version.hibernate.validator>
+		
+		<!-- maven-compiler-plugin -->
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+
+		<!-- Global defined arquillian properties -->
+
+		<!-- This property is also used in *TestIT.java-files for http requests. -->
+		<wildfly.host.address>192.168.4.1</wildfly.host.address>
+		<wildfly.host.http.port>8180</wildfly.host.http.port>
+
+		<!-- Properties used for 'managed' Arquillian tests. -->
+		<global.arq.wildfly.home>D:\myMiddleware\wildfly-10.0.0.Final</global.arq.wildfly.home>
+		<global.arq.wildfly.java.vm.arg>
+			-Djboss.socket.binding.port-offset=100
+			-Djboss.bind.address.management=${wildfly.host.address}
+			-Djboss.node.name=local.node0
+			-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n
+		</global.arq.wildfly.java.vm.arg>
+		<global.arq.wildfly.server.config>standalone-full-ha-bomc.xml</global.arq.wildfly.server.config>
+		<!-- Properties used for 'managed' and 'remote' Arquillian tests. -->
+		<global.arq.wildfly.management.address>${wildfly.host.address}</global.arq.wildfly.management.address>
+		<global.arq.wildfly.management.port>10090</global.arq.wildfly.management.port>
+		<global.arq.wildfly.port.offset>100</global.arq.wildfly.port.offset>
+		<global.arq.persistence.default.data.source>java:jboss/datasources/poc-auth-mysql-ds</global.arq.persistence.default.data.source>
+
+		<!-- pact config directories -->
+		<pact.config.dir>src/config/pacts</pact.config.dir>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- JBoss distributes a complete set of Java EE 7 APIs including a Bill 
+				of Materials (BOM). A BOM specifies the versions of a "stack" (or a collection) 
+				of artifacts. We use this here so that we always get the correct versions 
+				of artifacts. Here we use the jboss-javaee-7.0-with-tools stack (you can 
+				read this as the JBoss stack of the Java EE 7 APIs, with some extras tools 
+				for your project, such as Arquillian for testing) and the jboss-javaee-7.0-with-hibernate 
+				stack you can read this as the JBoss stack of the Java EE 7 APIs, with extras 
+				from the Hibernate family of projects) -->
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>jboss-javaee-7.0-with-tools</artifactId>
+				<version>${version.jboss.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>jboss-javaee-7.0-with-hibernate</artifactId>
+				<version>${version.jboss.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>jboss-javaee-7.0-with-resteasy</artifactId>
+				<version>${version.jboss.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+            <dependency>
+                <groupId>javax</groupId>
+                <artifactId>javaee-api</artifactId>
+                <version>${version.javaee.api}</version>
+                <scope>provided</scope>
+            </dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+
+		<!-- First declare the APIs we depend on and need for compilation. All 
+			of them are provided by JBoss WildFly -->
+
+		<!-- Import the CDI API, we use provided scope as the API is included in 
+			JBoss WildFly -->
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- http://mvnrepository.com/artifact/javax.inject/javax.inject -->
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the Common Annotations API (JSR-250), we use provided scope 
+			as the API is included in JBoss WildFly -->
+		<dependency>
+			<groupId>org.jboss.spec.javax.annotation</groupId>
+			<artifactId>jboss-annotations-api_1.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.interceptor</groupId>
+			<artifactId>javax.interceptor-api</artifactId>
+			<version>${version.javax.interceptor.api}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the JAX-RS API, we use provided scope as the API is included 
+			in JBoss WildFly -->
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>jaxrs-api</artifactId>
+			<!--<version>3.0.12.Final</version>-->
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the JPA API, we use provided scope as the API is included in 
+			JBoss WildFly -->
+		<dependency>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.1-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the Servlet API -->
+		<dependency>
+			<groupId>org.jboss.spec.javax.servlet</groupId>
+			<artifactId>jboss-servlet-api_3.1_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the EJB API, we use provided scope as the API is included in 
+			JBoss WildFly -->
+		<dependency>
+			<groupId>org.jboss.spec.javax.ejb</groupId>
+			<artifactId>jboss-ejb-api_3.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- JSR-303 (Bean Validation) Implementation -->
+		<!-- Provides portable constraints such as @Email -->
+		<!-- Hibernate Validator is shipped in JBoss WildFly -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${version.hibernate.validator}</version>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- Now we declare any tools needed -->
+
+		<!-- Annotation processor to generate the JPA 2.0 metamodel classes for 
+			typesafe criteria queries -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-jpamodelgen</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Annotation processor that raising compilation errors whenever constraint 
+			annotations are incorrectly used. -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator-annotation-processor</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Start: Only needed at build time for generating a mapper implementation. -->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-jdk8</artifactId>
+			<version>${version.mapstruct}</version>
+		</dependency>
+		<!-- End -->
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${version.log4j}</version>
+		</dependency>
+
+		<!-- Used for creating JsonObject instances. -->
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+			<version>${version.javax.json}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Used for Json pretty print. -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${version.jackson.databind}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-client</artifactId>
+			<version>${version.resteasy}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxb-provider</artifactId>
+			<version>${version.resteasy}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jackson-provider</artifactId>
+			<version>${version.resteasy}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-jaxrs</artifactId>
+			<version>${version.org.codehaus.jackson}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>${version.org.codehaus.jackson}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- http://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl -->
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>${version.org.codehaus.jackson}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<version>${version.resteasy}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!--<dependency>-->
+			<!--<groupId>org.jboss.resteasy</groupId>-->
+			<!--<artifactId>resteasy-validator-provider-11</artifactId>-->
+			<!--<version>3.0.14.Final</version>-->
+			<!--<scope>provided</scope>-->
+		<!--</dependency>-->
+
+		<!-- Zookeeper interface -->
+		<!-- The are currently two released versions of Curator, 2.x.x and 3.x.x: -->
+		<!-- Curator 2.x.x - compatible with both ZooKeeper 3.4.x and ZooKeeper 3.5.x  -->
+		<!-- Curator 3.x.x - compatible only with ZooKeeper 3.5.x and includes support for new features such as dynamic reconfiguration, etc.  -->
+		<!-- ZooKeeper 3.5.x adds a number of new features including dynamic reconfiguration, watcher removal and others. -->
+		<!-- The Curator 3.x.x Jira issues tracking these features are here: https://issues.apache.org/jira/browse/CURATOR-159. -->
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-framework</artifactId>
+			<!--<version>3.1.0</version>-->
+ 			<version>${version.curator}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-recipes</artifactId>
+			<!--<version>3.1.0</version>-->
+			<version>${version.curator}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-client</artifactId>
+			<!--<version>3.1.0</version>-->
+			<version>${version.curator}</version>
+		</dependency>		
+		
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-x-discovery</artifactId>
+            <!--<version>3.1.0</version>-->
+			<version>${version.curator}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+		
+		<dependency>
+			<groupId>org.apache.zookeeper</groupId>
+			<artifactId>zookeeper</artifactId>
+			<version>${version.zookeeper}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${version.com.google.guava}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Used for concurrency in ejb's executor -->
+		<dependency>
+			<groupId>javax.enterprise.concurrent</groupId>
+			<artifactId>javax.enterprise.concurrent-api</artifactId>
+			<version>${version.javax.enterprise.concurrent.api}</version>
+			<scope>provided</scope>
+		</dependency>
+        
+        <!-- Used for concurrency in ejb's executor -->
+		<dependency>
+            <groupId>org.jboss.spec.javax.transaction</groupId>
+            <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+			<scope>provided</scope>
+        </dependency>
+
+		<!-- Is used in persistence.xml for 'HibernatePersistenceProvider'. -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>${version.org.hibernate.entitymanager}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Needed for running tests (you may also use TestNG) -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- http://mvnrepository.com/artifact/com.netflix.curator/curator-test -->
+		<!-- Provides a zookeeper TestServer. -->
+		<dependency>
+			<groupId>com.netflix.curator</groupId>
+			<artifactId>curator-test</artifactId>
+			<version>${version.curator.test}</version>
+			<scope>test</scope>
+			<exclusions>
+				<!-- Depends on SE hibernate tests persistence.xml -->
+    			<exclusion>
+					<groupId>org.javassist</groupId>
+					<artifactId>javassist</artifactId>
+    			</exclusion>
+    		</exclusions>	
+		</dependency>
+		
+		<!-- hamcrest dependencies -->
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+			<version>${version.hamcrest}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+			<version>${version.hamcrest}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.exparity</groupId>
+			<artifactId>hamcrest-date</artifactId>
+			<version>${version.hamcrest.date}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- Ende: hamcrest dependencies -->
+
+		<!-- Optional, but highly recommended -->
+		<!-- Arquillian allows you to test enterprise code such as EJBs and Transactional(JTA) 
+			JPA from JUnit/TestNG -->
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-container</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- http://mvnrepository.com/artifact/org.jboss.arquillian.junit/arquillian-junit-core -->
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.protocol</groupId>
+			<artifactId>arquillian-protocol-servlet</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.container</groupId>
+			<artifactId>arquillian-container-test-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-depchain</artifactId>
+			<type>pom</type>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-api-maven</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.descriptors</groupId>
+			<artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jboss.shrinkwrap</groupId>
+			<artifactId>shrinkwrap-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Arquillian-performance API -->
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-performance-impl</artifactId>
+			<version>${version.arquillian.performance}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-performance-api</artifactId>
+			<version>${version.arquillian.performance}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- Ende: Arquillian-performance API -->
+
+		<!-- Wird für In-Memory Tests mit HSQL verwendet. -->
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>${version.hsqldb}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- MySQL database driver, used for testing in SE environment. -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${version.mysql.connector.java}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Ende: Wird für In-Memory Tests verwendet. -->
+
+		<!--  Cdi testing -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${version.httpcomponents.httpclient}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Plugins für jacoco test coverage. -->
+		<!-- http://www.eclemma.org/jacoco/trunk/doc/counters.html -->
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-jacoco</artifactId>
+			<version>${version.jacoco.arquillian}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>org.jacoco.core</artifactId>
+			<version>${version.jacoco}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm-util</artifactId>
+			<version>${version.asm}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- End: Plugins für jacoco test coverage. -->
+
+		<!-- Mockito testing -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>${version.mockito}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>${version.mockito}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>tjws</artifactId>
+			<version>${version.tjws}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- End: Mockito testing -->
+
+		<!-- Is used for connection-pooling in Java SE environment, with JUnit -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-c3p0</artifactId>
+			<version>${version.hibernate.c3p0}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Is used for testing contraint-validations -> JUnit (Java SE environment) -->
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>javax.el-api</artifactId>
+			<version>${version.javax.el.api}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.web</groupId>
+			<artifactId>el-impl</artifactId>
+			<version>${version.glassfish.el.impl}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Db unit testing -->
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-persistence-api</artifactId>
+			<version>${version.arquillian.persistence}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-persistence-dbunit</artifactId>
+			<version>${version.arquillian.persistence}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-persistence-core</artifactId>
+			<version>${version.arquillian.persistence}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- End: Db unit testing -->
+
+		<!-- For consumer contract tests -->
+		<dependency>
+			<groupId>au.com.dius</groupId>
+			<artifactId>pact-jvm-consumer-junit_2.11</artifactId>
+			<version>${version.pact.consumer.junit}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>au.com.dius</groupId>
+			<artifactId>pact-jvm-model_2.11</artifactId>
+			<version>${version.pact.consumer.junit}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- http://mvnrepository.com/artifact/au.com.dius/pact-jvm-consumer_2.11 -->
+		<dependency>
+			<groupId>au.com.dius</groupId>
+			<artifactId>pact-jvm-consumer_2.11</artifactId>
+			<version>${version.pact.consumer.junit}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>fluent-hc</artifactId>
+			<version>${version.httpcomponents.fluent.hc}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Is for logback logging, pact testing -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<scope>test</scope>
+			<version>${version.slf4j.api}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
+			<version>${version.logback}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<scope>test</scope>
+			<version>${version.logback}</version>
+		</dependency>
+		<!-- End: Is for logback logging, pact testing -->
+
+		<!-- Dependencies for running curator-zookeeper in cdc-tests profile.  -->
+		<!-- http://mvnrepository.com/artifact/io.netty/netty-all -->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty</artifactId>
+			<version>${version.io.netty}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- http://mvnrepository.com/artifact/org.osgi/org.osgi.enterprise -->
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.enterprise</artifactId>
+			<version>${version.org.osgi.enterprise}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- http://mvnrepository.com/artifact/org.jboss.marshalling/jboss-marshalling-river -->
+		<dependency>
+			<groupId>org.jboss.marshalling</groupId>
+			<artifactId>jboss-marshalling-river</artifactId>
+			<version>${version.jboss.marshalling.river}</version>
+			<scope>test</scope>
+		</dependency>
+	
+		<!-- http://mvnrepository.com/artifact/org.eclipse.jetty.npn/npn-api -->
+		<dependency>
+			<groupId>org.eclipse.jetty.npn</groupId>
+			<artifactId>npn-api</artifactId>
+			<version>${version.npn-api}</version>
+			<scope>test</scope>
+		</dependency>
+	
+		<!-- http://mvnrepository.com/artifact/org.osgi/org.osgi.core -->
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>${version.org.osgi.core}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- End: Dependencies for running curator-zookeeper in cdc-tests profile.  -->
+
+		<!-- Arquillian docker testing <dependency> <groupId>org.arquillian.cube</groupId> 
+			<artifactId>arquillian-cube-docker</artifactId> <version>1.0.0.Alpha10</version> 
+			<scope>test</scope> </dependency> -->
+		<!-- End: Arquillian docker testing -->
+	</dependencies>
+
+	<build>
+		<!-- Maven will append the version to the finalName (which is the name 
+			given to the generated war, and hence the context root) -->
+		<finalName>${project.artifactId}</finalName>
+        
+		<!-- Enables the version at runtime. -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+                    <include>**/persistence.xml</include>
+					<include>**/import.sql</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<testResources>
+			<testResource>
+				<directory>${basedir}/src/main/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</testResource>
+			<testResource>
+				<directory>${basedir}/src/test/resources/</directory>
+			</testResource>
+		</testResources>
+
+		<plugins>
+			<!-- Hibernate generation of meta-model has problems with java compiler 
+				versions < 2.5.1, this is a known bug. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${version.compiler.plugin}</version>
+				<configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+					<!-- Fuer die Verwendung von MapStruct wird Annotation-Processing verwendet. 
+						Damit dies nicht zweimal ueberschrieben wird, muss dass Compiler-Plugin ueberschrieben 
+						werden und das 'compilerArgument' gesetzt werden. -->
+					<compilerArgument>-proc:none</compilerArgument>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${version.war.plugin}</version>
+				<configuration>
+					<!-- Java EE 7 doesn't require web.xml, Maven needs to catch up! -->
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<version>${version.processor.plugin}</version>
+				<configuration>
+					<defaultOutputDirectory>
+						${project.build.directory}/generated-sources/annotations
+					</defaultOutputDirectory>
+					<processors>
+						<processor>org.mapstruct.ap.MappingProcessor</processor>
+					</processors>
+					<options>
+						<mapstruct.suppressGeneratorTimestamp>true</mapstruct.suppressGeneratorTimestamp>
+						<mapstruct.defaultComponentModel>default</mapstruct.defaultComponentModel>
+						<!-- <mapstruct.defaultComponentModel>cdi</mapstruct.defaultComponentModel> -->
+					</options>
+				</configuration>
+				<executions>
+					<execution>
+						<id>process-jpamodelgen</id>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<phase>generate-sources</phase>
+						<configuration>
+							<outputDirectory>target/generated-sources/annotations</outputDirectory>
+							<processors>
+								<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
+							</processors>
+						</configuration>
+					</execution>
+					<execution>
+						<id>process-mapstruct</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>process</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.hibernate</groupId>
+						<artifactId>hibernate-jpamodelgen</artifactId>
+						<version>${version.hibernate.jpamodelgen}</version>
+					</dependency>
+
+					<dependency>
+						<groupId>org.mapstruct</groupId>
+						<artifactId>mapstruct-processor</artifactId>
+						<version>${version.mapstruct}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${version.jacoco}</version>
+				<configuration>
+					<destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+					<dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+				</configuration>
+				<executions>
+					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-site</id>
+						<phase>package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- The WildFly plugin deploys your war to a local WildFly container. -->
+			<!-- To use, run: mvn package wildfly:deploy -->
+			<!-- TODO: check for configuration to another ip than localhost:8080, e.g. 192.168.4.1:8180 -->
+			<plugin>
+				<groupId>org.wildfly.plugins</groupId>
+				<artifactId>wildfly-maven-plugin</artifactId>
+				<version>${version.wildfly.maven.plugin}</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>${version.enforcer.plugin}</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${version.resources.plugin}</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${version.maven.javadoc}</version>
+				<executions>
+					<execution>
+						<id>generate-service-docs</id>
+						<phase>generate-resources</phase>
+						<configuration>
+							<!-- https://github.com/mhardorf/swagger-jaxrs-doclet/blob/master/README.md -->
+							<doclet>com.carma.swagger.doclet.ServiceDoclet</doclet>
+							<docletArtifact>
+								<groupId>com.carma</groupId>
+								<artifactId>swagger-doclet</artifactId>
+								<version>${version.swagger.doclet}</version>
+							</docletArtifact>
+							<reportOutputDirectory>src/main/webapp</reportOutputDirectory>
+							<useStandardDocletOptions>false</useStandardDocletOptions>
+							<!-- docBasePath: where swagger spec files(.json) will be generated. -->
+							<!-- apiBasePath: path used in the calls made from the API documentation(swagger-ui generates executable documentation) -->
+							<!-- swaggerUiPath: the plugin can generate the swagger-ui ditribution.
+                                As i am copying the dist manually i do not use this option and point it to target folder (in fact i could not get it working well so i need to play more with this option). -->
+							<!-- To invoke swagger 'http://192.168.4.1:8180/auth-microservice/apidocs/' -->
+							<additionalparam>
+								-logDebug
+								-apiVersion ${project.version}
+								-docBasePath /auth-microservice/apidocs
+								-apiBasePath /auth-microservice/auth-api
+								-swaggerUiPath ${project.build.directory}/
+							</additionalparam>
+						</configuration>
+						<goals>
+							<goal>javadoc</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<!-- This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. TODO: #60 Remove when 
+					the m2e plugin can correctly bind to Maven lifecycle -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>${version.org.eclipse.m2e.lifecycle.mapping}</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.jacoco</groupId>
+										<artifactId>jacoco-maven-plugin</artifactId>
+										<versionRange>[0.7.4,)</versionRange>
+										<goals>
+											<goal>prepare-agent</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-javadoc-plugin</artifactId>
+										<versionRange>[2.10.3,)</versionRange>
+										<goals>
+											<goal>javadoc</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<profiles>
+		<profile>
+			<!-- Dies ist das Default-Profile bei dem Junit Tests IMMER ausgeführt 
+				werden. 'mvn clean install'. -->
+			<!-- Damit Testabdeckung ausgeführt wird, Befehl 'mvn clean test jacoco:report' 
+				auf Kommandozeile ausführen. -->
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${version.surefire.plugin}</version>
+						<configuration>
+							<skip>false</skip>
+							<runOrder>alphabetical</runOrder>
+							<!-- Excludes integration tests when instances tests are run. -->
+							<excludes>
+								<exclude>**/*IT.java</exclude>
+							</excludes>
+							<!-- System properties for pacts directories. -->
+							<systemProperties>
+								<!-- The pact contracts are placed after the junit tests in this directory. -->
+								<pact.rootDir>${project.basedir}/${pact.config.dir}</pact.rootDir>
+								<buildDirectory>${project.build.directory}</buildDirectory>
+							</systemProperties>
+						</configuration>
+					</plugin>
+					<plugin>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>analyze</id>
+								<goals>
+									<goal>analyze-only</goal>
+								</goals>
+								<configuration>
+									<failOnWarning>false</failOnWarning>
+									<outputXML>true</outputXML>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-enforcer-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>enforce-property</id>
+								<goals>
+									<goal>enforce</goal>
+								</goals>
+								<configuration>
+									<rules>
+										<requireProperty>
+											<property>maven.test.skip</property>
+											<message>*** Property 'maven.test.skip' muss definiert
+												werden. ***</message>
+											<regex>false</regex>
+											<regexMessage>*** Autsch, bei Ausfuehrung des
+												'default'-Profils, koennen die Tests NICHT ge-'skipped'
+												werden!
+											</regexMessage>
+										</requireProperty>
+									</rules>
+									<fail>true</fail>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- A profile that skip all tests, use with: 'mvn clean install -PskipTest'. -->
+			<id>skipTest</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${version.surefire.plugin}</version>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<profile>
+			<!-- An optional Arquillian testing profile that executes tests in your 
+				WildFly instance -->
+			<!-- This profile will start a new WildFly instance, and execute the test, 
+				shutting it down when done -->
+			<!-- Run with: 'mvn clean test -Parq-wildfly-managed' with code coverage 
+				'mvn clean verify -Parq-wildfly-managed' -->
+			<id>arq-wildfly-managed</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly</groupId>
+					<artifactId>wildfly-arquillian-container-managed</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${version.surefire.plugin}</version>
+						<configuration>
+							<skip>false</skip>
+							<includes>
+								<include>**/*IT.java</include>
+							</includes>
+							<excludes>
+								<exclude>**/*TestCdiIT.java</exclude>
+							</excludes>
+							<systemProperties>
+								<arquillian.launch>wildfly-managed</arquillian.launch>
+								<arq.wildfly.home>${global.arq.wildfly.home}</arq.wildfly.home>
+								<arq.wildfly.java.vm.arg>${global.arq.wildfly.java.vm.arg}</arq.wildfly.java.vm.arg>
+								<arq.wildfly.server.config.file.name>${global.arq.wildfly.server.config}</arq.wildfly.server.config.file.name>
+								<arq.wildfly.management.address>${global.arq.wildfly.management.address}</arq.wildfly.management.address>
+								<arq.wildfly.management.port>${global.arq.wildfly.management.port}</arq.wildfly.management.port>
+								<!-- These parameters are necessary for arquillian tests in 'RunAsClient' mode. -->
+								<jboss.bind.address>${global.arq.wildfly.management.address}</jboss.bind.address>
+								<jboss.socket.binding.port-offset>${global.arq.wildfly.port.offset}</jboss.socket.binding.port-offset>
+							</systemProperties>
+							<!-- Selects the Wildfly-server to start.
+							<environmentVariables>
+            					<JBOSS_HOME>${arquillian.serverHome}</JBOSS_HOME>
+        					</environmentVariables>
+							-->
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+							<execution>
+								<!-- We need to verify the content of jacoco.exec after the 'test' 
+									JVM has shutdown and flushed the data to disk. -->
+								<id>verify-output-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- An optional Arquillian testing profile that executes tests in a remote 
+				WildFly instance -->
+			<!-- Run with: mvn clean test -Parq-wildfly-remote with code coverage 
+				'mvn clean verify -Parq-wildfly-remote' -->
+			<id>arq-wildfly-remote</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly</groupId>
+					<artifactId>wildfly-arquillian-container-remote</artifactId>
+					<scope>test</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.jboss.arquillian.protocol</groupId>
+					<artifactId>arquillian-protocol-servlet</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${version.surefire.plugin}</version>
+						<configuration>
+							<skip>false</skip>
+							<includes>
+								<include>**/*IT.java</include>
+							</includes>
+							<excludes>
+								<exclude>**/*TestCdiIT.java</exclude>
+							</excludes>
+							<systemProperties>
+								<arquillian.launch>wildfly-remote</arquillian.launch>
+								<arq.wildfly.management.address>${global.arq.wildfly.management.address}</arq.wildfly.management.address>
+								<arq.wildfly.management.port>${global.arq.wildfly.management.port}</arq.wildfly.management.port>
+								<arq.persistence.default.data.source>${global.arq.persistence.default.data.source}</arq.persistence.default.data.source>
+								<!-- These parameters are necessary for arquillian tests in 'RunAsClient' mode. -->
+								<jboss.bind.address>${global.arq.wildfly.management.address}</jboss.bind.address>
+								<jboss.socket.binding.port-offset>${global.arq.wildfly.port.offset}</jboss.socket.binding.port-offset>
+							</systemProperties>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+							<!--<execution> -->
+							<!-- We need to verify the content of jacoco.exec after the 'test' -->
+							<!-- JVM has shutdown and flushed the data to disk. -->
+							<!--<id>verify-output-tests</id> -->
+							<!--<phase>test</phase> -->
+							<!--<goals> -->
+							<!--<goal>test</goal> -->
+							<!--</goals> -->
+							<!--<configuration> -->
+							<!--<skip>false</skip> -->
+							<!--</configuration> -->
+							<!--</execution> -->
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- A profile for cdi testing. -->
+			<!-- The 'mvn clean test -Parq-cdi-embedded' run cdi embedded tests. -->
+			<id>arq-cdi-embedded</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${version.surefire.plugin}</version>
+						<configuration>
+							<skip>false</skip>
+							<runOrder>alphabetical</runOrder>
+							<!-- Excludes integration tests when instances tests are run. -->
+							<includes>
+								<include>**/*TestCdiIT.java</include>
+							</includes>
+							<excludes>
+								<exclude>**/*TestIT.java</exclude>
+								<exclude>**/*Test.java</exclude>
+								<exclude>**/*PactTest.java</exclude>
+							</excludes>
+							<systemProperties>
+								<arquillian.launch>cdi-embedded</arquillian.launch>
+							</systemProperties>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+							<!--<execution> -->
+							<!-- We need to verify the content of jacoco.exec after the 'test' -->
+							<!-- JVM has shutdown and flushed the data to disk. -->
+							<!--<id>verify-output-tests</id> -->
+							<!--<phase>test</phase> -->
+							<!--<goals> -->
+							<!--<goal>test</goal> -->
+							<!--</goals> -->
+							<!--<configuration> -->
+							<!--<skip>false</skip> -->
+							<!--</configuration> -->
+							<!--</execution> -->
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.spec</groupId>
+					<artifactId>jboss-javaee-7.0</artifactId>
+					<version>${version.jboss.javaee.7.0}</version>
+					<type>pom</type>
+					<scope>provided</scope>
+				</dependency>
+
+				<!-- Arquillian container adapter for the target container -->
+				<dependency>
+					<groupId>org.jboss.arquillian.container</groupId>
+					<artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
+					<version>${version.arquillian.weld.ee.embedded.1.1}</version>
+					<scope>test</scope>
+				</dependency>
+
+				<!-- CDI dependency for container -->
+				<dependency>
+					<groupId>org.jboss.weld</groupId>
+					<artifactId>weld-core</artifactId>
+					<version>${version.weld.core}</version>
+					<scope>test</scope>
+				</dependency>			
+			</dependencies>
+		</profile>
+
+		<profile>
+			<!-- NOTE: This tests MUST running against a running Wildfly instance with a deployed 'auth-microservice.war' archive. -->
+			<!-- Use this profile 'mvn clean install -Pcdc-tests' to run the consumer driven contract tests. -->
+			<id>cdc-tests</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${version.surefire.plugin}</version>
+						<configuration>
+							<systemPropertyVariables>
+								<pact.rootDir>${project.basedir}/${pact.config.dir}</pact.rootDir>
+								<buildDirectory>${project.build.directory}</buildDirectory>
+							</systemPropertyVariables>
+							<skip>false</skip>
+							<runOrder>alphabetical</runOrder>
+							<!-- Excludes integration, unit and zookeeper tests when instances tests are run. -->
+							<excludes>
+								<exclude>**/*IT.java</exclude>
+								<exclude>**/*Test.java</exclude>
+								<exclude>**/*TestCdiIT.java</exclude>
+							</excludes>
+							<includes>
+								<include>**/*PactTest.java</include>
+							</includes>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>au.com.dius</groupId>
+						<artifactId>pact-jvm-provider-maven_2.11</artifactId>
+						<version>${version.pact.provider.maven}</version>
+						<executions>
+							<execution>
+								<id>verify-pacts</id>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>verify</goal>
+								</goals>
+								<configuration>
+									<serviceProviders>
+										<serviceProvider>
+											<name>VersionRestProvider</name>
+											<protocol>http</protocol>
+											<host>${wildfly.host.address}</host>
+											<port>${wildfly.host.http.port}</port>
+											<path>/</path>
+											<consumers>
+												<!-- Again, you can define as many consumers for each provider as you need, but each must have a unique name -->
+												<consumer>
+													<name>VersionRestEndpoint</name>
+													<!--  currently supports a file path using pactFile or a URL using pactUrl -->
+													<pactFile>${project.basedir}/${pact.config.dir}/VersionRestEndpoint-VersionRestProvider.json</pactFile>
+												</consumer>
+											</consumers>
+											<!-- Verifying all pact files in a directory for a provider -->
+											<!--<pactFileDirectory>${project.basedir}/src/pacts</pactFileDirectory>-->
+										</serviceProvider>
+										<serviceProvider>
+											<name>RuntimeAvailableHeapRestProvider</name>
+											<protocol>http</protocol>
+											<host>${wildfly.host.address}</host>
+											<port>${wildfly.host.http.port}</port>
+											<path>/</path>
+											<consumers>
+												<!-- Again, you can define as many consumers for each provider as you need, but each must have a unique name -->
+												<consumer>
+													<name>RuntimeRestEndpoint</name>
+													<!--  currently supports a file path using pactFile or a URL using pactUrl -->
+													<pactFile>${project.basedir}/${pact.config.dir}/RuntimeRestEndpoint-RuntimeAvailableHeapRestProvider.json</pactFile>
+												</consumer>
+											</consumers>
+											<!-- Verifying all pact files in a directory for a provider -->
+											<!--<pactFileDirectory>${project.basedir}/src/pacts</pactFileDirectory>-->
+										</serviceProvider>
+										<serviceProvider>
+											<name>RuntimeNodeNameRestProvider</name>
+											<protocol>http</protocol>
+											<host>${wildfly.host.address}</host>
+											<port>${wildfly.host.http.port}</port>
+											<path>/</path>
+											<consumers>
+												<!-- Again, you can define as many consumers for each provider as you need, but each must have a unique name -->
+												<consumer>
+													<name>RuntimeRestEndpoint</name>
+													<!--  currently supports a file path using pactFile or a URL using pactUrl -->
+													<pactFile>${project.basedir}/${pact.config.dir}/RuntimeRestEndpoint-RuntimeNodeNameRestProvider.json</pactFile>
+												</consumer>
+											</consumers>
+											<!-- Verifying all pact files in a directory for a provider -->
+											<!--<pactFileDirectory>${project.basedir}/src/pacts</pactFileDirectory>-->
+										</serviceProvider>
+										<serviceProvider>
+											<name>RuntimeOsInfoRestProvider</name>
+											<protocol>http</protocol>
+											<host>${wildfly.host.address}</host>
+											<port>${wildfly.host.http.port}</port>
+											<path>/</path>
+											<consumers>
+												<!-- Again, you can define as many consumers for each provider as you need, but each must have a unique name -->
+												<consumer>
+													<name>RuntimeRestEndpoint</name>
+													<!--  currently supports a file path using pactFile or a URL using pactUrl -->
+													<pactFile>${project.basedir}/${pact.config.dir}/RuntimeRestEndpoint-RuntimeOsInfoRestProvider.json</pactFile>
+												</consumer>
+											</consumers>
+											<!-- Verifying all pact files in a directory for a provider -->
+											<!--<pactFileDirectory>${project.basedir}/src/pacts</pactFileDirectory>-->
+										</serviceProvider>
+										<serviceProvider>
+											<name>UsermanagementV1FindAllRolesByUsernameRestProvider</name>
+											<protocol>http</protocol>
+											<host>${wildfly.host.address}</host>
+											<port>${wildfly.host.http.port}</port>
+											<path>/</path>
+											<consumers>
+												<!-- Again, you can define as many consumers for each provider as you need, but each must have a unique name -->
+												<consumer>
+													<name>AuthUserManagementRestEndpoint</name>
+													<!--  currently supports a file path using pactFile or a URL using pactUrl -->
+													<pactFile>${project.basedir}/${pact.config.dir}/AuthUserManagementRestEndpoint-UsermanagementV1FindAllRolesByUsernameRestProvider.json</pactFile>
+												</consumer>
+											</consumers>
+											<!-- Verifying all pact files in a directory for a provider -->
+											<!--<pactFileDirectory>${project.basedir}/src/pacts</pactFileDirectory>-->
+										</serviceProvider>
+										<serviceProvider>
+											<name>UsermanagementV2FindAllRolesByUsernameRestProvider</name>
+											<protocol>http</protocol>
+											<host>${wildfly.host.address}</host>
+											<port>${wildfly.host.http.port}</port>
+											<path>/</path>
+											<consumers>
+												<!-- Again, you can define as many consumers for each provider as you need, but each must have a unique name -->
+												<consumer>
+													<name>AuthUserManagementRestEndpoint</name>
+													<!--  currently supports a file path using pactFile or a URL using pactUrl -->
+													<pactFile>${project.basedir}/${pact.config.dir}/AuthUserManagementRestEndpoint-UsermanagementV2FindAllRolesByUsernameRestProvider.json</pactFile>
+												</consumer>
+											</consumers>
+											<!-- Verifying all pact files in a directory for a provider -->
+											<!--<pactFileDirectory>${project.basedir}/src/pacts</pactFileDirectory>-->
+										</serviceProvider>
+									</serviceProviders>
+									<configuration>
+										<pact.showStacktrace>true</pact.showStacktrace>
+									</configuration>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

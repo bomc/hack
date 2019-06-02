@@ -1,0 +1,56 @@
+# __________________________________________________________________________________________________________
+# Batch script to add a datasource in the datasource subsystem of the server configuration file.
+# To run this script run: $JBOSS_HOME/bin>jboss-cli.bat --file=../standalone/configuration/configure-mysql-ds.cli
+
+
+
+# __________________________________________________________________________________________________________
+# Enter here ip and port of the running wildfly instance.
+connect --controller=192.168.4.1:10090
+
+
+
+# The batch mode allows one to group commands and operations and execute them together as an atomic unit.
+# __________________________________________________________________________________________________________
+batch
+
+
+
+module add --name=com.mysql --resources=/downloads/mysql-connector-java-5.1.38-bin.jar --dependencies=javax.api,javax.transaction.api
+
+/subsystem=datasources/jdbc-driver=mysql:add(driver-name=mysql,driver-module-name=com.mysql)
+
+data-source add --jndi-name=java:jboss/datasources/poc-unterbauDS --name=poc-unterbauDS-pool --connection-url=jdbc:mysql://localhost:3306/poc-unterbaudb --driver-name=mysql --user-name=root --password= --use-ccm=false --enabled=true --max-pool-size=25 --blocking-timeout-wait-millis=5000
+
+
+
+# If at least one of the commands or operations fails, all the other successfully executed commands and operations
+# in the batch are rolled back.
+# __________________________________________________________________________________________________________
+run-batch
+
+
+
+
+
+# __________________________________________________________________________________________________________
+# Troubleshooting:
+#
+# if you fail to activate the Datasource due to the following error:
+#
+# Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Access denied for user 'jboss'@'localhost' to database 'as7development'
+#     at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) [rt.jar:1.7.0_67]
+#     at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:57) [rt.jar:1.7.0_67]
+#     at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) [rt.jar:1.7.0_67]
+#     at java.lang.reflect.Constructor.newInstance(Constructor.java:526) [rt.jar:1.7.0_67]
+#     at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+#     at com.mysql.jdbc.Util.getInstance(Util.java:386)
+#
+# It's a problem with your user settings. You should check out that your user has been granted privileges to connect to the specified host.
+#
+# Make sure you have granted privileges to your user, for example:
+#
+# CREATE USER 'jboss'@'localhost' IDENTIFIED BY 'jboss';
+#
+# GRANT ALL PRIVILEGES ON *.* to 'jboss'@'localhost' with GRANT OPTION;
+# Query OK, 0 rows affected (0.00 sec)

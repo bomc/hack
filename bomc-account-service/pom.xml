@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.bomc.poc</groupId>
+		<artifactId>bomc-parent-pom</artifactId>
+		<version>1.00.00-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>bomc-account-service</artifactId>
+
+	<packaging>pom</packaging>
+
+	<name>${project.artifactId}		::Parent modul of the account microservice.</name>
+	<description>Ein Multi-Modul-Projekt, dass ein Skeleton zur Verfuegung stellt.</description>
+
+	<modules>
+		<module>bomc-account-service-lib</module>
+		<module>bomc-account-service-web</module>
+		<module>bomc-account-service-model</module>
+		<module>bomc-account-service-dao</module>
+		<module>bomc-account-service-business</module>
+	</modules>
+
+	<properties>
+		<!-- Define the version of the JBoss BOMs we want to import to specify 
+			tested stacks. -->
+		<version.jboss.bom>8.2.2.Final</version.jboss.bom>
+
+		<!-- Property prevents skipping unit tests with 'mvn clean install'. -->
+		<maven.test.skip>false</maven.test.skip>
+
+		<!-- Defines the Wildfly-dist version from nexus. -->
+		<version.bomc.wildfly.dist>1.00.00-SNAPSHOT</version.bomc.wildfly.dist>
+
+		<!-- Properties for arquillian tests. -->
+		<!-- Example for start vm-wildfly parameter. -->
+		<wildfly.version>10.0.0.Final</wildfly.version>
+		<wildfly.server.config>standalone.xml</wildfly.server.config>
+		<wildfly.management.address>192.168.4.1</wildfly.management.address>
+		<wildfly.address>192.168.4.1</wildfly.address>
+		<wildfly.port>10090</wildfly.port>
+		<wildfly.port.offset>100</wildfly.port.offset>
+		<!-- IMPORTANT: These properties must be adapted to a available local Wildfly 
+			instance. -->
+		<!-- These properties are necessary for the managed profiles. -->
+		<wildfly.home>${project.basedir}/wildfly-run/wildfly-${version.wildfly}</wildfly.home>
+		<arq.wildfly.java.vm.arg.managed>-Djboss.socket.binding.port-offset=100
+			-Djboss.bind.address.management=${wildfly.management.address}
+			-Djboss.node.name=account-service.1
+			-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n
+		</arq.wildfly.java.vm.arg.managed>
+
+		<!-- Other dependencies. -->
+		<version.wildfly>10.0.0.Final</version.wildfly>
+		<version.log4j>1.2.17</version.log4j>
+		<version.org.jacoco.core>0.7.7.201606060606</version.org.jacoco.core>
+		<version.asm-util>3.3.1</version.asm-util>
+		<version.hamcrest-all>1.3</version.hamcrest-all>
+		<version.mockito-core>1.10.19</version.mockito-core>
+		<version.mockito-all>1.10.19</version.mockito-all>
+		<version.arquillian-performance-impl>1.0.0.CR1</version.arquillian-performance-impl>
+		<version.arquillian-performance-api>1.0.0.CR1</version.arquillian-performance-api>
+		<version.arquillian-jacoco>1.0.0.Alpha8</version.arquillian-jacoco>
+		<version.jaxrs-api>3.0.12.Final</version.jaxrs-api>
+		<version.mapstruct-jdk8>1.0.0.Final</version.mapstruct-jdk8>
+		<version.zk-lib>1.00.00-SNAPSHOT</version.zk-lib>
+		<version.exception-lib>1.00.00-SNAPSHOT</version.exception-lib>
+		<version.logging-lib>1.00.00-SNAPSHOT</version.logging-lib>
+
+		<!-- Arquillian dbunit testing -->
+		<version.arquillian.persistence>1.0.0.Alpha7</version.arquillian.persistence>
+
+		<!-- Other plugins. -->
+		<version.wildfly-maven-plugin>1.1.0.Alpha8</version.wildfly-maven-plugin>
+		<version.jacoco-maven-plugin>0.7.7.201606060606</version.jacoco-maven-plugin>
+		<version.mapstruct-processor>1.0.0.Final</version.mapstruct-processor>
+		
+		<version.org.eclipse.m2e.lifecycle.mapping>1.0.0</version.org.eclipse.m2e.lifecycle.mapping>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>bomc-account-service-lib</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>bomc-account-service-model</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>bomc-account-service-dao</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>bomc-account-service-business</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>bomc-account-service-web</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<!-- JBoss distributes a complete set of Java EE 7 APIs including a Bill 
+				of Materials (BOM). A BOM specifies the versions of a "stack" (or a collection) 
+				of artifacts. We use this here so that we always get the correct versions 
+				of artifacts. Here we use the jboss-javaee-7.0-with-tools stack (you can 
+				read this as the JBoss stack of the Java EE 7 APIs, with some extras tools 
+				for your project, such as Arquillian for testing) and the jboss-javaee-7.0-with-hibernate 
+				stack you can read this as the JBoss stack of the Java EE 7 APIs, with extras 
+				from the Hibernate family of projects) -->
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>jboss-javaee-7.0-with-tools</artifactId>
+				<version>${version.jboss.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>jboss-javaee-7.0-with-hibernate</artifactId>
+				<version>${version.jboss.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>jboss-javaee-7.0-with-resteasy</artifactId>
+				<version>${version.jboss.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.arquillian.extension</groupId>
+				<artifactId>arquillian-performance-api</artifactId>
+				<version>${version.arquillian-performance-api}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.arquillian.extension</groupId>
+				<artifactId>arquillian-performance-impl</artifactId>
+				<version>${version.arquillian-performance-impl}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.arquillian.extension</groupId>
+				<artifactId>arquillian-jacoco</artifactId>
+				<version>${version.arquillian-jacoco}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>jaxrs-api</artifactId>
+				<version>${version.jaxrs-api}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mapstruct</groupId>
+				<artifactId>mapstruct-jdk8</artifactId>
+				<version>${version.mapstruct-jdk8}</version>
+			</dependency>
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>${version.log4j}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jacoco</groupId>
+				<artifactId>org.jacoco.core</artifactId>
+				<version>${version.org.jacoco.core}</version>
+			</dependency>
+			<dependency>
+				<groupId>asm</groupId>
+				<artifactId>asm-util</artifactId>
+				<version>${version.asm-util}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>zk-lib</artifactId>
+				<version>${version.zk-lib}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>logging-lib</artifactId>
+				<version>${version.logging-lib}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>exception-lib</artifactId>
+				<version>${version.exception-lib}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-all</artifactId>
+				<version>${version.hamcrest-all}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${version.mockito-core}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>${version.mockito-all}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!-- This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. TODO: #60 Remove when 
+					the m2e plugin can correctly bind to Maven lifecycle -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>${version.org.eclipse.m2e.lifecycle.mapping}</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.jacoco</groupId>
+										<artifactId>jacoco-maven-plugin</artifactId>
+										<versionRange>[0.7.4,)</versionRange>
+										<goals>
+											<goal>prepare-agent</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-javadoc-plugin</artifactId>
+										<versionRange>[2.10.3,)</versionRange>
+										<goals>
+											<goal>javadoc</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${version.jacoco-maven-plugin}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<profiles>
+		<profile>
+			<!-- All tests are skipped by this profile, 'mvn clean install -PskipTest'. -->
+			<id>skipTest</id>
+			<activation>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- The 'mvn clean test jacoco:report -Pjacoco' profile run all module 
+				instances tests. with jacoco use 'mvn clean test jacoco:report -Pjacoco' -->
+			<id>jacoco</id>
+			<activation>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<runOrder>alphabetical</runOrder>
+							<!-- Excludes integration tests when instances tests are run. -->
+							<excludes>
+								<exclude>**/*IT*.java</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

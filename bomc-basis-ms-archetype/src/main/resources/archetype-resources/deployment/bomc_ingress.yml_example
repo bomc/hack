@@ -1,0 +1,64 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kuberistio-wf
+  namespace: bomc-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kuberistio-wf
+  template:
+    metadata:
+      labels:
+        app: kuberistio-wf
+    spec:
+      containers:
+      - name: kuberistio-wf
+        image: bomc/kuberistio-wf:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kuberistio-svc
+  namespace: bomc-app
+spec:
+  selector:
+    app: kuberistio-wf
+  ports:
+  - protocol: TCP
+    port: 80
+    name: http
+    targetPort: 8080
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: bomc-ingress
+  namespace: bomc-app
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    #ingress.kubernetes.io/ssl-redirect: "false"
+    # Avoid the Google Compute Engine controller from processing this Ingress.
+    ingress.kubernetes.io/ingress.class: "nginx"
+spec:
+  backend:
+    serviceName: default-http-backend
+    servicePort: 80
+  rules:
+   - host: bomc.ingress.org
+     http:
+      paths:
+      - path: /bomc-kuberistio
+        backend:
+          serviceName: kuberistio-svc
+          servicePort: 80
+          # Invoke ingress, note host has to be set on host (system windows) system, see ReadMe.md for more.
+          # curl -v http://bomc.ingress.org/${artifactId}/rest/version/current-version

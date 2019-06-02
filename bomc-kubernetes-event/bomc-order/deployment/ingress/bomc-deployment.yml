@@ -1,0 +1,36 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bomc-order
+  namespace: bomc-app
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bomc-order
+    spec:
+      containers:
+      - name: bomc-order
+        image: bomc/bomc-order:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - curl -f localhost:8080/
+          initialDelaySeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - curl -f localhost:8080/bomc-order/rest/version/current-version
+          initialDelaySeconds: 20
+      restartPolicy: Always
+---

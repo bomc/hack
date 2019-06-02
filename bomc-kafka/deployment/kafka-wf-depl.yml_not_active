@@ -1,0 +1,19 @@
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: kafka-wf
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-wf
+  template:
+    metadata:
+      labels:
+        app: kafka-wf
+    spec:
+      containers:
+      - name: kafka-wf
+        image: bomc/kafka-wf:v1.0.0

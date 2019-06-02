@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+
+<suppressions>    
+	 <!-- suppress all checks on all files in a package -->
+	<suppress checks="JavadocPackage" files="[\\/]test[\\/]"/>
+	<suppress checks=".*" files="[\\/].*Test\.java"/>
+
+	<!--Alle mit generated im packagename werden von checkstyle ingoriert.-->
+	<suppress checks=".*" files="[\\/].*generated.*[\\/]"/>
+</suppressions>

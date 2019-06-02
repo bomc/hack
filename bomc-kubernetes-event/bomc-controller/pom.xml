@@ -1,0 +1,1559 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.bomc.poc</groupId>
+        <artifactId>bomc-parent-pom</artifactId>
+        <version>1.00.00-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>bomc-controller</artifactId>
+
+    <groupId>de.bomc.poc.controller</groupId>
+
+    <version>1.00.00-SNAPSHOT</version>
+
+    <packaging>war</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>A web project for implementing a microservice.</description>
+
+    <properties>
+        <!-- Explicitly declaring the source encoding eliminates the following
+            message: -->
+        <!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered
+            resources, i.e. build is platform dependent! -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- automatically run annotation processors within the incremental compilation -->
+        <m2e.apt.activation>jdt_apt</m2e.apt.activation>
+        
+        <!-- Property verhindert, dass be Ausführung von 'mvn clean install' die
+            Unit-Tests ge-'skipped' werden. -->
+        <maven.test.skip>false</maven.test.skip>
+        <!-- Site plugin überspringen, da sonst release auf die Nase fällt -->
+        <maven-site-plugin.skip>true</maven-site-plugin.skip>
+        <maven-checkstyle-plugin.skip>false</maven-checkstyle-plugin.skip>
+
+        <!-- Properties set in version.properties file. -->
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+
+        <!-- Jacoco test coverage properties. -->
+        <jacoco.instruction.coveredratio>0.75</jacoco.instruction.coveredratio>
+        <jacoco.complexity.coveredratio>0.75</jacoco.complexity.coveredratio>
+        <jacoco.line.coveredratio>0.75</jacoco.line.coveredratio>
+        <jacoco.branch.coveredratio>0.75</jacoco.branch.coveredratio>
+
+        <!-- Swagger-ui properties -->
+        <swagger.apisource.locations>de.bomc.poc.controller.interfaces.rest</swagger.apisource.locations>
+        <swagger.apisource.http>http</swagger.apisource.http>
+        <swagger.apisource.title>API Dokumentation fuer den ${project.artifactId} microservice.
+        </swagger.apisource.title>
+        <swagger.apisource.description>API Referenz Dokument</swagger.apisource.description>
+        <swagger.apisource.email>bomc@bomc.org</swagger.apisource.email>
+        <swagger.apisource.name>Michael Börner</swagger.apisource.name>
+
+        <!-- Properties for swagger and asciiDoc documentation -->
+        <!-- NOTE@MVN: will be changed during mvn project generation. -->
+        <swagger.location.endpoints>de.bomc.poc.controller.interfaces.rest</swagger.location.endpoints>
+        <generated.asciidoc.directory>${project.build.directory}/asciidoc/generated</generated.asciidoc.directory>
+        <asciidoctor.input.directory>${project.basedir}/src/docs/asciidoc</asciidoctor.input.directory>
+        <asciidoctor.html.output.directory>${project.build.directory}/asciidoc/html</asciidoctor.html.output.directory>
+        <asciidoctor.pdf.output.directory>${project.build.directory}/asciidoc/pdf</asciidoctor.pdf.output.directory>
+        <asciidoctor.epub3.output.directory>${project.build.directory}/asciidoc/epub3</asciidoctor.epub3.output.directory>
+        <asciidoctor.docbook.output.directory>${project.build.directory}/asciidoc/docbook</asciidoctor.docbook.output.directory>
+        <!-- Properties for using swagger as webapp. -->
+        <swagger.ui.host>localhost:8180</swagger.ui.host>
+        <application.context.root>/${project.artifactId}</application.context.root>
+
+        <!-- Properties for arquillian tests. -->
+        <!-- Example for start vm-wildfly parameter. -->		
+        <wildfly.management.address>127.0.0.1</wildfly.management.address>
+        <wildfly.port>10090</wildfly.port>
+        <wildfly.server.config>standalone-full.xml</wildfly.server.config>
+        <wildfly.management.address>127.0.0.1</wildfly.management.address>
+        <wildfly.address>127.0.0.1</wildfly.address>
+        <wildfly.port>10090</wildfly.port>
+        <wildfly.port.offset>100</wildfly.port.offset>
+        <!-- IMPORTANT: These properties must be adapted to a available local Wildfly instance. -->
+        <!-- These properties are necessary for the managed profiles. -->
+        <arq.wildfly.java.vm.arg.managed>
+            -Djboss.socket.binding.port-offset=100
+            -Djboss.bind.address=${wildfly.address}
+            -Djboss.bind.address.management=${wildfly.management.address}
+            -Djboss.node.name=bomc-controller.local
+            -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n
+            -server -Xmx512m
+        </arq.wildfly.java.vm.arg.managed>
+
+		<version.bomc.wildfly.dist>1.00.00-SNAPSHOT</version.bomc.wildfly.dist>
+		
+        <version.javaee-api>8.0</version.javaee-api>
+
+        <version.wildlfy.bom>13.0.0.Final</version.wildlfy.bom>
+
+        <version.exception-lib-ext>1.00.00-SNAPSHOT</version.exception-lib-ext>
+        <version.logging-lib>1.00.00-SNAPSHOT</version.logging-lib>
+        <version.rest-lib>1.00.00-SNAPSHOT</version.rest-lib>
+
+        <version.jackson-databind>2.9.5</version.jackson-databind>
+		<version.jackson-datatype-jsr310>2.9.5</version.jackson-datatype-jsr310>
+        <version.wildfly>13.0.0.Final</version.wildfly>        
+
+        <!-- swagger handling apidocs -->
+        <version.swagger2markup-import-files-ext>1.3.1</version.swagger2markup-import-files-ext>
+        <version.swagger2markup-spring-restdocs-ext>1.3.1</version.swagger2markup-spring-restdocs-ext>
+        <version.asciidoctorj-pdf>1.5.0-alpha.16</version.asciidoctorj-pdf>
+        <version.asciidoctorj-epub3>1.5.0-alpha.8.1</version.asciidoctorj-epub3>
+        <version.asciidoctorj>1.5.8.1</version.asciidoctorj>
+
+        <!-- Dependencies for using swagger -->
+        <version.swagger-jaxrs>1.5.21</version.swagger-jaxrs>
+        <version.swagger-ui>3.14.2</version.swagger-ui>
+        <version.swagger-annotations>1.5.21</version.swagger-annotations>
+        <version.replacer>1.5.3</version.replacer>
+
+        <!-- Other dependencies versions -->
+        <version.log4j>1.2.17</version.log4j>
+        <version.mockito-core>2.23.4</version.mockito-core>
+        <version.hamcrest-all>1.3</version.hamcrest-all>
+        <version.hamcrest-pojo>1.1.1</version.hamcrest-pojo>
+        <version.yasson>1.0.1</version.yasson>
+        <version.javax.json>1.1</version.javax.json>
+        <version.arquillian-jacoco>1.0.0.Alpha10</version.arquillian-jacoco>
+        <version.org.jacoco.core>0.8.2</version.org.jacoco.core>
+        <version.tjws>3.5.1.Final</version.tjws>
+        <version.hibernate-java8>5.1.14.Final</version.hibernate-java8>
+        <version.hsqldb>2.4.1</version.hsqldb>
+        <version.hibernate-c3p0>5.1.14.Final</version.hibernate-c3p0>
+        <version.mapstruct-jdk8>1.2.0.Final</version.mapstruct-jdk8>
+        <version.mapstruct>1.2.0.Final</version.mapstruct>
+        <version.mapstruct-processor>1.2.0.Final</version.mapstruct-processor>
+
+        <!-- Other plugins. -->
+        <version.jacoco-maven-plugin>0.8.2</version.jacoco-maven-plugin>
+        <version.maven-war-plugin>2.1.1</version.maven-war-plugin>
+        <version.wildfly.maven.plugin>1.0.2.Final</version.wildfly.maven.plugin>
+        <version.maven-processor-plugin>3.1.0</version.maven-processor-plugin>
+        <!-- Plugins for using swagger -->
+        <version.swagger-maven-plugin>3.1.7</version.swagger-maven-plugin>
+        <version.asciidoctor-maven-plugin>1.5.7.1</version.asciidoctor-maven-plugin>
+        <version.swagger2markup-maven-plugin>1.3.3</version.swagger2markup-maven-plugin>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.wildfly.bom</groupId>
+                <artifactId>wildfly-javaee7-with-tools</artifactId>
+                <version>${version.wildlfy.bom}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax</groupId>
+                <artifactId>javaee-api</artifactId>
+                <version>${version.javaee-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.bomc.poc</groupId>
+                <artifactId>logging-lib</artifactId>
+                <version>${version.logging-lib}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.bomc.poc</groupId>
+                <artifactId>rest-lib</artifactId>
+                <version>${version.rest-lib}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.bomc.poc</groupId>
+                <artifactId>exception-lib-ext</artifactId>
+                <version>${version.exception-lib-ext}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${version.jackson-databind}</version>
+            </dependency>
+            <!-- Used for json serializing of LocalDate -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${version.jackson-datatype-jsr310}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${version.log4j}</version>
+            </dependency>
+
+            <!-- Allows java8 localDate -->
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-java8</artifactId>
+                <version>${version.hibernate-java8}</version>
+            </dependency>
+
+            <!-- mapstruct -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${version.mapstruct}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-jdk8</artifactId>
+                <version>${version.mapstruct-jdk8}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${version.mapstruct-processor}</version>
+            </dependency>
+
+            <!-- Swagger -->
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-jaxrs</artifactId>
+                <version>${version.swagger-jaxrs}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${version.swagger-annotations}</version>
+            </dependency>
+
+            <!-- Test dependencies -->
+
+            <!-- Used for in-memory tests with HSQL -->
+            <dependency>
+                <groupId>org.hsqldb</groupId>
+                <artifactId>hsqldb</artifactId>
+                <version>${version.hsqldb}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-c3p0</artifactId>
+                <version>${version.hibernate-c3p0}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${version.mockito-core}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-all</artifactId>
+                <version>${version.hamcrest-all}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>tjws</artifactId>
+                <version>${version.tjws}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jacoco</groupId>
+                <artifactId>org.jacoco.core</artifactId>
+                <version>${version.org.jacoco.core}</version>
+            </dependency>
+
+            <!-- Used only for unit tests to test the jsonb handling. -->
+            <dependency>
+                <groupId>org.eclipse</groupId>
+                <artifactId>yasson</artifactId>
+                <version>${version.yasson}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>javax.json</artifactId>
+                <version>${version.javax.json}</version>
+            </dependency>
+
+            <!-- Arquillian extension -->
+            <dependency>
+                <groupId>org.jboss.arquillian.extension</groupId>
+                <artifactId>arquillian-jacoco</artifactId>
+                <version>${version.arquillian-jacoco}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Import the JPA API, we use provided scope as the API is included in
+            JBoss WildFly -->
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- JSR-303 (Bean Validation) Implementation -->
+        <!-- Provides portable constraints such as @Email -->
+        <!-- Hibernate Validator is shipped in JBoss WildFly -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Is used in persistence.xml for 'HibernatePersistenceProvider'. -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Now we declare any tools needed -->
+
+        <!-- Annotation processor that raising compilation errors whenever constraint
+            annotations are incorrectly used. -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator-annotation-processor</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Import the JAX-RS API, it is used in provided scope as the API is
+            included in JBoss WildFly -->
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.annotation</groupId>
+            <artifactId>jboss-annotations-api_1.2_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.ws.rs</groupId>
+            <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.ejb</groupId>
+            <artifactId>jboss-ejb-api_3.2_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.bomc.poc</groupId>
+            <artifactId>logging-lib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.bomc.poc</groupId>
+            <artifactId>rest-lib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.bomc.poc</groupId>
+            <artifactId>exception-lib-ext</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Used for json serializing of LocalDate -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Start: Only needed at build time for generating a mapper implementation. -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-jdk8</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- We need a Servlet to enable hystrix-metrics-event-stream -->
+        <dependency>
+            <groupId>org.jboss.spec.javax.servlet</groupId>
+            <artifactId>jboss-servlet-api_3.1_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Allows java8 localDate -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-java8</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Used for in-memory tests with HSQL -->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Swagger -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jaxrs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>tjws</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>org.jacoco.core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Used only for unit tests to test the jsonb handling. -->
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>yasson</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Optional, but highly recommended -->
+        <!-- Arquillian allows you to test enterprise code such as EJBs and Transactional(JTA)
+            JPA from JUnit/TestNG -->
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.protocol</groupId>
+            <artifactId>arquillian-protocol-servlet</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-container-test-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Arquillian extension -->
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-jacoco</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Maven resolver api -->
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-depchain</artifactId>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-api-maven</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.descriptors</groupId>
+            <artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap</groupId>
+            <artifactId>shrinkwrap-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!-- Maven will append the version to the finalName (which is the name
+            given to the generated war, and hence the context root) -->
+        <finalName>${project.artifactId}</finalName>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>version.properties</include>
+                    <include>configuration.properties</include>
+                    <include>META-INF/persistence.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <encoding>UTF-8</encoding>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${version.mapstruct-processor}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <generatedSourcesDirectory>${project.build.directory}/generated-sources</generatedSourcesDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${version.maven-war-plugin}</version>
+                <configuration>
+                    <!-- Java EE 7 doesn't require web.xml, Maven needs to catch up! -->
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+            <!-- Perform a checkstyle analysis according to the configuration defined by plugin management. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>${project.basedir}/checkstyle-bomc.xml</configLocation>
+                    <suppressionsLocation>${project.basedir}/checkstyle-suppressions.xml</suppressionsLocation>
+                    <failsOnError>false</failsOnError>
+                    <consoleOutput>true</consoleOutput>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <excludes>**/package-info.java</excludes>
+                    <skip>${maven-checkstyle-plugin.skip}</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-checkstyle</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>${version.wildfly.maven.plugin}</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>analyze</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>false</failOnWarning>
+                            <outputXML>true</outputXML>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+                <version>${version.maven-processor-plugin}</version>
+                <configuration>
+                    <defaultOutputDirectory>${project.build.directory}/generated-sources</defaultOutputDirectory>
+                    <processors>
+                        <processor>org.mapstruct.ap.MappingProcessor</processor>
+                    </processors>
+                    <options>
+                        <mapstruct.suppressGeneratorTimestamp>true</mapstruct.suppressGeneratorTimestamp>
+                        <mapstruct.defaultComponentModel>default</mapstruct.defaultComponentModel>
+                    </options>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>process-mapstruct</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.mapstruct</groupId>
+                        <artifactId>mapstruct-processor</artifactId>
+                        <version>${version.mapstruct-processor}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- ********************************************************************************** -->
+    <!-- The default profile, unit tests will be executed.  'mvn clean install'.            -->
+    <!-- ********************************************************************************** -->
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <runOrder>alphabetical</runOrder>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- ********************************************************************** -->
+        <!-- All tests are skipped by this profile, 'mvn clean install -PskipTest'. -->
+        <!-- ********************************************************************** -->
+        <profile>
+            <id>skipTest</id>
+            <activation>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-property</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireProperty>
+                                            <property>maven.test.skip</property>
+                                            <message>*** Property 'maven.test.skip' muss definiert
+                                                werden. ***
+                                            </message>
+                                            <regex>false</regex>
+                                            <regexMessage>*** Autsch, bei Ausfuehrung des
+                                                'default'-Profils, koennen die Tests NICHT ge-'skipped'
+                                                werden!
+                                            </regexMessage>
+                                        </requireProperty>
+                                    </rules>
+                                    <fail>true</fail>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- ********************************************************************** -->
+            <!-- An optional Arquillian testing profile that executes tests in a remote -->
+            <!-- WildFly instance, that means a wildfly                                 -->
+            <!-- Run with: mvn clean test -Parq-wildfly-remote                          -->
+            <!-- with code coverage: 'mvn clean verify -Parq-wildfly-remote'            -->
+            <!-- ********************************************************************** -->
+            <id>arq-wildfly-remote</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly.arquillian</groupId>
+                    <artifactId>wildfly-arquillian-container-remote</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${version.jacoco-maven-plugin}</version>
+                        <configuration>
+                            <destFile>${basedir}/target/coverage-reports/jacoco.exec</destFile>
+                            <dataFile>${basedir}/target/coverage-reports/jacoco.exec</dataFile>
+                            <!-- Add here classes to be excluded from code coverage process. -->
+                            <excludes>
+                                <exclude>**/application/basis/**/*.class</exclude>
+                                <exclude>**/interfaces/rest/v1/basis/**/*.class</exclude>
+                                <exclude>**/infrastructure/persistence/basis/**/*.class</exclude>
+								<exclude>**/infrastructure/events/basis/**/*.class</exclude>
+                                <exclude>**/domain/model/basis/**/*.class</exclude>
+								<exclude>**/domain/shared/**/DomainObjectUtils.class</exclude>
+                                <exclude>**/infrastructure/events/basis/**/*.class</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>jacoco-initialize</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>jacoco-site</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <includes>
+                                <include>**/*TestIT.java</include>
+                            </includes>
+                            <systemProperties>
+                                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                                <arquillian.launch>wildfly-remote</arquillian.launch>
+                                <arq.wildfly.management.address>${wildfly.management.address}</arq.wildfly.management.address>
+                                <arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+                            </systemProperties>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>integration-tests</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>false</skip>
+                                </configuration>
+                            </execution>
+                            <!-- We need to verify the content of jacoco.exec after the 'test'
+                                JVM has shutdown and flushed the data to disk. -->
+                            <execution>
+                                <id>verify-output-tests</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>false</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- ********************************************************************************************* -->
+            <!-- Dieses Profile wird soll auf dem Jenkins ausgeführt werden. Der Unterschied zu den anderen    -->
+            <!-- Profilen ist die Verwendung des Failsafe Plugins. Dies ermöglicht das separate Ausführen von  -->
+            <!-- Unit tests und Arq-Integrations Test in einem Jenkins Job.                                    -->
+            <!-- Run with: mvn clean test '-Parq-wildfly-managed-dist'                                         -->
+            <!-- with code coverage: 'mvn clean verify -Parq-wildfly-managed-dist'                             -->
+            <!-- ********************************************************************************************* -->
+            <id>arq-wildfly-managed-dist</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly.arquillian</groupId>
+                    <artifactId>wildfly-arquillian-container-managed</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${version.jacoco-maven-plugin}</version>
+                        <configuration>
+                            <destFile>${basedir}/target/coverage-reports/jacoco.exec</destFile>
+                            <dataFile>${basedir}/target/coverage-reports/jacoco.exec</dataFile>
+                            <!-- Add here classes to be excluded from code coverage process. -->
+                            <excludes>
+                                <exclude>**/application/basis/**/*.class</exclude>
+                                <exclude>**/interfaces/rest/v1/basis/**/*.class</exclude>
+                                <exclude>**/infrastructure/persistence/basis/**/*.class</exclude>
+								<exclude>**/infrastructure/events/basis/**/*.class</exclude>
+                                <exclude>**/domain/model/basis/**/*.class</exclude>
+                                <exclude>**/infrastructure/events/basis/**/*.class</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+							<!--
+								Ensures that the code coverage report for unit tests is created after
+								unit tests have been run.
+							-->
+							<execution>
+								<id>post-unit-test</id>
+								<phase>test</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+							<!-- The Executions required by unit tests are omitted. -->
+							<!--
+								Prepares the property pointing to the JaCoCo runtime agent which
+								is passed as VM argument when Maven the Failsafe plugin is executed.
+							-->
+							<execution>
+								<id>pre-integration-test</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+									<!--
+										Sets the name of the property containing the settings
+										for JaCoCo runtime agent.
+									-->
+									<propertyName>failsafeArgLine</propertyName>
+								</configuration>
+							</execution>
+							<!--
+								Ensures that the code coverage report for integration tests after
+								integration tests have been run.
+							-->
+							<execution>
+								<id>post-integration-test</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+                            <execution>
+                                <id>jacoco-check</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <rule>
+                                            <element>BUNDLE</element>
+                                            <limits>
+                                                <!-- The supported counter options are: LINE, BRANCH, INSTRUCTION,
+                                                    COMPLEXITY, METHOD, CLASS (mvn clean verify). -->
+                                                <limit>
+                                                    <counter>LINE</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.line.coveredratio}</minimum>
+                                                </limit>
+                                                <limit>
+                                                    <counter>BRANCH</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.branch.coveredratio}</minimum>
+                                                </limit>
+                                                <limit>
+                                                    <counter>INSTRUCTION</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.instruction.coveredratio}</minimum>
+                                                </limit>
+                                                <limit>
+                                                    <counter>COMPLEXITY</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.complexity.coveredratio}</minimum>
+                                                </limit>
+                                            </limits>
+                                        </rule>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <!-- Junit tests werden hier ausgeführt. -->
+                            <skip>false</skip>
+                            <includes>
+                                <include>**/*Test.java</include>
+                            </includes>
+                            <!-- NOTE@MVN: will be changed during maven project creation. -->
+                            <groups>de.bomc.poc.controller.CategoryFastUnitTest</groups>
+							<argLine>${surefireArgLine}</argLine>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>de.bomc.poc</groupId>
+                                            <artifactId>bomc-wildfly-dist</artifactId>
+                                            <version>${version.bomc.wildfly.dist}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                            <overWrite>false</overWrite>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <!-- Für jeden Test wird eine VM gestartet, in dieser VM wird jeweils ein separater Wildfly gestartet,
+                                 das Test-Artefakt deployed und Wildfly anschliessend gestoppt. -->
+                            <forkCount>1</forkCount>
+                            <reuseForks>false</reuseForks>
+                            <includes>
+                                <include>**/*TestIT.java</include>
+                            </includes>
+                            <!-- NOTE@MVN: will be changed during maven project creation. -->
+                            <groups>de.bomc.poc.controller.CategoryFastIntegrationTestIT</groups>
+                            <systemProperties>
+                                <arquillian.launch>wildfly-managed-dist</arquillian.launch>
+                                <arq.wildfly.home>${project.build.directory}/wildfly-${version.wildfly}</arq.wildfly.home>
+                                <arq.wildfly.java.vm.arg>${arq.wildfly.java.vm.arg.managed}</arq.wildfly.java.vm.arg>
+                                <arq.wildfly.server.config.file.name>${wildfly.server.config}</arq.wildfly.server.config.file.name>
+                                <arq.wildfly.management.address>${wildfly.management.address}</arq.wildfly.management.address>
+                                <arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+                            </systemProperties>
+                        </configuration>
+						<executions>
+							<!--
+								Ensures that both integration-test and verify goals of the Failsafe Maven
+								plugin are executed.
+							-->
+							<execution>
+								<id>integration-tests</id>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+								<configuration>
+									<!-- Sets the VM argument line used when integration tests are run. -->
+									<argLine>${failsafeArgLine}</argLine>
+								</configuration>
+							</execution>
+						</executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- ********************************************************************************************* -->
+        <!-- Dieses Profile wird soll auf dem Jenkins ausgeführt werden. Der Unterschied zu den anderen    -->
+        <!-- Profilen ist die Verwendung des Failsafe Plugins. Dies ermöglicht das separate Ausführen von  -->
+        <!-- Unit tests und Arq-Integrations Test in einem Jenkins Job. Hier werden ALLE Tests ausgeführt. -->
+        <!-- Run with: mvn clean test '-Parq-wildfly-managed-all'                                          -->
+        <!-- with code coverage: 'mvn clean verify -Parq-wildfly-managed-all'                              -->
+        <!-- ********************************************************************************************* -->
+        <profile>
+            <id>arq-wildfly-managed-all</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly.arquillian</groupId>
+                    <artifactId>wildfly-arquillian-container-managed</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${version.jacoco-maven-plugin}</version>
+                        <configuration>
+                            <destFile>${basedir}/target/coverage-reports/jacoco.exec</destFile>
+                            <dataFile>${basedir}/target/coverage-reports/jacoco.exec</dataFile>
+                        </configuration>
+                        <executions>
+							<!--
+								Prepares the property pointing to the JaCoCo runtime agent which
+								is passed as VM argument when Maven the Surefire plugin is executed.
+							-->
+							<execution>
+								<id>pre-unit-test</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+									<!--
+										Sets the name of the property containing the settings
+										for JaCoCo runtime agent.
+									-->
+									<propertyName>surefireArgLine</propertyName>
+								</configuration>
+							</execution>
+							<!--
+								Ensures that the code coverage report for unit tests is created after
+								unit tests have been run.
+							-->
+							<execution>
+								<id>post-unit-test</id>
+								<phase>test</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+							<!-- The Executions required by unit tests are omitted. -->
+							<!--
+								Prepares the property pointing to the JaCoCo runtime agent which
+								is passed as VM argument when Maven the Failsafe plugin is executed.
+							-->
+							<execution>
+								<id>pre-integration-test</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+									<!--
+										Sets the name of the property containing the settings
+										for JaCoCo runtime agent.
+									-->
+									<propertyName>failsafeArgLine</propertyName>
+								</configuration>
+							</execution>
+							<!--
+								Ensures that the code coverage report for integration tests after
+								integration tests have been run.
+							-->
+							<execution>
+								<id>post-integration-test</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+                            <execution>
+                                <id>jacoco-check</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <rule>
+                                            <element>BUNDLE</element>
+                                            <limits>
+                                                <!-- The supported counter options are: LINE, BRANCH, INSTRUCTION,
+                                                    COMPLEXITY, METHOD, CLASS (mvn clean verify). -->
+                                                <limit>
+                                                    <counter>LINE</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.line.coveredratio}</minimum>
+                                                </limit>
+                                                <limit>
+                                                    <counter>BRANCH</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.branch.coveredratio}</minimum>
+                                                </limit>
+                                                <limit>
+                                                    <counter>INSTRUCTION</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.instruction.coveredratio}</minimum>
+                                                </limit>
+                                                <limit>
+                                                    <counter>COMPLEXITY</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.complexity.coveredratio}</minimum>
+                                                </limit>
+                                            </limits>
+                                        </rule>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <!-- Junit tests werden hier ausgeführt. -->
+                            <skip>false</skip>
+                            <includes>
+                                <include>**/*Test.java</include>
+                            </includes>
+                            <argLine>${surefireArgLine}</argLine>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>de.bomc.poc</groupId>
+                                            <artifactId>bomc-wildfly-dist</artifactId>
+                                            <version>${version.bomc.wildfly.dist}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                            <overWrite>false</overWrite>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <!-- Für jeden Test wird eine VM gestartet, in dieser VM wird jeweils ein separater Wildfly gestartet,
+                                 das Test-Artefakt deployed und Wildfly anschliessend gestoppt. -->
+                            <forkCount>1</forkCount>
+                            <reuseForks>false</reuseForks>
+                            <includes>
+                                <include>**/*TestIT.java</include>
+                            </includes>
+                            <systemProperties>
+                                <arquillian.launch>wildfly-managed-dist</arquillian.launch>
+                                <arq.wildfly.home>${project.build.directory}/wildfly-${version.wildfly}</arq.wildfly.home>
+                                <arq.wildfly.java.vm.arg>${arq.wildfly.java.vm.arg.managed}</arq.wildfly.java.vm.arg>
+                                <arq.wildfly.server.config.file.name>${wildfly.server.config}</arq.wildfly.server.config.file.name>
+                                <arq.wildfly.management.address>${wildfly.management.address}</arq.wildfly.management.address>
+                                <arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+                            </systemProperties>
+                        </configuration>
+                        <executions>
+                            <!--
+                                Ensures that both integration-test and verify goals of the Failsafe Maven
+                                plugin are executed.
+                            -->
+                            <execution>
+                                <id>integration-tests</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- Sets the VM argument line used when integration tests are run. -->
+                                    <argLine>${failsafeArgLine}</argLine>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- ********************************************************************* -->
+        <!-- A profile that generates a war-archive with swagger-ui.               -->
+        <!-- Use it with 'http://localhost:8180/${project.artifactId}/swagger-ui'. -->
+        <!-- ********************************************************************* -->
+        <profile>
+            <id>swagger</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <runOrder>alphabetical</runOrder>
+                            <!-- Excludes integration tests when unit tests are running. -->
+                            <excludes>
+                                <exclude>**/*IT.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.kongchen</groupId>
+                        <artifactId>swagger-maven-plugin</artifactId>
+                        <version>${version.swagger-maven-plugin}</version>
+                        <configuration>
+                            <apiSources>
+                                <apiSource>
+                                    <locations>${swagger.apisource.locations}</locations>
+                                    <schemes>${swagger.apisource.http}</schemes>
+                                    <host>${swagger.ui.host}</host>
+                                    <basePath>${application.context.root}/rest</basePath>
+                                    <info>
+                                        <title>${swagger.apisource.title}</title>
+                                        <version>${project.version}</version>
+                                        <description>${swagger.apisource.description}</description>
+                                        <contact>
+                                            <email>${swagger.apisource.email}</email>
+                                            <name>${swagger.apisource.name}</name>
+                                        </contact>
+                                    </info>
+                                    <swaggerDirectory>${project.build.directory}/swagger-ui/META-INF/resources/webjars/swagger-ui/${version.swagger-ui}</swaggerDirectory>
+                                    <outputFormats>json</outputFormats>
+                                </apiSource>
+                            </apiSources>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Step 1. - Download Swagger UI webjar -->
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>swagger ui</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.webjars</groupId>
+                                            <artifactId>swagger-ui</artifactId>
+                                            <version>${version.swagger-ui}</version>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${project.build.directory}/swagger-ui</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Step 2. Add Swagger-ui Resources to the WAR -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <configuration>
+                            <webResources combine.children="append">
+                                <resource>
+                                    <directory>${project.build.directory}/swagger-ui/META-INF/resources/webjars/swagger-ui/${version.swagger-ui}</directory>
+                                    <includes>
+                                        <include>**/*.*</include>
+                                    </includes>
+                                    <targetPath>swagger-ui</targetPath>
+                                </resource>
+                            </webResources>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <version>${version.replacer}</version>
+                        <executions>
+                            <execution>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <file>${project.build.directory}/swagger-ui/META-INF/resources/webjars/swagger-ui/${version.swagger-ui}/index.html</file>
+                            <replacements>
+                                <replacement>
+                                    <token>http://petstore.swagger.io/v2/swagger.json</token>
+                                    <value>http://${swagger.ui.host}${application.context.root}/swagger-ui/swagger.json</value>
+                                </replacement>
+                            </replacements>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- ********************************************************* -->
+        <!-- A profile that generates the api documentation.           -->
+        <!-- 'mvn clean install -Papidocs'.                            -->
+        <!-- see '/target/apiidoc' for output (pdf, html, epub3, ...). -->
+        <!-- ********************************************************* -->
+        <profile>
+            <id>apidocs</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.kongchen</groupId>
+                        <artifactId>swagger-maven-plugin</artifactId>
+                        <version>${version.swagger-maven-plugin}</version>
+                        <configuration>
+                            <apiSources>
+                                <apiSource>
+                                    <locations>${swagger.apisource.locations}</locations>
+                                    <schemes>${swagger.apisource.http}</schemes>
+                                    <host>${swagger.ui.host}</host>
+                                    <basePath>${application.context.root}/rest</basePath>
+                                    <info>
+                                        <title>${swagger.apisource.title}</title>
+                                        <version>${project.version}</version>
+                                        <description>${swagger.apisource.description}</description>
+                                        <contact>
+                                            <email>${swagger.apisource.email}</email>
+                                            <name>${swagger.apisource.name}</name>
+                                        </contact>
+                                    </info>
+                                    <swaggerDirectory>${project.build.directory}/swagger-doc</swaggerDirectory>
+                                    <outputFormats>json</outputFormats>
+                                </apiSource>
+                            </apiSources>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- First, use the swagger2markup plugin to generate asciidoc -->
+                    <plugin>
+                        <groupId>io.github.swagger2markup</groupId>
+                        <artifactId>swagger2markup-maven-plugin</artifactId>
+                        <version>${version.swagger2markup-maven-plugin}</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>io.github.swagger2markup</groupId>
+                                <artifactId>swagger2markup-import-files-ext</artifactId>
+                                <version>${version.swagger2markup-import-files-ext}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>io.github.swagger2markup</groupId>
+                                <artifactId>swagger2markup-spring-restdocs-ext</artifactId>
+                                <version>${version.swagger2markup-spring-restdocs-ext}</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <swaggerInput>${project.build.directory}/swagger-doc/swagger.json</swaggerInput>
+                            <outputDir>${generated.asciidoc.directory}</outputDir>
+                            <config>
+                                <swagger2markup.markupLanguage>ASCIIDOC</swagger2markup.markupLanguage>
+                                <swagger2markup.pathsGroupedBy>TAGS</swagger2markup.pathsGroupedBy>
+                                <swagger2markup.outputLanguage>DE</swagger2markup.outputLanguage>
+                                <swagger2markup.generatedExamplesEnabled>true</swagger2markup.generatedExamplesEnabled>
+                                <swagger2markup.extensions.dynamicOverview.contentPath>${project.basedir}/src/docs/asciidoc/extensions/overview</swagger2markup.extensions.dynamicOverview.contentPath>
+                                <swagger2markup.extensions.dynamicDefinitions.contentPath>${project.basedir}/src/docs/asciidoc/extensions/definitions</swagger2markup.extensions.dynamicDefinitions.contentPath>
+                                <swagger2markup.extensions.dynamicPaths.contentPath>${project.basedir}/src/docs/asciidoc/extensions/paths</swagger2markup.extensions.dynamicPaths.contentPath>
+                                <swagger2markup.extensions.dynamicSecurity.contentPath>${project.basedir}src/docs/asciidoc/extensions/security/</swagger2markup.extensions.dynamicSecurity.contentPath>
+                            </config>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>convertSwagger2markup</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Run the generated asciidoc through Asciidoctor to generate other
+                        documentation types, such as PDFs or HTML5 -->
+                    <plugin>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctor-maven-plugin</artifactId>
+                        <version>${version.asciidoctor-maven-plugin}</version>
+                        <!-- Include Asciidoctor PDF for pdf generation -->
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.asciidoctor</groupId>
+                                <artifactId>asciidoctorj-pdf</artifactId>
+                                <version>${version.asciidoctorj-pdf}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.asciidoctor</groupId>
+                                <artifactId>asciidoctorj-epub3</artifactId>
+                                <version>${version.asciidoctorj-epub3}</version>
+                            </dependency>
+                        </dependencies>
+                        <!-- Configure generic document generation settings -->
+                        <configuration>
+                            <!-- defaults to ${basedir}/src/main/asciidoc -->
+                            <sourceDirectory>${asciidoctor.input.directory}</sourceDirectory>
+                            <!-- an override to process a single source file; defaults to all
+                                files in ${sourceDirectory} -->
+                            <sourceDocumentName>apiDocApp.adoc</sourceDocumentName>
+                            <!-- enables and sets the source highlighter; currently coderay and
+                                highlightjs are supported -->
+                            <sourceHighlighter>coderay</sourceHighlighter>
+                            <!-- a Map<String,String> of attributes to pass to Asciidoctor, defaults
+                                to null -->
+                            <attributes>
+                                <doctype>book</doctype>
+                                <toc>left</toc>
+                                <toclevels>3</toclevels>
+                                <numbered/>
+                                <hardbreaks/>
+                                <sectlinks/>
+                                <sectanchors/>
+                                <generated>${generated.asciidoc.directory}</generated>
+                            </attributes>
+                        </configuration>
+                        <!-- Since each execution can only handle one backend, run separate
+                            executions for each desired output type -->
+                        <executions>
+                            <execution>
+                                <id>output-html</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>html5</backend>
+                                    <outputDirectory>${asciidoctor.html.output.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>output-pdf</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>pdf</backend>
+                                    <outputDirectory>${asciidoctor.pdf.output.directory}</outputDirectory>
+                                    <attributes>
+                                        <pdf-stylesdir>${project.basedir}/src/docs/asciidoc/theme</pdf-stylesdir>
+                                        <pdf-style>custom</pdf-style>
+                                        <!--<pdf-fontsdir>${project.basedir}/src/docs/asciidoc/fonts</pdf-fontsdir> -->
+                                        <icons>font</icons>
+                                        <pagenums/>
+                                        <toc/>
+                                        <idprefix/>
+                                        <idseparator>-</idseparator>
+                                        <sectnums>true</sectnums>
+                                    </attributes>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>output-epub3</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>epub3</backend>
+                                    <outputDirectory>${asciidoctor.epub3.output.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>output-docbook</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>docbook</backend>
+                                    <outputDirectory>${asciidoctor.docbook.output.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

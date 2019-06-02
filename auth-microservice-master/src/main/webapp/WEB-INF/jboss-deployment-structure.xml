@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure>
+    <deployment>
+        <!--<exclusions>-->
+            <!--<module name="org.jboss.resteasy.resteasy-jackson-provider"/>-->
+        <!--</exclusions>-->
+        <dependencies>
+            <module name="org.codehaus.jackson.jackson-jaxrs" services="import"/>
+            <module name="org.codehaus.jackson.jackson-mapper-asl" services="import"/>
+            <module name="com.google.guava" services="import"/> 
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>

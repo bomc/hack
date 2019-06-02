@@ -1,0 +1,25 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ${artifactId}
+  namespace: bomc-app
+  labels:
+    app: ${artifactId}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${artifactId}
+  template:
+    metadata:
+      labels:
+        app: ${artifactId}
+    spec:
+      containers:
+      - name: ${artifactId}
+        image: bomc/${artifactId}:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          protocol: TCP

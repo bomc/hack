@@ -1,0 +1,35 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bomc-invoice
+  namespace: bomc-app
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bomc-invoice
+    spec:
+      containers:
+      - name: bomc-invoice
+        image: bomc/bomc-invoice:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8180
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /bomc-invoice/rest/health/liveness
+            port: 8180
+            scheme: HTTP
+          initialDelaySeconds: 20
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - curl -f localhost:8180/bomc-invoice/rest/health/readiness
+          initialDelaySeconds: 40
+      restartPolicy: Always
+---

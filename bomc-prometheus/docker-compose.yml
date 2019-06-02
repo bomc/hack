@@ -1,0 +1,35 @@
+version: '3.0'
+
+services:
+
+  bomc-prometheus:
+    build: prometheus/
+    container_name: bomc-prometheus
+    ports:
+      - "8180:8080"
+    env_file:
+      - ./metrics.env
+    volumes:
+      - 0831b6d2aa6c993f57a2c5febbb12f587b689746e60d855b1b8253dc2e6b6058:/opt/wildfly/logs
+#    networks:
+#      - bomc_back-tier
+#      - prometheus_back-tier    
+  sampleservice:
+    build: prometheus-sample-service-web/ 
+    container_name: sampleservice
+    expose:
+      - 8080
+#    networks:
+#      - bomc_back-tier
+    depends_on:
+      - bomc-prometheus
+
+volumes:
+  0831b6d2aa6c993f57a2c5febbb12f587b689746e60d855b1b8253dc2e6b6058:
+    external: true
+
+#networks:
+#  bomc_back-tier:
+#    driver: bridge
+#  prometheus_back-tier:
+#    external: true

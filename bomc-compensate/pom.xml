@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.bomc.poc</groupId>
+		<artifactId>bomc-parent-pom</artifactId>
+		<version>1.00.00-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>bomc-compensate</artifactId>
+
+	<version>1.00.00-SNAPSHOT</version>
+
+	<packaging>war</packaging>
+
+	<name>${project.artifactId}</name>
+	<description>Two Rest Web services backed by Databases accessed in a JTA Transaction.</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
+
+		<!-- Properties for arquillian tests. -->
+		<!-- Example for start vm-wildfly parameter. -->
+		<wildfly.management.address>127.0.0.1</wildfly.management.address>
+		<wildfly.port>10090</wildfly.port>
+
+		<version.javaee-api>8.0</version.javaee-api>
+
+		<version.wildlfy.bom>13.0.0.Final</version.wildlfy.bom>
+		<version.wildfly.maven.plugin>1.0.2.Final</version.wildfly.maven.plugin>
+
+		<version.logging-lib>1.00.00-SNAPSHOT</version.logging-lib>
+		<version.rest-lib>1.00.00-SNAPSHOT</version.rest-lib>
+		<version.exception-lib>1.00.00-SNAPSHOT</version.exception-lib>
+
+		<version.narayana>5.8.1.Final</version.narayana>
+
+		<version.wildfly>13.0.0.Final</version.wildfly>
+
+		<!-- Other versions -->
+		<version.swagger-jaxrs>1.5.16</version.swagger-jaxrs>
+		<version.swagger-annotations>1.5.16</version.swagger-annotations>
+		<version.swagger-ui>3.2.2</version.swagger-ui>
+		<version.log4j>1.2.17</version.log4j>
+		<version.mockito-all>1.10.19</version.mockito-all>
+		<version.hamcrest-all>1.3</version.hamcrest-all>
+		<version.hamcrest-pojo>1.1.1</version.hamcrest-pojo>
+		<version.yasson>1.0.1</version.yasson>
+		<version.javax.json>1.1</version.javax.json>
+		<version.arquillian-jacoco>1.0.0.Alpha9</version.arquillian-jacoco>
+		<version.org.jacoco.core>0.8.1</version.org.jacoco.core>
+		<version.tjws>3.5.1.Final</version.tjws>
+		
+		<!-- Other plugins. -->
+		<version.jacoco-maven-plugin>0.8.1</version.jacoco-maven-plugin>
+		<version.maven-war-plugin>2.1.1</version.maven-war-plugin>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>wildfly-javaee7-with-tools</artifactId>
+				<version>${version.wildlfy.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>${version.javaee-api}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the JAX-RS API, it is used in provided scope as the API is 
+			included in JBoss WildFly -->
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-client</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Narayana compensating. -->
+        <dependency>
+            <groupId>org.jboss.narayana.compensations</groupId>
+            <artifactId>compensations</artifactId>
+            <version>${version.narayana}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging-spi</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana.jta</groupId>
+            <artifactId>narayana-jta</artifactId>
+            <version>${version.narayana}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging-spi</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.spec.javax.annotation</groupId>
+			<artifactId>jboss-annotations-api_1.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.spec.javax.ws.rs</groupId>
+			<artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.spec.javax.ejb</groupId>
+			<artifactId>jboss-ejb-api_3.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>logging-lib</artifactId>
+			<version>${version.logging-lib}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>rest-lib</artifactId>
+			<version>${version.rest-lib}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>exception-lib</artifactId>
+			<version>${version.exception-lib}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${version.log4j}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- We need a Servlet to enable hystrix-metrics-event-stream -->
+		<dependency>
+			<groupId>org.jboss.spec.javax.servlet</groupId>
+			<artifactId>jboss-servlet-api_3.1_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>${version.mockito-all}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<version>${version.hamcrest-all}</version>
+			<scope>test</scope>
+		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.spotify</groupId> -->
+<!-- 			<artifactId>hamcrest-pojo</artifactId> -->
+<!-- 			<version>${version.hamcrest-pojo}</version> -->
+<!-- 			<scope>test</scope> -->
+<!-- 		</dependency> -->
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>tjws</artifactId>
+			<version>${version.tjws}</version>
+			<scope>test</scope>
+		</dependency>
+				
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>org.jacoco.core</artifactId>
+			<version>${version.org.jacoco.core}</version>
+			<scope>test</scope>
+		</dependency>
+
+
+		<!-- Optional, but highly recommended -->
+		<!-- Arquillian allows you to test enterprise code such as EJBs and Transactional(JTA) 
+			JPA from JUnit/TestNG -->
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-container</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.protocol</groupId>
+			<artifactId>arquillian-protocol-servlet</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.container</groupId>
+			<artifactId>arquillian-container-test-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- Arquillian extension -->
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-jacoco</artifactId>
+			<version>${version.arquillian-jacoco}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Maven resolver api -->
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-depchain</artifactId>
+			<type>pom</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-api-maven</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.descriptors</groupId>
+			<artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.shrinkwrap</groupId>
+			<artifactId>shrinkwrap-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>version.properties</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${version.maven-war-plugin}</version>
+				<configuration>
+					<!-- Java EE 6 doesn't require web.xml, Maven needs to catch up! -->
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.wildfly.plugins</groupId>
+				<artifactId>wildfly-maven-plugin</artifactId>
+				<version>${version.wildfly.maven.plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${version.jacoco-maven-plugin}</version>
+				<configuration>
+					<destFile>${basedir}/target/coverage-reports/jacoco.exec</destFile>
+					<dataFile>${basedir}/target/coverage-reports/jacoco.exec</dataFile>
+					<!--<outputDirectory>${session.executionRootDirectory}/jacoco/web</outputDirectory> -->
+				</configuration>
+				<executions>
+					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-site</id>
+						<phase>package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>analyze</id>
+						<goals>
+							<goal>analyze-only</goal>
+						</goals>
+						<configuration>
+							<failOnWarning>false</failOnWarning>
+							<outputXML>true</outputXML>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<runOrder>alphabetical</runOrder>
+							<!-- Excludes integration tests when unit tests are running. -->
+							<excludes>
+								<exclude>**/*IT.java</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<!-- All tests are skipped by this profile, 'mvn clean install -PskipTest'. -->
+			<id>skipTest</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<!-- An optional Arquillian testing profile that executes tests in a remote 
+				WildFly instance -->
+			<!-- Run with: mvn clean test -Parq-wildfly-remote with code coverage 
+				'mvn clean verify -Parq-wildfly-remote' -->
+			<id>arq-wildfly-remote</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly.arquillian</groupId>
+					<artifactId>wildfly-arquillian-container-remote</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<includes>
+								<include>**/*TestIT.java</include>
+							</includes>
+							<systemProperties>
+								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+								<arquillian.launch>wildfly-remote</arquillian.launch>
+								<arq.wildfly.management.address>${wildfly.management.address}</arq.wildfly.management.address>
+								<arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+							</systemProperties>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+							<!-- We need to verify the content of jacoco.exec after the 'test' 
+								JVM has shutdown and flushed the data to disk. -->
+							<execution>
+								<id>verify-output-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

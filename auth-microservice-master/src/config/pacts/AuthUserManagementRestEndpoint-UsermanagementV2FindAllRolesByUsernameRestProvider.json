@@ -1,0 +1,54 @@
+{
+    "provider": {
+        "name": "UsermanagementV2FindAllRolesByUsernameRestProvider"
+    },
+    "consumer": {
+        "name": "AuthUserManagementRestEndpoint"
+    },
+    "interactions": [
+        {
+            "providerState": "Describe the state the provider needs to be in for the pact test to be verified",
+            "description": "Description of the request that is expected to be received",
+            "request": {
+                "method": "GET",
+                "path": "/auth-microservice/auth-api/usermanagement/roles-by-username/Default-System_user",
+                "headers": {
+                    "X-BOMC-AUTHORIZATION": "BOMC_USER"
+                }
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/vnd.usermanagement-v2+json"
+                },
+                "body": [
+                    {
+                        "description": "This role allows restricted access to the system",
+                        "grantDTO": [
+                            {
+                                "description": "Allows reading (2) parts from db.",
+                                "id": 2,
+                                "name": "read2"
+                            },
+                            {
+                                "description": "Allows reading (1) parts from db.",
+                                "id": 1,
+                                "name": "read1"
+                            }
+                        ],
+                        "id": 3,
+                        "name": "Default-System_user"
+                    }
+                ]
+            }
+        }
+    ],
+    "metadata": {
+        "pact-specification": {
+            "version": "2.0.0"
+        },
+        "pact-jvm": {
+            "version": "3.2.2"
+        }
+    }
+}

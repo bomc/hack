@@ -1,0 +1,939 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.bomc.poc</groupId>
+		<artifactId>bomc-feature-togglz-service</artifactId>
+		<version>1.00.00-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>bomc-feature-togglz-service-web</artifactId>
+	<packaging>war</packaging>
+
+	<name>${project.artifactId}		::Contains the web-layer of the feature-togglz microservice.</name>
+
+	<description>A bomc project that contains a REST interface.</description>
+
+	<properties>
+		<version.javax.json>1.0.3</version.javax.json>
+		<version.tjws>3.0.10.Final</version.tjws>
+		<version.resteasy-jaxrs>3.0.19.Final</version.resteasy-jaxrs>
+		<version.resteasy-client>3.0.19.Final</version.resteasy-client>
+		<version.resteasy-jaxb-provider>3.0.19.Final</version.resteasy-jaxb-provider>
+		<version.commons-io>2.4</version.commons-io>
+		<version.httpcomponents.httpclient>4.5</version.httpcomponents.httpclient>
+		<version.gatling-charts-highcharts>2.2.3</version.gatling-charts-highcharts>
+		<version.gatling-maven-plugin>2.2.1</version.gatling-maven-plugin>
+
+		<!-- other plugin versions -->
+		<version.war.plugin>2.5</version.war.plugin>
+	</properties>
+
+	<dependencies>
+
+		<!-- First declare the APIs we depend on and need for compilation. All 
+			of them are provided by JBoss WildFly -->
+
+		<!-- Import the CDI API, we use provided scope as the API is included in 
+			JBoss WildFly -->
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the Common Annotations API (JSR-250), we use provided scope 
+			as the API is included in JBoss WildFly -->
+		<dependency>
+			<groupId>org.jboss.spec.javax.annotation</groupId>
+			<artifactId>jboss-annotations-api_1.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Provides access to Concurrency API, we use provided scope as the API 
+			is included in JBoss WildFly -->
+		<dependency>
+
+			<groupId>org.jboss.spec.javax.enterprise.concurrent</groupId>
+
+			<artifactId>jboss-concurrency-api_1.0_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the Servlet API -->
+		<dependency>
+			<groupId>org.jboss.spec.javax.servlet</groupId>
+			<artifactId>jboss-servlet-api_3.1_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the JAX-RS API, we use provided scope as the API is included 
+			in JBoss WildFly -->
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>jaxrs-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-client</artifactId>
+			<version>${version.resteasy-client}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxb-provider</artifactId>
+			<version>${version.resteasy-jaxb-provider}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<version>${version.resteasy-jaxrs}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${version.httpcomponents.httpclient}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${version.commons-io}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Import the EJB API, we use provided scope as the API is included in 
+			JBoss WildFly -->
+		<dependency>
+			<groupId>org.jboss.spec.javax.ejb</groupId>
+			<artifactId>jboss-ejb-api_3.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- JSR-303 (Bean Validation) Implementation -->
+		<!-- Provides portable constraints such as @Email -->
+		<!-- Hibernate Validator is shipped in JBoss WildFly -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- Now we declare any tools needed -->
+
+		<!-- Annotation processor that raising compilation errors whenever constraint 
+			annotations are incorrectly used. -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator-annotation-processor</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Used for creating JsonObject instances. -->
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+			<version>${version.javax.json}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>logging-lib</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>exception-lib</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>rest-lib</artifactId>
+		</dependency>
+
+		<!-- Used for togglz implementation. -->
+		<dependency>
+			<groupId>org.togglz</groupId>
+			<artifactId>togglz-cdi</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.togglz</groupId>
+			<artifactId>togglz-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.togglz</groupId>
+			<artifactId>togglz-console</artifactId>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.blazegraph/junit-ext -->
+		<dependency>
+			<groupId>com.blazegraph</groupId>
+			<artifactId>junit-ext</artifactId>
+			<version>2.1.4</version>
+		</dependency>
+
+
+		<!-- Needed for running tests (you may also use TestNG) -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Optional, but highly recommended -->
+		<!-- Arquillian allows you to test enterprise code such as EJBs and Transactional(JTA) 
+			JPA from JUnit/TestNG -->
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-container</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.protocol</groupId>
+			<artifactId>arquillian-protocol-servlet</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Arquillian performance check. -->
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-performance-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-performance-impl</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Used for jacoco test coverage -->
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-jacoco</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>org.jacoco.core</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm-util</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Maven resolver api -->
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-depchain</artifactId>
+			<type>pom</type>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-api-maven</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.descriptors</groupId>
+			<artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap</groupId>
+			<artifactId>shrinkwrap-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Mockito testing -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>tjws</artifactId>
+			<version>${version.tjws}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- End: Mockito testing -->
+
+		<!-- Gatlin testing -->
+		<dependency>
+			<groupId>io.gatling.highcharts</groupId>
+			<artifactId>gatling-charts-highcharts</artifactId>
+			<version>${version.gatling-charts-highcharts}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.gatling</groupId>
+			<artifactId>gatling-maven-plugin</artifactId>
+			<version>${version.gatling-maven-plugin}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- End: Gatlin testing -->
+
+	</dependencies>
+
+	<build>
+		<!-- Maven will append the version to the finalName (which is the name 
+			given to the generated war, and hence the context root) -->
+		<finalName>${project.artifactId}</finalName>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>version.properties</include>
+					<include>togglz-features.properties</include>
+					<include>jboss-web.xml</include>
+					<include>jboss-ejb3.xml</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${version.war.plugin}</version>
+				<configuration>
+					<!-- Java EE 7 doesn't require web.xml, Maven needs to catch up! -->
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+			<!-- The WildFly plugin deploys your war to a local WildFly container -->
+			<!-- To use, run: mvn package wildfly:deploy -->
+			<plugin>
+				<groupId>org.wildfly.plugins</groupId>
+				<artifactId>wildfly-maven-plugin</artifactId>
+				<version>${version.wildfly-maven-plugin}</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<configuration>
+					<destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+					<dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+				</configuration>
+				<executions>
+					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-site</id>
+						<phase>package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<!-- Dies ist das Default-Profile bei dem Junit Tests IMMER ausgeführt 
+				werden. 'mvn clean install'. -->
+			<!-- Damit Testabdeckung ausgeführt wird, Befehl 'mvn clean test jacoco:report' 
+				auf Kommandozeile ausführen. -->
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<runOrder>alphabetical</runOrder>
+							<!-- Excludes integration tests when unit tests are running. -->
+							<excludes>
+								<exclude>**/*IT.java</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+        <profile>
+            <!-- Ein Profil bei dem die Tests ge-'skipped' werden, 'mvn clean install -PskipTest'. -->
+            <id>skipTest</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        
+		<!-- Profile zum Starten und Stoppen von Wildfly. -->
+		<!-- Start: 'mvn wildfly:start -Pwildfly-local' -->
+		<!-- Stop: 'mvn wildfly:shutdown -Pwildfly-local' -->
+		<profile>
+			<id>wildfly-local</id>
+			<activation>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<runOrder>alphabetical</runOrder>
+							<!-- Excludes integration tests when unit tests are running. -->
+							<excludes>
+								<exclude>**/*IT.java</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.wildfly.plugins</groupId>
+						<artifactId>wildfly-maven-plugin</artifactId>
+						<version>${version.wildfly-maven-plugin}</version>
+						<configuration>
+							<!-- Get the custom wildfly 10.0.0.Final. -->
+							<groupId>de.bomc.poc</groupId>
+							<artifactId>bomc-wildfly-dist</artifactId>
+							<version>${version.bomc.wildfly.dist}</version>
+							<!-- Set the server-configuration. -->
+							<serverConfig>${wildfly.server.config}</serverConfig>
+							<!-- Target directory for deployable artefacts. -->
+							<targetDir>${project.parent.basedir}/target</targetDir>
+							<jbossHome>${project.parent.basedir}/wildfly-run/wildfly-${version.wildfly}</jbossHome>
+							<add-user>
+								<users>
+									<user>
+										<username>admin</username>
+										<password>admin.1234</password>
+									</user>
+									<user>
+										<username>admin-user</username>
+										<password>user.1234</password>
+										<groups>
+											<group>admin</group>
+											<group>user</group>
+										</groups>
+										<application-user>true</application-user>
+									</user>
+									<user>
+										<username>default-user</username>
+										<password>user.1234</password>
+										<groups>
+											<group>user</group>
+										</groups>
+										<application-user>true</application-user>
+									</user>
+								</users>
+							</add-user>
+							<serverArgs>
+								<serverArg>-Djboss.bind.address=${wildfly.address}</serverArg>
+								<serverArg>-Djboss.bind.address.management=${wildfly.management.address}</serverArg>
+								<serverArg>-Djboss.socket.binding.port-offset=${wildfly.port.offset}</serverArg>
+							</serverArgs>
+							<!-- Set additional jvm args, is optional. -->
+							<javaOpts>
+								<javaOpt>-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n</javaOpt>
+								<javaOpt>-Xms64m</javaOpt>
+								<javaOpt>-Xmx512m</javaOpt>
+								<javaOpt>-Xss256k</javaOpt>
+								<javaOpt>-Djava.net.preferIPv4Stack=true</javaOpt>
+								<javaOpt>-Dsun.rmi.dgc.client.gcInterval=3600000</javaOpt>
+								<javaOpt>-Dsun.rmi.dgc.server.gcInterval=3600000</javaOpt>
+								<!-- The given directory must be available. <javaOpt>-Djboss.server.config.dir=${project.parent.basedir}/conf</javaOpt> -->
+							</javaOpts>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- An optional Arquillian testing profile that executes tests in your 
+				WildFly instance -->
+			<!-- The location of wildfly is: wildfly.home, this mandotory. -->
+			<!-- This profile will start a new WildFly instance, and execute the test, 
+				shutting it down when done -->
+			<!-- Run with: 'mvn clean test -Parq-wildfly-managed' with code coverage 
+				'mvn clean verify -Parq-wildfly-managed' -->
+			<id>arq-wildfly-managed</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly</groupId>
+					<artifactId>wildfly-arquillian-container-managed</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<includes>
+								<include>**/*IT.java</include>
+							</includes>
+							<systemProperties>
+								<arquillian.launch>wildfly-managed</arquillian.launch>
+								<arq.wildfly.home>${project.parent.basedir}/wildfly-run/wildfly-${version.wildfly}</arq.wildfly.home>
+								<arq.wildfly.java.vm.arg>${arq.wildfly.java.vm.arg.managed}</arq.wildfly.java.vm.arg>
+								<arq.wildfly.server.config.file.name>${wildfly.server.config}</arq.wildfly.server.config.file.name>
+								<arq.wildfly.management.address>${wildfly.management.address}</arq.wildfly.management.address>
+								<arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+							</systemProperties>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+							<execution>
+								<!-- We need to verify the content of jacoco.exec after the 'test' 
+									JVM has shutdown and flushed the data to disk. -->
+								<id>verify-output-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- Dieses Profile wird soll auf dem Jenkins ausgeführt werden. Der Unterschied 
+				zu den anderen Profilen ist die Verwendung des Failsafe Plugins. Dies ermöglicht 
+				das separate Ausführen von Unit tests und Arq-Integrations Test in einem 
+				Jenkins Job. -->
+			<!-- Run with: mvn clean test '-Parq-wildfly-managed-dist' with code coverage 
+				'mvn clean verify -Parq-wildfly-managed-dist' auf Jenkins: 'mvn clean install 
+				jacoco:report -Pjacoco,arq-wildfly-managed-dist' -->
+			<id>arq-wildfly-managed-dist</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly</groupId>
+					<artifactId>wildfly-arquillian-container-managed</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<!-- Junit tests werden hier nicht ausgeführt. -->
+							<skip>true</skip>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+						</configuration>
+						<executions>
+							<execution>
+								<id>unpack</id>
+								<!--<phase>process-test-classes</phase> -->
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>de.bomc.poc</groupId>
+											<artifactId>bomc-wildfly-dist</artifactId>
+											<version>${version.bomc.wildfly.dist}</version>
+											<type>zip</type>
+											<outputDirectory>${project.build.directory}</outputDirectory>
+											<overWrite>false</overWrite>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<!-- Für jeden Test wird eine VM gestartet, in dieser VM wird jeweils 
+								ein separater Wildfly gestartet, das Test-Artefakt deployed und Wildfly anschliessend 
+								gestoppt. -->
+							<forkCount>1</forkCount>
+							<reuseForks>false</reuseForks>
+							<!--<argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine> -->
+							<includes>
+								<include>**/*IT.java</include>
+							</includes>
+							<systemProperties>
+								<arquillian.launch>wildfly-managed-dist</arquillian.launch>
+								<arq.wildfly.home>${project.build.directory}/wildfly-${version.wildfly}</arq.wildfly.home>
+								<arq.wildfly.java.vm.arg>${arq.wildfly.java.vm.arg.managed}</arq.wildfly.java.vm.arg>
+								<arq.wildfly.server.config.file.name>${wildfly.server.config}</arq.wildfly.server.config.file.name>
+								<arq.wildfly.management.address>${wildfly.management.address}</arq.wildfly.management.address>
+								<arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+							</systemProperties>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-tests</id>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>integration-test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+							<execution>
+								<id>verify</id>
+								<goals>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- An optional Arquillian testing profile that executes tests in a remote 
+				WildFly instance -->
+			<!-- Run with: mvn clean test -Parq-wildfly-remote with code coverage 
+				'mvn clean verify -Parq-wildfly-remote' -->
+			<id>arq-wildfly-remote</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly</groupId>
+					<artifactId>wildfly-arquillian-container-remote</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<includes>
+								<include>**/*TestIT.java</include>
+							</includes>
+							<systemProperties>
+								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+								<arquillian.launch>wildfly-remote</arquillian.launch>
+								<arq.wildfly.management.address>${wildfly.management.address}</arq.wildfly.management.address>
+								<arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+							</systemProperties>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+							<execution>
+								<!-- We need to verify the content of jacoco.exec after the 'test' 
+									JVM has shutdown and flushed the data to disk. -->
+								<id>verify-output-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- Profile zum initialen Download vom Wildfly. -->
+		<!-- Der Wildfly wird in das Verzeichnis 'project.parent.basedir' runtergeladen 
+			und gestartet. -->
+		<!-- Dieses Profil sollte nur zum Runterladen ausgefuehrt werden. -->
+		<!-- Zum Starten, Stoppen und Deployen sollte das Profile 'wildfly-local-download' 
+			benutzt werden. -->
+		<!-- Download mit anschliessendem Start von Wildfly: 'mvn wildfly:start 
+			-Pwildfly-local-download' -->
+		<profile>
+			<id>wildfly-local-download</id>
+			<activation>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.wildfly.plugins</groupId>
+						<artifactId>wildfly-maven-plugin</artifactId>
+						<version>${version.wildfly-maven-plugin}</version>
+						<configuration>
+							<!-- Get the custom wildfly 10.0.0.Final. -->
+							<groupId>de.bomc.poc</groupId>
+							<artifactId>bomc-wildfly-dist</artifactId>
+							<version>${version.bomc.wildfly.dist}</version>
+							<!-- Set the server-configuration. -->
+							<serverConfig>${wildfly.server.config}</serverConfig>
+							<targetDir>${project.parent.basedir}</targetDir>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>apidocs</id>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>generate-service-docs</id>
+								<phase>generate-resources</phase>
+								<configuration>
+									<doclet>com.carma.swagger.doclet.ServiceDoclet</doclet>
+									<docletArtifact>
+										<groupId>com.carma</groupId>
+										<artifactId>swagger-doclet</artifactId>
+										<!-- <version>${version.swagger.doclet}</version> -->
+										<version>1.1.2</version>
+									</docletArtifact>
+
+									<!-- <subpackages>de.bomc.poc.rest.endpoints:org.keycloak.protocol.oidc</subpackages> -->
+									<subpackages>de.bomc.poc.rest.endpoints</subpackages>
+									<detectOfflineLinks>false</detectOfflineLinks>
+									<offlineLinks>
+										<offlineLink>
+											<url>../javadocs</url>
+											<location>${project.basedir}/../target/site/apidocs</location>
+										</offlineLink>
+									</offlineLinks>
+
+									<reportOutputDirectory>${project.basedir}/target/apidocs-rest/swagger</reportOutputDirectory>
+									<useStandardDocletOptions>false</useStandardDocletOptions>
+									<additionalparam> -skipUiFiles -apiVersion 1
+										-includeResourcePrefixes de.bomc.poc.rest.endpoints.v1
+										-docBasePath /apidocs -apiBasePath
+										http://localhost:8080/bomc-war -apiInfoFile
+										${project.basedir}/src/docs/swagger/apiinfo.json</additionalparam>
+								</configuration>
+								<goals>
+									<goal>javadoc</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>com.redowlanalytics</groupId>
+						<artifactId>swagger2markup-maven-plugin</artifactId>
+						<version>0.8.0</version>
+
+						<dependencies>
+							<dependency>
+								<groupId>io.github.robwin</groupId>
+								<artifactId>swagger2markup</artifactId>
+								<version>0.9.2</version>
+							</dependency>
+						</dependencies>
+
+						<executions>
+							<execution>
+								<id>gen-asciidoc</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>process-swagger</goal>
+								</goals>
+								<configuration>
+									<inputDirectory>${project.basedir}/target/apidocs-rest/swagger/apidocs</inputDirectory>
+									<outputDirectory>${project.basedir}/target/apidocs-rest/asciidoc</outputDirectory>
+									<markupLanguage>asciidoc</markupLanguage>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.asciidoctor</groupId>
+						<artifactId>asciidoctor-maven-plugin</artifactId>
+						<version>1.5.3</version>
+						<executions>
+							<execution>
+								<id>generate-docs</id>
+								<phase>package</phase>
+								<goals>
+									<goal>process-asciidoc</goal>
+								</goals>
+								<configuration>
+									<sourceDirectory>${project.basedir}/src/docs/asciidoc</sourceDirectory>
+									<sourceDocumentName>index.adoc</sourceDocumentName>
+									<outputDirectory>${project.basedir}/target/apidocs-rest/output</outputDirectory>
+									<!-- <backend>html</backend> -->
+									<!-- <attributes> -->
+									<!-- List of attributes: https://github.com/asciidoctor/asciidoctorj/blob/master/asciidoctorj-core/src/main/java/org/asciidoctor/Attributes.java -->
+									<!-- <toc /> -->
+									<!-- </attributes> -->
+									<!-- </configuration> -->
+
+									<backend>html5</backend>
+									<attributes>
+										<generated>${project.basedir}/target/apidocs-rest/asciidoc</generated>
+										<doctype>pdf</doctype>
+										<toclevels>2</toclevels>
+										<toc>left</toc>
+										<doctype>book</doctype>
+									</attributes>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>performance</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>io.gatling</groupId>
+						<artifactId>gatling-maven-plugin</artifactId>
+						<version>2.0.0-RC4</version>
+						<configuration>
+							<dataFolder>src/test/resources/data</dataFolder>
+							<resultsFolder>target/gatling/results</resultsFolder>
+							<requestBodiesFolder>src/test/resources/request-bodies</requestBodiesFolder>
+							<simulationsFolder>src/test/scala</simulationsFolder>
+						</configuration>
+						<executions>
+							<execution>
+								<id>test1</id>
+								<phase>test</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+								<configuration>
+									<simulationClass>com.example.SimulationOne</simulationClass>
+								</configuration>
+							</execution>
+							<execution>
+								<id>test2</id>
+								<phase>test</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+								<configuration>
+									<simulationClass>com.example.SimulationTwo</simulationClass>
+								</configuration>
+							</execution>
+							<execution>
+								<id>test3</id>
+								<phase>test</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+								<configuration>
+									<simulationClass>com.example.SimulationThree</simulationClass>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

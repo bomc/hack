@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kafka-wf
+  namespace: kafka
+  labels:
+    app: kafka-wf
+spec:
+  containers:
+    - name: kafka-wf
+      image: bomc/kafka-wf:latest
+      imagePullPolicy: IfNotPresent
+#  imagePullSecrets:
+#    - name: regsecret

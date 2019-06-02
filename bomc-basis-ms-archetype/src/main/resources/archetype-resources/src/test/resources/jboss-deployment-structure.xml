@@ -1,0 +1,34 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<?xml version="1.0"?>
+<!--
+	A common source of errors in Java applications is including API classes in a deployment that are also 
+	provided by the container. This can result in multiple versions of the class being created and the 
+	deployment failing to deploy properly. To prevent this in WildFly, module dependencies are added in a 
+	specific order that should prevent this situation from occurring. 
+
+	In order of highest priority to lowest priority
+
+	System Dependencies - These are dependencies that are added to the module automatically by the 
+	                      container, including the Java EE api's.
+	User Dependencies - These are dependencies that are added through jboss-deployment-structure.xml or 
+						through the Dependencies: manifest entry.
+	Local Resource - Class files packaged up inside the deployment itself, e.g. class files from 
+					 WEB-INF/classes or WEB-INF/lib of a war.
+	Inter deployment dependencies - These are dependencies on other deployments in an ear deployment. 
+	This can include classes in an ear's lib directory, or classes defined in other ejb jars. 
+	
+	See: https://docs.jboss.org/author/display/WFLY10/Class+Loading+in+WildFly
+-->
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+	<!-- 
+    <deployment>
+        <dependencies>
+            <module name="org.apache.httpcomponents"/>
+            <module name="org.codehaus.jackson.jackson-core-asl" />
+            <module name="org.codehaus.jackson.jackson-mapper-asl" />
+        </dependencies>
+    </deployment>
+	-->
+</jboss-deployment-structure>

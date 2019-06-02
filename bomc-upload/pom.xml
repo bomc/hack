@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.bomc.poc</groupId>
+		<artifactId>bomc-parent-pom</artifactId>
+		<version>1.00.00-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>bomc-upload</artifactId>
+
+	<packaging>pom</packaging>
+
+	<name>bomc-upload</name>
+
+	<modules>
+		<module>bomc-upload-web</module>
+		<module>bomc-upload-lib</module>
+		<module>bomc-upload-gatling</module>
+	</modules>
+
+	<properties>
+		<!-- Explicitly declaring the source encoding eliminates the following 
+			message: -->
+		<!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered 
+			resources, i.e. build is platform dependent! -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- Property verhindert, dass be Ausführung von 'mvn clean install' die 
+			Unit-Tests ge-'skipped' werden. -->
+		<maven.test.skip>false</maven.test.skip>
+
+		<!-- JBoss dependency versions -->
+
+		<version.wildfly.maven.plugin>1.1.0.Final</version.wildfly.maven.plugin>
+
+		<!-- Define the version of the JBoss BOMs we want to import to specify 
+			tested stacks. -->
+		<version.jboss.bom>8.2.2.Final</version.jboss.bom>
+
+		<!-- pact config directories -->
+		<pact.config.dir>src/config/pacts</pact.config.dir>
+		<pact.wildfly.host.address>192.168.4.1</pact.wildfly.host.address>
+		<pact.wildfly.host.http.port>8180</pact.wildfly.host.http.port>
+
+		<version.bomc-upload-lagacy-api>1.00.00-SNAPSHOT</version.bomc-upload-lagacy-api>
+		<version.logging-lib>1.00.00-SNAPSHOT</version.logging-lib>
+		<version.exception-lib>1.00.00-SNAPSHOT</version.exception-lib>
+		<version.rest-lib>1.00.00-SNAPSHOT</version.rest-lib>
+		<version.resteasy-multipart-provider>3.0.19.Final</version.resteasy-multipart-provider>
+		<version.resteasy-client>3.0.19.Final</version.resteasy-client>
+		<version.resteasy-jackson-provider>3.0.19.Final</version.resteasy-jackson-provider>
+		<version.log4j>1.2.17</version.log4j>
+		<version.arquillian-jacoco>1.0.0.Alpha9</version.arquillian-jacoco>
+		<version.org.jacoco.core>0.7.8</version.org.jacoco.core>
+		<version.asm-util>3.3.1</version.asm-util>
+		<version.commons-lang>2.6</version.commons-lang>
+		<version.hamcrest-all>1.3</version.hamcrest-all>
+		<version.jackson-databind>2.5.4</version.jackson-databind>
+		<version.jackson-datatype-jsr310>2.5.4</version.jackson-datatype-jsr310>
+		<version.pact-jvm-consumer-junit_2.11>3.3.4</version.pact-jvm-consumer-junit_2.11>
+		<version.pact-jvm-consumer_2.11>3.3.4</version.pact-jvm-consumer_2.11>
+		<version.fluent-hc>4.5.2</version.fluent-hc>
+		<version.slf4j-api>1.7.22</version.slf4j-api>
+		<version.logback-classic>1.1.9</version.logback-classic>
+		<version.logback-core>1.1.9</version.logback-core>
+
+		<!-- other plugin versions -->
+		<version.maven-surefire-plugin>2.19.1</version.maven-surefire-plugin>
+		<version.war.plugin>2.5</version.war.plugin>
+		<version.jacoco-maven-plugin>0.7.8</version.jacoco-maven-plugin>
+
+		<!-- maven-compiler-plugin -->
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+
+		<!-- Properties for arquillian tests. -->
+		<!-- Example for start vm-wildfly parameter. -->
+		<version.wildfly>10.1.0.Final</version.wildfly>
+		<wildfly.server.config>standalone.xml</wildfly.server.config>
+		<wildfly.management.address>192.168.4.1</wildfly.management.address>
+		<wildfly.address>192.168.4.1</wildfly.address>
+		<wildfly.port>10090</wildfly.port>
+		<wildfly.port.offset>100</wildfly.port.offset>
+		<!-- IMPORTANT: These properties must be adapted to a available local Wildfly 
+			instance. -->
+		<!-- These properties are necessary for the managed profiles. -->
+		<wildfly.home>${project.basedir}/wildfly-run/wildfly-${version.wildfly}</wildfly.home>
+		<arq.wildfly.java.vm.arg.managed>
+			-Djboss.socket.binding.port-offset=${wildfly.port.offset}
+			-Djboss.bind.address=${wildfly.address}
+			-Djboss.bind.address.management=${wildfly.management.address}
+			-Djboss.node.name=auth.local
+			-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n
+		</arq.wildfly.java.vm.arg.managed>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<!-- Define the version of the WAR so that we don't need to repeat ourselves 
+				in every module -->
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>bomc-upload-web</artifactId>
+				<version>${project.version}</version>
+				<type>war</type>
+				<scope>compile</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>bomc-upload-lib</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>bomc-upload-gatling</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>logging-lib</artifactId>
+				<version>${version.logging-lib}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>exception-lib</artifactId>
+				<version>${version.exception-lib}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>rest-lib</artifactId>
+				<version>${version.rest-lib}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>de.bomc.poc</groupId>
+				<artifactId>bomc-upload-lagacy-api</artifactId>
+				<version>${version.bomc-upload-lagacy-api}</version>
+			</dependency>
+
+			<!-- JBoss distributes a complete set of Java EE 7 APIs including a Bill 
+				of Materials (BOM). A BOM specifies the versions of a "stack" (or a collection) 
+				of artifacts. We use this here so that we always get the correct versions 
+				of artifacts. Here we use the jboss-javaee-7.0-with-tools stack (you can 
+				read this as the JBoss stack of the Java EE 7 APIs, with some extras tools 
+				for your project, such as Arquillian for testing) and the jboss-javaee-7.0-with-hibernate 
+				stack you can read this as the JBoss stack of the Java EE 7 APIs, with extras 
+				from the Hibernate family of projects) -->
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>jboss-javaee-7.0-with-tools</artifactId>
+				<version>${version.jboss.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.wildfly.bom</groupId>
+				<artifactId>jboss-javaee-7.0-with-hibernate</artifactId>
+				<version>${version.jboss.bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-client</artifactId>
+				<version>${version.resteasy-client}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-multipart-provider</artifactId>
+				<version>${version.resteasy-multipart-provider}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-jackson-provider</artifactId>
+				<version>${version.resteasy-jackson-provider}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>${version.log4j}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>${version.commons-lang}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-all</artifactId>
+				<version>${version.hamcrest-all}</version>
+			</dependency>
+
+			<!-- Used for jacoco test coverage -->
+			<dependency>
+				<groupId>org.jboss.arquillian.extension</groupId>
+				<artifactId>arquillian-jacoco</artifactId>
+				<version>${version.arquillian-jacoco}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jacoco</groupId>
+				<artifactId>org.jacoco.core</artifactId>
+				<version>${version.org.jacoco.core}</version>
+			</dependency>
+			<dependency>
+				<groupId>asm</groupId>
+				<artifactId>asm-util</artifactId>
+				<version>${version.asm-util}</version>
+			</dependency>
+
+			<!-- For consumer contract tests -->
+			<dependency>
+				<groupId>au.com.dius</groupId>
+				<artifactId>pact-jvm-consumer-junit_2.11</artifactId>
+				<version>${version.pact-jvm-consumer-junit_2.11}</version>
+			</dependency>
+			<dependency>
+				<groupId>au.com.dius</groupId>
+				<artifactId>pact-jvm-consumer_2.11</artifactId>
+				<version>${version.pact-jvm-consumer_2.11}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>fluent-hc</artifactId>
+				<version>${version.fluent-hc}</version>
+			</dependency>
+
+			<!-- Is for logback logging, pact testing -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${version.slf4j-api}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${version.logback-classic}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-core</artifactId>
+				<version>${version.logback-core}</version>
+			</dependency>
+			<!-- End: Is for logback logging, pact testing -->
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!-- The WildFly plugin deploys your ear to a local JBoss AS container -->
+				<!-- Due to Maven's lack of intelligence with EARs we need to configure 
+					the wildfly maven plugin to skip deployment for all modules. We then enable 
+					it specifically in the ear module. -->
+				<plugin>
+					<groupId>org.wildfly.plugins</groupId>
+					<artifactId>wildfly-maven-plugin</artifactId>
+					<version>${version.wildfly.maven.plugin}</version>
+					<inherited>true</inherited>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${version.jacoco-maven-plugin}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${version.maven-surefire-plugin}</version>
+				</plugin>
+
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

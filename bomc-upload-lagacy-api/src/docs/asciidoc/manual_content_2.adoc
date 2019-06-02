@@ -1,0 +1,31 @@
+# Validierungs-Codes im Response Objekt
+
+Der eigentliche Status der Validierung wird im Response-Objekt mitgeschickt. Hierbei stehen die Parameter
+
+```
+- requestId
+- statusCode
+- statusText (erlaubte Textlänge sind 500 Zeichen; Formatierungen und Steuerungszeichen sind nicht erlaubt)
+```
+
+zur Verfügung.
+
+Alle Parameter müssen zwingend mit Werten befüllt werden.
+
+[options="header"]
+|===
+|statusCode|statusText
+|10100|Validierung konnte erfolgreich ausgeführt werden.
+|10101|Validierung konnte nicht erfolgreich ausgeführt werden.
+|===
+
+## Beispiel für ein Response:
+
+```
+{
+     "statusCode": "10100",
+     "statusText": "Validierung konnte erfolgreich ausgeführt werden",
+     "requestId": "ab33e2ee-9443-4302-9142-e0df8e5b3cb9"
+     "duration": "2000"
+}
+```

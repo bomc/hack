@@ -1,0 +1,115 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.bomc.poc</groupId>
+	<artifactId>lra-order-controller</artifactId>
+	<version>1.00.00-SNAPSHOT</version>
+	<packaging>war</packaging>
+
+	<name>Service that represents the order and controller for lra.</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<version.java>1.8</version.java>
+		
+		<version.javaee-api>7.0</version.javaee-api>
+		<version.axon>3.3.5</version.axon>
+		<version.axon-cdi>3.3-alpha2-SNAPSHOT</version.axon-cdi>
+		
+		<version.log4j>1.2.17</version.log4j>
+		
+		<version.jackson-datatype-jsr310>2.6.0</version.jackson-datatype-jsr310>
+		<version.hystrix-core>1.5.12</version.hystrix-core>
+		<version.hystrix-metrics-event-stream>1.5.12</version.hystrix-metrics-event-stream>
+		<version.rxjava>1.3.0</version.rxjava>
+		
+		<version.resteasy-client>3.5.1.Final</version.resteasy-client>
+		
+		<version.junit>4.12</version.junit>
+		
+		<!-- Other plugins -->
+		<version.maven-compiler-plugin>3.8.0</version.maven-compiler-plugin>
+		<version.maven-war-plugin>3.2.0</version.maven-war-plugin>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>${version.javaee-api}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.axonframework</groupId>
+			<artifactId>axon-cdi</artifactId>
+			<version>${version.axon-cdi}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>${version.jackson-datatype-jsr310}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${version.log4j}</version>
+		</dependency>
+
+		<!-- Hystrix -->
+		<dependency>
+			<groupId>com.netflix.hystrix</groupId>
+			<artifactId>hystrix-core</artifactId>
+			<version>${version.hystrix-core}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.netflix.hystrix</groupId>
+			<artifactId>hystrix-metrics-event-stream</artifactId>
+			<version>${version.hystrix-metrics-event-stream}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.reactivex</groupId>
+			<artifactId>rxjava</artifactId>
+			<version>${version.rxjava}</version>
+		</dependency>
+
+		<!-- Resteasy client -->
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-client</artifactId>
+			<version>${version.resteasy-client}</version>
+			<scope>provided</scope>
+		</dependency>
+        
+		<!-- Testing -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${version.junit}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${version.maven-compiler-plugin}</version>
+				<configuration>
+					<source>${version.java}</source>
+					<target>${version.java}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${version.maven-war-plugin}</version>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+					</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

@@ -1,0 +1,17 @@
+t_user:
+ - dtype: 'User'
+   c_id: 1
+   c_entity_uid: '40c82e3d-8194-4b30-afc0-cdf27c158be3'
+   c_version: 0
+   c_enabled: 1
+   c_expiration_date: '2021-03-22 14:49:01'
+   c_extern: 0
+   c_fullname: 'my_fullname'
+   c_last_password_change: '2016-03-22 14:49:01'
+   c_locked: 0
+   c_password: 'My@123Password'
+   c_comment: 'myComment'
+   c_image: "[null]"
+   c_phone_no: 0791234567
+   c_sex: 'MALE'
+   c_username: 'myUsername'

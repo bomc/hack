@@ -1,0 +1,4 @@
+
+== Vokabular
+
+Das verwendete Vokabular wird im entsprechenden Abschnitt des Datenmodells dokumentiert. Zur Zeit verwendet der Microservcie das folgende spezifische Vokabular in seinem Datenmodell.

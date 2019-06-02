@@ -1,0 +1,7 @@
+ifndef::imagesdir[:imagesdir: images]
+include::{generated}/overview.adoc[]
+include::manual_content_1.adoc[]
+include::{generated}/paths.adoc[]
+include::{generated}/definitions.adoc[]
+include::manual_content_2.adoc[]
+include::release_notes.adoc[]

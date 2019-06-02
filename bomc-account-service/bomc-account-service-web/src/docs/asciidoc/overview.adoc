@@ -1,0 +1,12 @@
+= BomcApp REST API
+
+== Overview
+This is a REST API reference for the BomcApp
+
+=== Version information
+Version: 1
+
+=== URI scheme
+Host: localhost:8080
+BasePath: /bomc-war
+Schemes: HTTP

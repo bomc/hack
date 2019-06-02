@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bomc-upload</artifactId>
+		<groupId>de.bomc.poc</groupId>
+		<version>1.00.00-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>bomc-upload-web</artifactId>
+	<packaging>war</packaging>
+
+	<name>bomc-upload: WAR Module</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>bomc-upload-lib</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>logging-lib</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>exception-lib</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>rest-lib</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>de.bomc.poc</groupId>
+			<artifactId>bomc-upload-lagacy-api</artifactId>
+		</dependency>
+
+		<!-- Import the JAX-RS API, we use provided scope as the API is included 
+			in JBoss WildFly -->
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>jaxrs-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jackson-provider</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the CDI API, we use provided scope as the API is included in 
+			JBoss WildFly -->
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.spec.javax.ejb</groupId>
+			<artifactId>jboss-ejb-api_3.2_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Import the JPA API, we use provided scope as the API is included in 
+			JBoss WildFly -->
+		<dependency>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.1-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- JSR-303 (Bean Validation) Implementation -->
+		<!-- Provides portable constraints such as @Email -->
+		<!-- Hibernate Validator is shipped in JBoss WildFly -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-multipart-provider</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-client</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Needed for running tests (you may also use TestNG) -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Optional, but highly recommended -->
+		<!-- Arquillian allows you to test enterprise code such as EJBs and Transactional(JTA) 
+			JPA from JUnit/TestNG -->
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-container</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.protocol</groupId>
+			<artifactId>arquillian-protocol-servlet</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Used for jacoco test coverage -->
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-jacoco</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>org.jacoco.core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm-util</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Maven resolver api -->
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-depchain</artifactId>
+			<type>pom</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-api-maven</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.descriptors</groupId>
+			<artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.shrinkwrap</groupId>
+			<artifactId>shrinkwrap-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- For consumer contract tests -->
+		<dependency>
+			<groupId>au.com.dius</groupId>
+			<artifactId>pact-jvm-consumer-junit_2.11</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>au.com.dius</groupId>
+			<artifactId>pact-jvm-consumer_2.11</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>fluent-hc</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Is for logback logging, pact testing -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- End: Is for logback logging, pact testing -->
+
+		<!-- Hystrix -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.netflix.archaius</groupId> -->
+<!-- 			<artifactId>archaius-core</artifactId> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.netflix.hystrix</groupId> -->
+<!-- 			<artifactId>hystrix-core</artifactId> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.netflix.hystrix</groupId> -->
+<!-- 			<artifactId>hystrix-metrics-event-stream</artifactId> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>io.reactivex</groupId> -->
+<!-- 			<artifactId>rxjava</artifactId> -->
+<!-- 		</dependency> -->
+		<!-- End: Hystrix -->
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${version.war.plugin}</version>
+				<configuration>
+					<!-- Java EE 7 doesn't require web.xml, Maven needs to catch up! -->
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<configuration>
+					<destFile>${basedir}/target/coverage-reports/jacoco.exec</destFile>
+					<dataFile>${basedir}/target/coverage-reports/jacoco.exec</dataFile>
+					<!--<outputDirectory>${session.executionRootDirectory}/jacoco/web</outputDirectory> -->
+				</configuration>
+				<executions>
+					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-site</id>
+						<phase>package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<!-- Dies ist das Default-Profile bei dem Junit Tests IMMER ausgeführt 
+				werden. 'mvn clean install'. -->
+			<!-- Damit Testabdeckung ausgeführt wird, Befehl 'mvn clean test jacoco:report' 
+				auf Kommandozeile ausführen. -->
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<runOrder>alphabetical</runOrder>
+							<!-- Excludes integration tests when instances tests are run. -->
+							<excludes>
+								<exclude>**/*IT.java</exclude>
+							</excludes>
+							<!-- System properties for pacts directories. -->
+							<systemProperties>
+								<!-- The pact contracts are placed after the junit tests in this 
+									directory. -->
+								<pact.rootDir>${project.basedir}/${pact.config.dir}</pact.rootDir>
+								<buildDirectory>${project.build.directory}</buildDirectory>
+							</systemProperties>
+						</configuration>
+					</plugin>
+					<plugin>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>analyze</id>
+								<goals>
+									<goal>analyze-only</goal>
+								</goals>
+								<configuration>
+									<failOnWarning>false</failOnWarning>
+									<outputXML>true</outputXML>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-enforcer-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>enforce-property</id>
+								<goals>
+									<goal>enforce</goal>
+								</goals>
+								<configuration>
+									<rules>
+										<requireProperty>
+											<property>maven.test.skip</property>
+											<message>*** Property 'maven.test.skip' muss definiert
+												werden. ***</message>
+											<regex>false</regex>
+											<regexMessage>*** Autsch, bei Ausfuehrung des
+												'default'-Profils, koennen die Tests NICHT ge-'skipped'
+												werden!
+											</regexMessage>
+										</requireProperty>
+									</rules>
+									<fail>true</fail>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- A profile that skip all tests, use with: 'mvn clean install -PskipTest'. -->
+			<id>skipTest</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<!-- An optional Arquillian testing profile that executes tests in a remote 
+				WildFly instance -->
+			<!-- Run with: mvn clean test -Parq-wildfly-remote with code coverage 
+				'mvn clean verify -Parq-wildfly-remote' -->
+			<id>arq-wildfly-remote</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly</groupId>
+					<artifactId>wildfly-arquillian-container-remote</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>false</skip>
+							<includes>
+								<include>**/*IT.java</include>
+							</includes>
+							<systemProperties>
+								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+								<arquillian.launch>wildfly-remote</arquillian.launch>
+								<arq.wildfly.management.address>${wildfly.management.address}</arq.wildfly.management.address>
+								<arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+							</systemProperties>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+							<execution>
+								<!-- We need to verify the content of jacoco.exec after the 'test' 
+									JVM has shutdown and flushed the data to disk. -->
+								<id>verify-output-tests</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- NOTE: This tests MUST running against a running Wildfly instance 
+				with a deployed 'egov-hoko-service-web.war' archive. -->
+			<!-- Use this profile 'mvn clean install -Pcdc-tests' to run the consumer 
+				driven contract tests. -->
+			<id>cdc-tests</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<pact.rootDir>${project.basedir}/${pact.config.dir}</pact.rootDir>
+								<buildDirectory>${project.build.directory}</buildDirectory>
+							</systemPropertyVariables>
+							<skip>false</skip>
+							<runOrder>alphabetical</runOrder>
+							<!--<excludes> -->
+							<!--<exclude>**/*IT.java</exclude> -->
+							<!--<exclude>**/*Test.java</exclude> -->
+							<!--</excludes> -->
+							<includes>
+								<include>**/*PactTest.java</include>
+							</includes>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>au.com.dius</groupId>
+						<artifactId>pact-jvm-provider-maven_2.11</artifactId>
+						<executions>
+							<execution>
+								<id>verify-pacts</id>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>verify</goal>
+								</goals>
+								<configuration>
+									<serviceProviders>
+										<serviceProvider>
+											<name>UploadEndpointProvider_V1</name>
+											<protocol>http</protocol>
+											<host>${pact.wildfly.host.address}</host>
+											<port>${pact.wildfly.host.http.port}</port>
+											<path>/</path>
+											<consumers>
+												<!-- Again, you can define as many consumers for each provider 
+													as you need, but each must have a unique name -->
+												<consumer>
+													<name>UploadEndpoint</name>
+													<!-- currently supports a file path using pactFile or a URL 
+														using pactUrl -->
+													<pactFile>${project.basedir}/${pact.config.dir}/UploadEndpoint-UploadEndpointProvider_V1.json</pactFile>
+												</consumer>
+											</consumers>
+											<!-- Verifying all pact files in a directory for a provider -->
+											<!--<pactFileDirectory>${project.basedir}/src/pacts</pactFileDirectory> -->
+										</serviceProvider>
+									</serviceProviders>
+									<configuration>
+										<pact.showStacktrace>true</pact.showStacktrace>
+									</configuration>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>

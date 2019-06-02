@@ -1,0 +1,3 @@
+== Document end hook (definition)
+
+Dummy text in document end hook

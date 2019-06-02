@@ -1,0 +1,105 @@
+# __________________________________________________________________________________________________________
+# http://rhoads-zach.github.io/2015/09/02/setting-up-ssltls-with-wildfly-10/
+# Batch script to enable HTTPS in the undertow subsystem of the server configuration file.
+# To run this script run: $JBOSS_HOME/bin>jboss-cli.bat --file=../standalone/configuration/configure-https.cli
+# Do this first, add a management user to the security realm (for use later on the management interfaces):
+# Create a file '$JBOSS_HOME/standalone/configuration/httpsRealm.properties'.
+# $JBOSS_HOME/bin/add-user.bat -up $JBOSS_HOME/standalone/configuration/https-users.properties -r httpsRealm
+
+
+
+# NOTE: Put the java keystore in $WILDFLY_HOME/standalone/configuration/server.jks
+
+
+
+# __________________________________________________________________________________________________________
+# Enter here ip and port of the running wildfly instance.
+connect --controller=192.168.4.1:10090
+
+
+
+# The batch mode allows one to group commands and operations and execute them together as an atomic unit.
+# If at least one of the commands or operations fails, all the other successfully executed commands and operations in the batch are rolled back.
+# __________________________________________________________________________________________________________
+batch
+
+
+
+# Create the a security realm (in this case httpsRealm):
+# __________________________________________________________________________________________________________
+/core-service=management/security-realm=httpsRealm/:add
+
+
+
+# Update the security realm to reference the users (https-users.properties) file:
+#__________________________________________________________________________________________________________
+/core-service=management/security-realm=httpsRealm/authentication=properties/:add(path=https-users.properties, relative-to=jboss.server.config.dir)
+
+
+
+# Update the security realm to reference the SSL/TLS certificate (server.jks)
+# __________________________________________________________________________________________________________
+/core-service=management/security-realm=httpsRealm/server-identity=ssl:add(keystore-path=server.jks,keystore-relative-to=jboss.server.config.dir,keystore-password=tzdbmm)
+
+
+
+# Run batch, if at least one of the commands or operations fails, all the other successfully executed commands and operations in the batch are rolled back.
+# __________________________________________________________________________________________________________
+run-batch
+
+
+
+# Restart the wildfly instance.
+# __________________________________________________________________________________________________________
+reload
+
+
+
+# Connect to the wildfly instance again.
+# __________________________________________________________________________________________________________
+connect --controller=192.168.4.1:10090
+
+
+
+# The batch mode allows one to group commands and operations and execute them together as an atomic unit.
+# If at least one of the commands or operations fails, all the other successfully executed commands and operations in the batch are rolled back.
+# __________________________________________________________________________________________________________
+batch
+
+
+
+# Enabling SSL for the Undertow Subsystem
+# Once the security realm has been created and configured with the SSL/TLS certificate, an https-listener can be added to the Undertow subsystem (which will reference the new security realm):
+# __________________________________________________________________________________________________________
+/subsystem=undertow/server=default-server/https-listener=default-https:add(socket-binding=https,security-realm=httpsRealm)
+#SSL/TLS is now enabled. To test this, point your browser to https://localhost:8443.
+
+
+
+# Enabling SSL for Management Interfaces
+# Since a security realm has been created with both an SSL/TLS certificate as well as an authentication information, the management interface can be configured to use it for HTTPS.
+# Enable the socket binding for HTTPS:
+# __________________________________________________________________________________________________________
+/core-service=management/management-interface=http-interface:write-attribute(name=secure-socket-binding,value=management-https)
+
+
+
+# Update the interface to be secured by the security realm (httpsRealm):
+# __________________________________________________________________________________________________________
+/core-service=management/management-interface=http-interface/:write-attribute(name=security-realm,value=httpsRealm)
+
+
+
+# Run batch, if at least one of the commands or operations fails, all the other successfully executed commands and operations in the batch are rolled back.
+# __________________________________________________________________________________________________________
+run-batch
+
+
+
+# Restart the wildfly instance.
+# __________________________________________________________________________________________________________
+reload
+
+
+
+#  After this the jboss-cli is available with 'jboss-cli.bat --connect controller=192.168.4.1:10090'

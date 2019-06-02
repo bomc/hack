@@ -1,0 +1,80 @@
+/**
+ * Project: MY_POC
+ * <p/>
+ * <pre>
+ *
+ * Last change:
+ *
+ *  by: $Author: $
+ *
+ *  date: $Date: $
+ *
+ *  revision: $Revision: $
+ *
+ * </pre>
+ * <p/>
+ * Copyright (c): BOMC, 2016
+ */
+package de.bomc.poc.rest.ext;
+
+import de.bomc.poc.api.generic.transfer.response.ResponseObjectDTO;
+import de.bomc.poc.api.generic.types.AbstractType;
+import de.bomc.poc.api.generic.types.BooleanType;
+import de.bomc.poc.api.generic.types.DoubleType;
+import de.bomc.poc.api.generic.types.IntegerType;
+import de.bomc.poc.api.generic.types.LongType;
+import de.bomc.poc.api.generic.types.StringType;
+import de.bomc.poc.api.jaxb.GenericResponseObjectDTOCollectionMapper;
+import de.bomc.poc.api.jaxb.JaxbGenMapAdapter;
+import de.bomc.poc.api.jaxb.MapEntryType;
+import de.bomc.poc.api.jaxb.MapType;
+import de.bomc.poc.api.generic.Parameter;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+
+/**
+ * A {@link MessageBodyReader} for unmarshalling the {@link ResponseObjectDTO}.
+ * @author <a href="mailto:bomc@bomc.org">bomc</a>
+ */
+@Provider
+@Consumes(MediaType.WILDCARD)
+public class ListResponseObjDtoMessageBodyReader implements MessageBodyReader<GenericResponseObjectDTOCollectionMapper> {
+
+	// NOTE: A logger injection is not possible here, because this class could be
+	// used by a client, that is not running in a cdi container.
+
+	@Override
+    public boolean isReadable(final Class<?> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType) {
+    	// Example for ArrayList type.
+//		return type == new ArrayList<ResponseObjectDTO>().getClass();
+        return type == GenericResponseObjectDTOCollectionMapper.class;
+    }
+
+	@Override
+    public GenericResponseObjectDTOCollectionMapper readFrom(final Class<GenericResponseObjectDTOCollectionMapper> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, String> httpHeaders,
+                                     final InputStream entityStream) throws IOException, WebApplicationException {
+        try {
+            final JAXBContext jaxbContext = JAXBContext.newInstance(GenericResponseObjectDTOCollectionMapper.class, ResponseObjectDTO.class, Parameter.class, AbstractType.class, BooleanType.class, DoubleType.class, IntegerType.class, LongType.class, StringType.class,
+                JaxbGenMapAdapter.class, MapEntryType.class, MapType.class);
+            final GenericResponseObjectDTOCollectionMapper
+                genericResponseObjectDTOCollectionMapper = (GenericResponseObjectDTOCollectionMapper)jaxbContext.createUnmarshaller().unmarshal(entityStream);
+
+            return genericResponseObjectDTOCollectionMapper;
+        } catch (final JAXBException jaxbException) {
+            throw new ProcessingException("ListResponseObjDtoMessageBodyReader#readFrom - Deserializing of ResponseObjectDTO failed!", jaxbException);
+        }
+    }
+}

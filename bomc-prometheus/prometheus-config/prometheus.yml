@@ -1,0 +1,19 @@
+global:
+  scrape_interval:     15s
+
+  external_labels:
+    monitor: 'bomc-metrics'
+
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'sample-service'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    # metrics_path defaults to '/metrics'
+    metrics_path: '/bomc-prometheus/rest/metrics/sampleservice'
+    # scheme defaults to 'http'.
+
+    static_configs:
+         - targets: ['bomc-prometheus:8180']

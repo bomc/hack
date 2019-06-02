@@ -1,0 +1,33 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: bomc-order-ingress
+  namespace: bomc-app
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    #ingress.kubernetes.io/ssl-redirect: "false"
+    ingress.kubernetes.io/ingress.class: "nginx"
+spec:
+  backend:
+    serviceName: default-http-backend
+    servicePort: 80
+  rules:
+   - host: bomc.ingress.org
+     http:
+      paths:
+      - path: /bomc-order
+        backend:
+          serviceName: bomc-order-service
+          servicePort: 80
+          # Invoke ingress, note host has to be set on host (system windows) system, see ReadMe.md for more.
+          # Ensure ingress is enabled:
+          # minikube addons enable ingress
+          #
+          # Ensure ingress is running
+          # kubectl get ingresses -n bomc-app
+          # or
+          # kubectl get pods -n kube-system | grep nginx-ingress-controller
+          #
+          # curl -v http://bomc.ingress.org/bomc-order/rest/version/current-version
+          

@@ -1,0 +1,3 @@
+== Document end hook (path)
+
+Dummy text in document end hook

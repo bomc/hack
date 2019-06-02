@@ -1,0 +1,1420 @@
+== Microservice REST API
+
+© _Created by Michael Börner_
+
+=== Überblick
+Das Dokument beschreibt den Aufbau des Projektes, sowie den Aufbau und Umgang mit dem API für den Microservice.
+
+==== Aufbau der 'pom.xml'-Datei
+Das Projekt ist für die Java EE7 (Java Platform, Enterprise Edition) und Wildfly 13.0.0.Final ausgelegt. 
+Die notwendigen Dependencies sind unten angegeben.
+
+```
+	<dependency>
+		<groupId>org.wildfly.bom</groupId>
+		<artifactId>wildfly-javaee7-with-tools</artifactId>
+		<version>${version.wildlfy.bom}</version>
+		<type>pom</type>
+		<scope>import</scope>
+	</dependency>
+	<dependency>
+		<groupId>javax</groupId>
+		<artifactId>javaee-api</artifactId>
+		<version>${version.javaee-api}</version>
+	</dependency>
+```
+
+Im pom.xml gibt es mehrere '_profiles_', die verschiedene Artefakte liefern und kurz vorgestellt werden:
+
+   - profile '*default*':
+   kompiliert den Source-Code und führt alle Modultests aus. Integrationstests werden *nicht* ausgeführt.
+   `mvn clean install`
+
+> Modultest-Klassen müssen *unbedingt* folgender Namenskonvention folgen: `MeineTestKlasse*Test.java`.
+   
+   - profile '*skipTest*':
+   kompiliert den Source-Code und es werden keine Tests durchgeführt.
+   `mvn clean install -PskipTest`
+   
+   - profile '*arq-wildfly-remote*':
+   kompiliert den Source-Code und es werden alle Integrationstests mit _Arquillian_ ausgeführt.
+   `mvn clean install -Parq-wildfly-remote`
+   Soll ein bestimmter Test ausgeführt werden, muss der Maven-Befehl, wie folgt angegeben werden:
+   `mvn clean install -Parq-wildfly-remote -Dtest=MeineTestKlasseIT#auszuführendeMethode`
+   
+> *Bemerkung:*
+> Integrationstest-Klassen müssen *unbedingt* folgender Namenskonvention folgen: `MeineTestKlasse*TestIT*.java`.
+> Es muss beim Ausführen dieses Profiles unbedingt der Wildfly gestartet sein.
+> Die Verbindung zwischen Maven und Wildfly wird über das folgende Property im pom.xml gesteuert und nicht über den Debug-Port (in der Regel 8787, wird beim Aufstarten im Log-file angezeigt):    
+> ```
+	<arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+> ```
+
+   - profile '*arq-wildfly-managed-dist*':
+   kompiliert den Source-Code und es werden alle Modultests und Integrationstests ausgeführt. Dieses Profil soll auf dem Jenkins verwendet werden.
+   `mvn clean install verify -Parq-wildfly-managed-dist`
+
+
+   - profile '*swagger*':
+   kompiliert den Source-Code und erzeugt ein neues .war-Archive in dem das Swagger-UI enthalten ist.
+   `mvn clean install -Pswagger`
+   Das Archive muss im Applikationserver deployed werden und ist dann unter folgender URL erreichbar:
+   `http://127.0.0.1:8180/${artifactId}/swagger-ui`
+   
+> *Bemerkung:*
+> Der angegegbene _Port: 8180_ setzt voraus, dass der Applikationserver mit einem Port-Offset von _100_ gstartet wurde.
+
+   - profile '*apidocs*':
+   erzeugt dieses Dokument in 4 verschiedenen Medienformaten: pdf, html, epub3 und docbook. Die generierten Dokumente sind in den folgenden Verzeichnis zu finden:
+   `\${artifactId}\target\asciidoc`
+   Folgende Metainformationen in diesem Dokument werden im pom, im folgenden Abschnitt gesetzt:
+
+```   
+	<info>
+   		<title>API Dokumentation für den Microservice</title>
+		<version>${project.version}</version>
+		<description>API Referenz Dokument</description>
+		<contact>
+			<email>bomc@bomc.org</email>
+			<name>Michael Börner</name>
+		</contact>
+	</info>
+```   
+
+=== Default-Service Endpoints
+Jeder Microservice muss bestimmte Endpoints implementieren, damit er als Teil des Gesamt-Ensembles seine Funktion ausführen kann.
+
+==== Version-Endpoint
+Der _Versions-Endpoint_ liefert die aktuelle Version aus dem *S*ource *C*ode *R*epository (SCR) zurück. Die aktuelle Version wird während des compile/build erzeugt und in die `version.properties`-Datei geschrieben. Zur Laufzeit kann die Version über den Endpoint _Versions-Endpoint_ ausgelesen werden.
+`curl -v -H "Accept: application/vnd.version-v1+json" -H "Content-Type: application/vnd.version-v1+json" -H "X-BOMC-REQUEST-ID: SET-BY-CURL-123" -H "X-BOMC-AUTHORIZATION: BOMC_USER" -X GET "127.0.0.1:8180/${artifactId}/rest/version/current-version"`
+Annotationen die den REST-Service beschreiben, im Context von JaxRS und Swagger, werden im jeweiligen Interface definiert.
+
+```   
+@Path(JaxRsActivator.VERSION_ENDPOINT_PATH)
+@Produces({ VersionRestEndpoint.MEDIA_TYPE_JSON_V1 })
+@Api(value = "/version", description = "Show the current version of the deployed service.")
+public interface VersionRestEndpoint {
+
+	String MEDIA_TYPE_JSON_V1 = "application/vnd.version-v1+json";
+	MediaType MEDIA_TYPE_JSON_V1_TYPE = new MediaType("application", "vnd.version-v1+json");
+
+	@ApiOperation(value = "Read the current version from 'version.properties'.", response = String.class)
+	@ApiResponses({ @ApiResponse(code = 404, message = "Endpoint not found."),
+			@ApiResponse(code = 200, message = "The current version as response object that wraps the 				javax.json.JsonObject as a string.") })
+	@GET
+	@Path("/current-version")
+	Response getVersion();
+```  
+
+==== ApiOverview-Endpoint
+Der _ApiOverview-Endpoint_ liefert einen Überbllick aller deploy-ten REST Endpoints im json-Format.
+`curl -v -H "Accept: application/vnd.overview-v1+json" -H "Content-Type: application/vnd.overview-v1+json" -H "X-BOMC-REQUEST-ID: SET-BY-CURL-123" -H "X-BOMC-AUTHORIZATION: BOMC_USER" -X GET "127.0.0.1:8180/${artifactId}/rest/overview/endpoints"`
+
+==== MBean Metriken
+Die Applikation sammelt Metriken über die Endpoints. Hierzu zählt die Performance, Anzahl der Aufrufe, sowie die Durchschnittsdauer eines Aufrufes. Desweiteren können Abweichungen vom Durchschnittswert in ein Monitoringsystem emittiert werden.
+
+> Der Durchschnittswert wird nach den ersten 100 Aufrufen des jeweiligen Endpoints ermittelt. 
+> Sollten danach bei Endpoint-Aufrufe in der Performance Abweichungen >25% auftreten, können diese in ein Monitoringsystem emittiert werden.
+> Die folgende Klasse ist als Listener registriert 
+> `de.bomc.poc.application.jmx.ThresholdNotificationListener` 
+> und ist für das emittieren der Monitoring-Nachrichten zuständig.
+
+Damit ein Endpoint für das Sammeln von Metriken teilnehmen kann, muss der Endpoint wie folgt annotiert werden:
+
+```
+...
+
+	@PerformanceTrackingQualifier
+	public class ApiOverviewRestEndpointImpl implements ApiOverviewRestEndpoint {
+
+...
+
+```
+
+Weiterhin muss das _beans.xml_ um folgendes ergänzt werden:
+
+```
+...
+
+	<interceptors>
+		<class>de.bomc.poc.application.performance.interceptor.PerformanceTrackingInterceptor</class>
+	</interceptors>
+
+...
+
+```
+
+Das Performance Tracking wird mit JMX MBeans implementiert. Dies hat den Vorteil, dass die Metriken auch über die JMX-Schnittstelle verfügbar sind und damit auch von anderen Monitoring Tools ausgelesen und visualisiert werden können.
+Um sich die Metriken über die JMX-Schnittstelle anzuschauen, muss die _Java & Monitoring Console_ gestartet werden und mit der VM des Wildfly-Applikationserver verbunden werden (WILDFLY_HOME\bin\jconsole.bat). In dem Tool den Reiter MBeans aus wählen und in der MBean-Struktur nach dem entsprechenden Domainnamen suchen.
+
+> Der Domainname wird in der Klasse `AbstractMBean`, Attribute `DOMAIN_NAME` gesetzt.   
+
+In der MBean-Struktur muss das `PerformanceTracking`-MBean ausgewählt werden. Das MBean bietet die Methode `dump` an. Der _Dump_ zeigt alle aufgerufenen Metoden mit seinen Metriken an.  
+`PerformanceTracking#dumpSorted - [Entry [service=de.bomc.poc.interfaces.rest.v1.overview.ApiOverviewRestEndpointImpl, method=getAvailableEndpoints, avg=16.0, invocationCounter=1, min=16, max=16 , sum=16, callsQueue=[success_2018-11-14 12:52:24.003], callsBufferLength=100, isMonitoringEnabled=false, limitInPercent=25.0, notifyDataQueue.size=0]]`
+
+=== Contract-First Development
+
+Contract-First bietet eine weitere Möglichkeit zum Definieren von APIs - in dem zuerst das Interface beschrieben wird (swagger bzw. OpenApi - Programmiersprachen-unabhängig) und daraus der benötigte Sourcecode (API, DTOs) generiert wird (analog WSDL2Java).
+
+Als Editor bietet sich hierbei der https://editor.swagger.io/[Online-Editor von swagger] an, den es auch als https://swagger.io/tools/swagger-editor/[Offlineversion] gibt.
+
+==== Build Konfiguration
+Der folgende POM-Auszug zeigt eine Beispielkonfiguration zum Generieren des Source-Codes auf Basis einer `api.yaml` mit dem `swagger-codegen-maven-plugin`. Dabei handelt es sich um die Minimalkonfiguration - siehe auch https://github.com/swagger-api/swagger-codegen/tree/master/modules/swagger-codegen-maven-plugin[alle verfügbaren Optionen].
+
+Details:
+
+* language: `jaxrs-spec` - definiert was effektiv generiert wird. In diesem Fall nur die Spezifikation, d.h. API-Interface(s) sowie DTOs. Weitere Informationen zu den diversen unterstützten Outputs finden sich in der https://swagger.io/tools/swagger-codegen/[Swagger Codegen Documentation].
+* apiPackage & modelPackage: definiert die entsprechenden Package-Namen, die für die generierten Klassen verwendet werden
+* generateSupportingFiles: `false` - dadurch werden nur die benötigten Java-Klassen generiert, überschüssige Dateien (z.B. pom.xml) werden weggelassen.
+
+.pom.xml
+[source,xml]
+----
+    ...
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-codegen-maven-plugin</artifactId>
+                <version>2.3.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/api.yaml</inputSpec>
+                            <language>jaxrs-spec</language>
+                            <apiPackage>ch.bs.zid.egov.privateaccount.api</apiPackage>
+                            <modelPackage>ch.bs.zid.egov.privateaccount.dto</modelPackage>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    ...
+----
+
+=== Logging
+Es wird vorgegeben, dass beim Eintreten einer Methode eine Logmeldung ausgegeben wird, bei der der Klassenname, Methodenname und optional die übergebenen Parameter in das Logfile geschrieben werden.
+
+```
+	private static final String LOG_PREFIX = "VersionRestEndpointImpl#";
+	@Inject
+	@LoggerQualifier
+	private Logger logger;
+
+	public Response getVersion() {
+		this.logger.debug(LOG_PREFIX + "getVersion");
+```
+
+Im Logfile ergibt sich daraus eine Logmeldung im folgenden Format (`VersionRestEndpointImpl#getVersion`):
+`2018-11-14 11:45:27,877 [ec9b6fa6-c9df-483d-8035-447628c102b2] [>>127.0.0.1:8180/${artifactId}/rest/] DEBUG [de.bomc.poc.interfaces.rest.v1.version.VersionRestEndpointImpl] (default task-26) VersionRestEndpointImpl#getVersion`
+
+=== RequestId
+Damit ein Request in einer Microservice-Architektur geloggt werden kann, muss jeder Request einen eindeutigen Identifier mitliefern.
+Der Einstieg in die Applikation ist der REST-Endpoint. Es wird zwingend davon ausgegangen, dass der eindeutige Identifier als Header `X-BOMC-REQUEST-ID` Information bei jedem Request mitgeliefert wird. Der eindeutige Identifier muss zwingend dem Format einer UID folgen, z.B. `ec9b6fa6-c9df-483d-8035-447628c102b2`
+Das Auswerten der RequestId erfolgt im `MDCFilter`, der Teil der Logging-Library ist.
+
+```
+	<dependency>
+		<groupId>de.bomc.poc</groupId>
+		<artifactId>logging-lib</artifactId>
+		<version>${version.logging-lib}</version>
+	</dependency>
+```
+
+Ziel ist es, das zu jeder Logmeldung automatisch die RequestId geloggt wird, ohne dass diese bei jeder Logmeldung immer wieder erneut gesetzt werden muss.
+Hier zu wird der *M*apped *D*iagnostic *C*ontext (MDC) von Log4j verwendet, der das gewünschte Verhalten unterstützt. Die RequestId wird im LocalThread des ausführenden Threads im MDC gesetzt und gelöscht.
+
+> Bei Ausführung des Requests in einem neuen Thread, muss der MDC im alten MDC gelöscht und im neuen LocalThread gesetzt werden.
+
+Damit die Informationen im Logfile auftauchen müssen folgende Konfigurationen im standalone.xml hinzugfügt werden.
+
+```
+	<subsystem xmlns="urn:jboss:domain:logging:5.0">
+		<console-handler name="CONSOLE">
+			<level name="INFO"/>
+			<formatter>
+				<named-formatter name="COLOR-PATTERN"/>
+			</formatter>
+		</console-handler>
+		<console-handler name="BOMC_CONSOLE">
+			<level name="DEBUG"/>
+			<formatter>
+				<named-formatter name="BOMC-PATTERN"/>
+			</formatter>
+		</console-handler>
+
+		...
+		
+		<logger category="de.bomc.poc" use-parent-handlers="false">
+			<level name="DEBUG"/>
+				<handlers>
+					<handler name="BOMC_CONSOLE"/>
+				</handlers>
+		</logger>
+
+		...
+		
+		<formatter name="BOMC-PATTERN">
+			<pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%X{X-BOMC-REQUEST-ID}] [%X{X-BOMC-BASE-URI}] %-5p [%c] (%t) %s%e%n"/>
+		</formatter>
+	</subsystem> 
+```
+	
+=== Onion-Architektur
+Die Projektstruktur dieses Projekts ist nach der Onion Architektur aufgebaut und soll folgend kurz erklärt werden.
+Zuerst soll das bekannte Layer.Modell erklärt werden, um den Unterschied zur Onion-Architektur hervorzuheben. 
+ 
+==== Das N-Layer-Modell
+Das Layer-Pattern soll helfen, Applikationen zu strukturieren, indem sie in Gruppen von Subtasks – die wiederum Subtasks bis hin zu einer bestimmten Stufe an Granularität enthalten – zerlegt werden. All das bildet die Grundlage des originalen N-Layer-Modells.	
+ 
+
+In der Hierarchie höher angesiedelt Layer (Layer N+1) nutzen ausschließlich Dienste der darunterliegenden Layer (Layer N). Es sind keine weiteren direkten oder indirekten Abhängigkeiten zwischen den Layern erlaubt. Dadurch schützt jeder Layer die darunterliegenden Layer vor direktem Zugriff. Auf diese Weise wird das Prinzip von Datenkapselung (Information Hiding) erfüllt. Alle Komponenten innerhalb eines individuellen Layers besitzen denselben Abstraktionsgrad. Dieser Ansatz wird als _striktes_ Layering bezeichnet. Dass so genannte flexible Layering ist weniger restriktiv in Bezug auf Beziehungen zwischen den Layern. Jeder Layer darf die Dienste aller darunterliegenden Layer verwenden. Dieser Ansatz bietet durch reduziertes Mapping der Daten zwischen den Layern in der Regel mehr Flexibilität und Performance. Allerdings auf Kosten einer reduzierten Wartbarkeit. Es gibt in der Regel die definierten Layer - den Präsentations- oder Client-Layer, den Prozess- oder Service-Layer, den Domänen- oder Geschäftslogik-Layer und den Datenzugriffs- oder Infrastruktur-Layer. 
+Aus der definierten Layer-Struktur, ist der Präsentations-Layer vom Applikations-Layer und dann vom Domänen-Layer und schlussendlich vom Datenzugriffs-Layer abhängig. Dies bedeutet, dass jeder Layer mit dem darunterliegenden Layer gekoppelt ist. Die darunterliegenden Layer sind wiederum jeweils an die Infrastruktur gekoppelt. Zwar braucht eine Applikation Kopplung, um überhaupt eine sinnvolle Aufgabe erfüllen zu können, jedoch kreiert dieser Ansatz unnötige Kopplungen.
+Das grösste Problem ist die Kopplung der Benutzerschnittstelle und Geschäftslogik zum Datenzugriffs-Layer. *Die Benutzerschnittstelle ist gekoppelt zum Datenzugriffs-Layer?* Transitive Abhängigkeiten sind ebenfalls Abhängigkeiten. Die Benutzerschnittstelle kann nicht funktionieren, wenn die Geschäftslogik nicht vorhanden ist. Die Geschäftslogik kann nicht funktionieren. Wenn die beschriebene Architektur analysiert wird, kann festgestellt werden, dass der Datenzugriffs-Layer das Fundament der gesamten Applikationsstruktur bildet. Er wird zum kritischen Layer. Alle Änderungen auf dem Datenzugriffs- aber auch auf dem Infrastruktur-Layer betreffen alle darüberliegenden Layer. Das bedeutet, dass solche Änderungen von unten nach oben durch alle Schichten der Applikation durchstoßen.
+Dieses Architektur-Pattern stützt sich fast vollständig auf die Infrastruktur. Der Code, der die eigentliche Geschäftslogik abbildet, füllt die Lücken zwischen den Infrastruktur-Bits. Wenn sich ein Prozess- oder Domänen-Layer an die Infrastruktur koppelt, ist dies eine unnötige Kopplung, und es kann zu Komplikationen beim Testen des Layers kommen. Gerade dieser Layer sollte fast nichts über Infrastruktur wissen. Die Infrastruktur sollte die Geschäftslogik unterstützen und nicht umgekehrt. Ebenso sollten Entwicklungen ausgehend von der Geschäftslogik starten und nicht ausgehend vom Datenzugriffscode. Zudem sollte die nötige Infrastrukturverdrahtung ein Implementationsdetail sein.
+
+==== Prinzip der Onion Architektur
+Das Prinzip der Onion Architektur ist sehr einfach. Alle Infrastruktur- und Datenzugriffsbelange werden in das Äußere der Applikation verschoben.
+	
+![Abbildung 1](/extensions/overview/onion-architecture.png)
+
+Jeffrey Palermo erwähnte diesen Ansatz, genannt Zwiebelarchitektur (Onion Architecture), das erste Mal auf seinem Blog im Jahre 2008. Die Bezeichnung soll es erleichtern, sich das dahinterliegende Architekturmuster besser merken zu können. Der Ansatz ist allerdings nicht neu. Ähnliche Ansätze wurden bereits in Ports and Adapters (Cockburn), Screaming Architecture (Robert C. Martin), Data Context Interaction (DCI, James Coplien und Trygve Reenskaug) und BCE (A Use Case Driven Approach von Ivar Jacobson) vorgestellt.
+
+Das Hauptversprechen der Onion-Architektur ist, dass sie die Kopplung besser in den Griff bekommt. Die fundamentale Regel besagt, dass Code von Ringen abhängig sein darf, die nahe am Zentrum liegen, nicht aber von Ringen, die weiter außerhalb liegen. In anderen Worten: Alle Kopplung geht in die Richtung des Zentrums. Der Architekturansatz bevorzugt die objektorientierte Programmierung und stellt Objekte über alles andere.
+
+Darüber hinaus basiert die Onion Architektur auf den Prinzipien von Domain-driven Design (siehe: Vernon, Vaughn: "Implementing Domain-Driven Design", Addison-Wesley Professional, Chapter 4 Hexagonal or Ports and Adapters).
+
+Im Innern ist das Domänenmodell, das den Zustand und das Verhalten modelliert, das den Geschäftsprozess der jeweiligen Applikationsdomäne abbildet (alles Wichtige für die Geschäftsdomäne wie Domänenmodell, Validierungsregeln, Geschäftsprozesse etc.). Die Anzahl der Ringe im Applikationskern kann stark variieren, doch das Domänenmodell ist immer der innerste Ring. Weil alle Kopplung nach innen geht, ist das Domänenmodell nur mit sich selbst gekoppelt.
+
+Der erste Ring um das Domänenmodell ist typischerweise der Ring, in dem die Schnittstellen zu finden sind, die es erlauben, Objekte zu speichern oder zu laden (z.B. Repository-Schnittstellen). Das Verhalten selbst (also die Implementation der Schnittstelle) ist nicht im Applikationskern, weil dabei typischerweise ein Speichermedium involviert ist (was wiederum ein Infrastrukturaspekt ist). Nur die Schnittstellen sind im Kern.
+
+In den äußeren Ringen finden wir die Benutzerschnittstelle, die Infrastruktur und die Tests. Die äußeren Ringe sind reserviert für Dinge, die sich oft ändern. Mit diesem Ansatz wird abgesichert, dass der Applikationskern nicht geändert werden muss, wenn sich die Benutzerschnittstelle, der Datenzugriff, die REST-Services, die Nachrichteninfrastruktur oder die I/O-Technik ändert.
+
+Die Onion-Architektur basiert auf dem so genannten Dependency-Inversion-Prinzip [^1]. Der Applikationskern braucht Implementationen der Kernschnittstellen. Weil die Implementationen in den äußeren Ringen abgelegt sind, braucht es einen Mechanismus, der die Implementationen zur Laufzeit an die Schnittstellen bindet und dem Kern übergibt.
+
+Die Applikation ist um ein unabhängiges Objektmodell konstruiert. Der komplette Applikationskern ist unabhängig, weil er keine externen Bibliotheken referenziert und somit keinen technologiespezifischen Code beinhaltet. Die inneren Ringe definieren die Schnittstellen. Diese Schnittstellen müssen den Geschäftsfall abbilden, nicht aber technische Aspekte. Dies bedeutet, dass die Form der Schnittstelle direkt auf den Geschäftsfall passt und somit konsumentengetrieben ist.
+
+Der Kern übernimmt die Verantwortung über die Schnittstellen. Die Klassen und Komponenten in den äußeren Ringen implementieren die Schnittstellen, d.h. aller technologiespezifische Code ist in den äußeren Ringen. Der äußerste Ring kann Referenzen zu externen Bibliotheken haben. So kann ermöglicht werden, die Komplexität der Infrastruktur (welche nichts mit der Geschäftslogik zu tun hat) so weit wie möglich an den Rand der Applikation zu verschieben, wodurch die Kopplung immer mehr in Richtung Zentrum geht. Dieser Ansatz macht die Applikation unabhängig von verschiedenen Infrastruktur- und Querschnittsbelangen:
+
+Datenbank: Da die Geschäftsregeln unabhängig von der Datenbank sind, kann das Speichermedium ausgetauscht werden.
+Benutzerschnittstelle: Sie kann Änderungen vornehmen, ohne den Rest des Systems zu beeinflussen.
+Frameworks: Die Architektur ist nicht abhängig von der Existenz einer bestimmten Bibliothek oder eines Frameworks. Die Frameworks können daher als Tools betrachtet werden, und das System muss nicht in ihre Einschränkungen gepresst werden.
+Dies führt uns direkt zum ultimativen Vorteil dieses Ansatzes. Der Applikationskern ist zu 100 Prozent überprüfbar und unabhängig (siehe: Growing Object Oriented Software Guided by Tests, Designing for Maintainability Page 47-49).
+
+[^1]: Link zum Dependency-Inversion-Prinzip.
+
+==== Jacoco Report Analysis
+JaCoCo reports help you visually analyze code coverage by using diamonds with colors for branches and background colors for lines:
+
+- Red diamond means that no branches have been exercised during the test phase.
+- Yellow diamond shows that the code is partially covered – some branches have not been exercised.
+- Green diamond means that all branches have been exercised during the test.
+The same color code applies to the background color, but for lines coverage.
+
+JaCoCo mainly provides three important metrics:
+
+- Lines coverage reflects the amount of code that has been exercised based on the number of Java byte code instructions called by the tests.
+- Branches coverage shows the percent of exercised branches in the code – typically related to if/else and switch statements.
+- Cyclomatic complexity reflects the complexity of code by giving the number of paths needed to cover all the possible paths in a code through linear combination.
+To take a trivial example, if there is no if or switch statements in the code, the cyclomatic complexity will be 1, as we only need one execution path to cover the entire code.
+
+Generally the cyclomatic complexity reflects the number of test cases we need to implement in order to cover the entire code.
+
+=== H2 database configuration in-memory and extern:
+
+```
+    <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" spy="true">
+        <connection-url>jdbc:h2:tcp://localhost/~/flyway;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+        <driver>h2</driver>
+        <security>
+            <user-name>sa</user-name>
+            <password>sa</password>
+        </security>
+    </datasource>
+```
+The name of the database above is flyway and has to be set in setup GUI of the H2 db, no password is required.
+```
+    <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" spy="true">
+        <connection-url>jdbc:h2:tcp://localhost/~/DB_AUTH;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+        <driver>h2</driver>
+        <security>
+            <user-name>sa</user-name>
+            <password>sa</password>
+        </security>
+    </datasource>
+```
+
+=== HTTP-Cache (CacheContol - Last-Modified, If-Modified-Since)
+
+Der Rest-Endpoint:
+
+> Das Problem bei `request.evaluatePreconditions(lastModifiedDate)` ist, dass beim konditionellem Vergleich der Zeiten vom Server und vom Client auf die Sekunde verglichen wird. Das heisst, sollte aus der DB nach einem Update auf `lastModifiedDate = 29.11.1970 12:00:01.046` erfolgt sein, wird diese Zeit an den Client zurück gesendet. Der Client nimmt diese Zeit und schickt sie zum Vergleich wieder zurück. Die Methode-`evaluatePreconditions` arbeitet nur sekundengenau. D.h. um nicht ein erneutes Update festzustellen, obwohl keines vorliegt, muss immer sekundengenau aufgerundet werden `29.11.1970 12:00:02`, ansonsten ist der Vergleich - Server `29.11.1970 12:00:01:046` - Client `29.11.1970 12:00:01`.
+
+```
+/**
+ * Project: bomc-onion-architecture
+ * <pre>
+ *
+ * Last change:
+ *
+ *  by: $Author: bomc $
+ *
+ *  date: $Date: $
+ *
+ *  revision: $Revision: $
+ *
+ * </pre>
+ */
+package de.bomc.poc.order.interfaces.rest.v1.customer;
+
+import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
+import javax.ejb.EJB;
+import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+
+import org.apache.log4j.Logger;
+
+import de.bomc.poc.logging.qualifier.LoggerQualifier;
+import de.bomc.poc.order.application.customer.CustomerController;
+import de.bomc.poc.order.domain.model.customer.CustomerEntity;
+import de.bomc.poc.order.infrastructure.rest.cache.qualifier.CacheControlConfigQualifier;
+
+/**
+ * Handles actions for the {@link CustomerEntity}.
+ * 
+ * @author <a href="mailto:bomc@bomc.org">bomc</a>
+ * @since 03.02.2019
+ */
+public class CustomerRestEndpointImpl implements CustomerRestEndpoint {
+
+    private static final String LOG_PREFIX = "CustomerRestEndpointImpl#";
+    private static final String LATEST_MODIFIED_DATE_KEY_NAME = "Last-Modified";
+    @Inject
+    @LoggerQualifier
+    private Logger logger;
+    @Inject
+    @CacheControlConfigQualifier(maxAge = 0)
+    private CacheControl cacheControl;
+    @Context
+    private Request request;
+    @EJB
+    private CustomerController customerControllerEJB;
+    
+    @Override
+    public Response getLatestModifiedDate(final String userId) throws ParseException {
+        this.logger.debug(LOG_PREFIX + "getLatestModifiedDate [userId" + userId + "]");
+
+        final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+        final LocalDateTime lastModifiedLocalDateTime = this.customerControllerEJB.findLatestModifiedDateTime(userId);
+        
+        ResponseBuilder responseBuilder = null;
+        
+        if (lastModifiedLocalDateTime != null) {
+            this.logger.debug(LOG_PREFIX + "getLatestModifiedDate [lastModifiedLocalDate=" + lastModifiedLocalDateTime + "]");
+
+            // Format LocalDateTime to java.util.Date.
+            final Date lastModifiedDate = Date.from(lastModifiedLocalDateTime.atZone(ZoneId.systemDefault()).toInstant());
+            responseBuilder = request.evaluatePreconditions(lastModifiedDate);
+            
+            if (responseBuilder == null) {
+                // The precondition are met, this means there are modified resources.
+                this.logger.debug(LOG_PREFIX + "getLatestModifiedDate - resources are modified.");
+                
+                jsonObjectBuilder.add(LATEST_MODIFIED_DATE_KEY_NAME, lastModifiedLocalDateTime.toString());
+                responseBuilder = Response.ok().entity(jsonObjectBuilder.build()).cacheControl(cacheControl).lastModified(lastModifiedDate);
+            } else {
+                // No modified resources. Return the automatically generated response.
+                this.logger.debug(LOG_PREFIX + "getLatestModifiedDate - No modified resources - HTTP 304 status.");
+                
+                responseBuilder = Response.notModified();
+            }
+        }
+
+        return responseBuilder.build();
+    }
+}
+```
+Testklasse:
+
+```
+/**
+ * Project: bomc-onion-architecture
+ * <pre>
+ *
+ * Last change:
+ *
+ *  by: $Author: bomc $
+ *
+ *  date: $Date: $
+ *
+ *  revision: $Revision: $
+ *
+ * </pre>
+ */
+package de.bomc.poc.order.interfaces.rest.v1.customer;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+
+import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+import javax.json.JsonObject;
+import javax.transaction.UserTransaction;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.Response;
+
+import org.apache.log4j.Logger;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit.InSequence;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+
+import de.bomc.poc.logging.producer.LoggerProducer;
+import de.bomc.poc.logging.qualifier.LoggerQualifier;
+import de.bomc.poc.order.ArquillianBase;
+import de.bomc.poc.order.CategoryFastIntegrationTestIT;
+import de.bomc.poc.order.application.customer.CustomerController;
+import de.bomc.poc.order.application.customer.CustomerControllerEJB;
+import de.bomc.poc.order.application.internal.ApplicationUserEnum;
+import de.bomc.poc.order.application.util.JaxRsActivator;
+import de.bomc.poc.order.domain.model.basis.AbstractEntity;
+import de.bomc.poc.order.domain.model.basis.AbstractMetadataEntity;
+import de.bomc.poc.order.domain.model.basis.DomainObject;
+import de.bomc.poc.order.domain.model.customer.CustomerEntity;
+import de.bomc.poc.order.domain.model.customer.JpaCustomerDao;
+import de.bomc.poc.order.infrastructure.persistence.basis.JpaGenericDao;
+import de.bomc.poc.order.infrastructure.persistence.basis.impl.AbstractJpaDao;
+import de.bomc.poc.order.infrastructure.persistence.basis.producer.DatabaseProducer;
+import de.bomc.poc.order.infrastructure.persistence.basis.qualifier.JpaDao;
+import de.bomc.poc.order.infrastructure.persistence.customer.JpaCustomerDaoImpl;
+import de.bomc.poc.order.infrastructure.rest.cache.client.RestClientIfModifiedSinceFilter;
+import de.bomc.poc.order.infrastructure.rest.cache.client.RestClientIfNotMatchFilter;
+import de.bomc.poc.order.infrastructure.rest.cache.client.RestClientLastModifiedFilter;
+import de.bomc.poc.order.infrastructure.rest.cache.producer.CacheControlProducer;
+import de.bomc.poc.order.infrastructure.rest.cache.qualifier.CacheControlConfigQualifier;
+import de.bomc.poc.rest.logger.client.ResteasyClientLogger;
+
+/**
+ * Tests the {@link CustomerRestEndpointTestIT}.
+ * 
+ * <pre>
+ *     mvn clean install -Dtest=CustomerRestEndpointTestIT
+ * </pre>
+ * 
+ * @author <a href="mailto:bomc@bomc.org">bomc</a>
+ * @since 06.02.2019
+ */
+@RunWith(Arquillian.class)
+@Category(CategoryFastIntegrationTestIT.class)
+public class CustomerRestEndpointTestIT extends ArquillianBase {
+
+    private static final String LOG_PREFIX = "CustomerRestEndpointTestIT#";
+    private static final String WEB_ARCHIVE_NAME = "bomc-customer-war";
+    private static final String ZONE_ID_EUROPE_ZURICH = "Europe/Zurich";
+    @Inject
+    @LoggerQualifier
+    private Logger logger;
+    @Inject
+    @JpaDao
+    private JpaCustomerDao jpaCustomerDao;
+    @Inject
+    private UserTransaction utx;
+    private ResteasyClient resteasyClient;
+
+    // 'testable = true', means all the tests are running inside of the
+    // container.
+    @Deployment(testable = true)
+    public static Archive<?> createDeployment() {
+        final WebArchive webArchive = createTestArchive(WEB_ARCHIVE_NAME);
+        webArchive.addClasses(CustomerRestEndpointTestIT.class, CategoryFastIntegrationTestIT.class);
+        webArchive.addClasses(ResteasyClientLogger.class, LoggerQualifier.class, LoggerProducer.class);
+        webArchive.addClasses(JpaCustomerDao.class, JpaCustomerDaoImpl.class);
+        webArchive.addClasses(CustomerEntity.class, AbstractEntity.class, AbstractMetadataEntity.class,
+                DomainObject.class);
+        webArchive.addClasses(AbstractJpaDao.class, JpaGenericDao.class, DatabaseProducer.class, JpaDao.class);
+        webArchive.addClasses(CustomerController.class, CustomerControllerEJB.class);
+        webArchive.addClasses(CacheControlConfigQualifier.class, CacheControlProducer.class);
+        webArchive.addClasses(JaxRsActivator.class, CustomerRestEndpoint.class, CustomerRestEndpointImpl.class);
+        webArchive.addClasses(ApplicationUserEnum.class);
+        webArchive.addClasses(RestClientLastModifiedFilter.class, RestClientIfModifiedSinceFilter.class, RestClientIfNotMatchFilter.class);
+        // Add initial data.
+        webArchive.addAsResource("customer_log_import.sql", "import.sql");
+
+        //
+        // Add dependencies
+        final ConfigurableMavenResolverSystem resolver = Maven.configureResolver().withMavenCentralRepo(false);
+
+        // NOTE@MVN:will be changed during mvn project generating.
+        webArchive.addAsLibraries(resolver.loadPomFromFile("pom.xml").resolve("de.bomc.poc:exception-lib-ext:jar:?")
+                .withTransitivity().asFile());
+
+        System.out.println(LOG_PREFIX + "createDeployment: " + webArchive.toString(true));
+
+        return webArchive;
+    }
+
+    /**
+     * Setup.
+     */
+    @Before
+    public void setupClass() {
+        //
+    }
+
+    /**
+     * <pre>
+     *  mvn clean install -Parq-wildfly-remote -Dtest=CustomerRestEndpointTestIT#test010_v1_cacheModified_Pass
+     *
+     * <b><code>test010_v1_cacheModified_Pass</code>:</b><br>
+     *  Tests the handling of the CacheControl between client and server. 
+     *
+     * <b>Preconditions:</b><br>
+     *  - Artifact must be successful deployed in Wildfly.
+     *  - Initial data must be imported.
+     *
+     * <b>Scenario:</b><br>
+     *  The following steps are executed:
+     *  - Start a initial invocation. No modified date will be set. 
+     *    The response has status '200' and returns a entity. 
+     *    The last modified date from response has to be cached.
+     *  - Extract LAST_MODIFIED date from header. 
+     *    Invoke endpoint again, with header IF_MODIFIED_SINCE and the extracted date. 
+     *    A response with http-status '304' and no entity will be returned.
+     *  - Change modified date for one item in db to current date.
+     *  - Next invocation: with header 'If-Modified-Since' and last modified date from first invocation. 
+     *    The db has changed a entity and status '200' will be returned. 
+     *    The last modified date from response has to be cached for next invocation.
+     *  - Next invocation: with header 'If-Modified-Since' and last modified date from last invocation. 
+     *    A empty response and status '304' is returned.
+     *  - Next invocation: with header 'If-Modified-Since' and last modified date from last invocation. 
+     *    A empty response and status '304' is returned.
+     *
+     * <b>Postconditions:</b><br>
+     *  
+     * </pre>
+     * 
+     * @throws URISyntaxException
+     *             is thrown during URI creation, is not expected.
+     * @throws Exception
+     */
+    @Test
+    @InSequence(10)
+    public void test010_v1_cacheModified_Pass() throws URISyntaxException, Exception {
+        this.logger.debug(
+                LOG_PREFIX + "test010_v1_cacheModified_Pass [uri=" + this.buildUri(WEB_ARCHIVE_NAME) + "]");
+
+        Response response = null;
+        Date retLastModifiedDate = null;
+        String strIfModifiedSinceRFC1123 = null;
+        
+        // ___________________________________________
+        // 1. Start a initial invocation. No date will be set. The response has
+        // status '200' and returns a entity. The last modified date from
+        // response has to be cached.
+        try {
+            // Setup resteasy client.
+            resteasyClient = new ResteasyClientBuilder()
+                    .connectionTTL(DEFAULT_REST_CLIENT_CONNECTION_TTL, TimeUnit.MILLISECONDS).build();
+            this.resteasyClient.register(new ResteasyClientLogger(logger, true));
+
+            // Invoke endpoint by proxy.
+            final CustomerRestEndpoint proxy = this.resteasyClient.target(this.buildUri(WEB_ARCHIVE_NAME))
+                    .proxy(CustomerRestEndpoint.class);
+            response = proxy.getLatestModifiedDate(ApplicationUserEnum.TEST_USER.name());
+            assertThat(response.getStatus(), equalTo(Response.Status.OK.getStatusCode()));
+
+            retLastModifiedDate = response.getLastModified();
+            assertThat(retLastModifiedDate, notNullValue());
+
+            // Read response.
+            final JsonObject jsonObject = response.readEntity(JsonObject.class);
+            assertThat(jsonObject, notNullValue());
+            this.logger.info(LOG_PREFIX + "test010_v1_cacheModified_Pass [version=" + jsonObject + "]");
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+
+        // ___________________________________________
+        // 2. Extract LAST_MODIFIED date from header. Invoke endpoint again,
+        // with header IF_MODIFIED_SINCE and the extracted date. A response with
+        // http-status '304' and no entity will be returned.
+        try {
+            // Convert java.util.Date to LocalDateTime in RFC1123.
+            final ZoneId zoneIdEuropeParis = ZoneId.of(ZONE_ID_EUROPE_ZURICH);
+            final Instant instant = retLastModifiedDate.toInstant();
+            final ZonedDateTime ifModifiedSince = instant.atZone(zoneIdEuropeParis);
+            strIfModifiedSinceRFC1123 = ifModifiedSince.format(DateTimeFormatter.RFC_1123_DATE_TIME);
+
+            // Set header with 'IF_MODIFIED_SINCE'.
+            final RestClientIfModifiedSinceFilter restClientIfModifiedSinceFilter = new RestClientIfModifiedSinceFilter(
+                    strIfModifiedSinceRFC1123);
+            
+            // Setup resteasy client.
+            resteasyClient = new ResteasyClientBuilder()
+                    .connectionTTL(DEFAULT_REST_CLIENT_CONNECTION_TTL, TimeUnit.MILLISECONDS).build();
+            this.resteasyClient.register(restClientIfModifiedSinceFilter);
+            this.resteasyClient.register(new ResteasyClientLogger(logger, true));
+
+            // Invoke endpoint by proxy.
+            final CustomerRestEndpoint proxy = this.resteasyClient.target(this.buildUri(WEB_ARCHIVE_NAME))
+                    .proxy(CustomerRestEndpoint.class);
+            response = proxy.getLatestModifiedDate(ApplicationUserEnum.TEST_USER.name());
+            // Returns 304, that means noting has change on server.
+            assertThat(response.getStatus(), equalTo(Response.Status.NOT_MODIFIED.getStatusCode()));
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+
+        // ___________________________________________
+        // 3. Change modified date for one item in db to current date.
+        final List<CustomerEntity> customerEntityList = this.jpaCustomerDao.findAll();
+        assertThat(customerEntityList.size(), greaterThanOrEqualTo(0));
+
+        final CustomerEntity customerEntity = customerEntityList.get(0);
+        customerEntity.setEmail("myNewEmail");
+
+        this.utx.begin();
+        this.jpaCustomerDao.merge(customerEntity, ApplicationUserEnum.TEST_USER.name());
+        this.utx.commit();
+
+        // ___________________________________________
+        // 4. Next invocation: with header 'If-Modified-Since' and last modified
+        // date from first invocation. The db has changed a entity and status
+        // '200' will be returned. The last modified date from response has to
+        // be cached for next invocation.
+        try {
+            // Set header with 'IF_MODIFIED_SINCE'.
+            final RestClientIfModifiedSinceFilter restClientIfModifiedSinceFilter = new RestClientIfModifiedSinceFilter(
+                    strIfModifiedSinceRFC1123);
+            
+            // Setup resteasy client.
+            resteasyClient = new ResteasyClientBuilder()
+                    .connectionTTL(DEFAULT_REST_CLIENT_CONNECTION_TTL, TimeUnit.MILLISECONDS).build();
+            this.resteasyClient.register(restClientIfModifiedSinceFilter);
+            this.resteasyClient.register(new ResteasyClientLogger(logger, true));
+
+            // Invoke endpoint by proxy.
+            final CustomerRestEndpoint proxy = this.resteasyClient.target(this.buildUri(WEB_ARCHIVE_NAME))
+                    .proxy(CustomerRestEndpoint.class);
+            response = proxy.getLatestModifiedDate(ApplicationUserEnum.TEST_USER.name());
+
+            // Read response.
+            final JsonObject jsonObject = response.readEntity(JsonObject.class);
+            assertThat(jsonObject, notNullValue());
+            this.logger.info(LOG_PREFIX + "test010_v1_cacheModified_Pass [version=" + jsonObject + "]");
+
+            // Read last modified date from response.
+            retLastModifiedDate = response.getLastModified();
+            assertThat(retLastModifiedDate, notNullValue());
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+        
+        // ___________________________________________
+        // 5. Next invocation: with header 'If-Modified-Since' and last modified
+        // date from last invocation. A empty response and status '304' is
+        // returned.
+        try {
+            // Convert java.util.Date to LocalDateTime in RFC1123.
+            final ZoneId zoneIdEuropeParis = ZoneId.of(ZONE_ID_EUROPE_ZURICH);
+            final Instant instant = retLastModifiedDate.toInstant();
+            final ZonedDateTime ifModifiedSince = instant.atZone(zoneIdEuropeParis);
+            // NOTE: Add here one minute, to simulate change.
+            strIfModifiedSinceRFC1123 = ifModifiedSince.plusSeconds(1L).format(DateTimeFormatter.RFC_1123_DATE_TIME);
+
+            // Set header with 'IF_MODIFIED_SINCE'.
+            final RestClientIfModifiedSinceFilter restClientIfModifiedSinceFilter = new RestClientIfModifiedSinceFilter(
+                    strIfModifiedSinceRFC1123);
+
+            // Setup resteasy client.
+            resteasyClient = new ResteasyClientBuilder()
+                    .connectionTTL(DEFAULT_REST_CLIENT_CONNECTION_TTL, TimeUnit.MILLISECONDS).build();
+            this.resteasyClient.register(restClientIfModifiedSinceFilter);
+            this.resteasyClient.register(new ResteasyClientLogger(logger, true));
+
+            // Invoke endpoint by proxy.
+            final CustomerRestEndpoint proxy = this.resteasyClient.target(this.buildUri(WEB_ARCHIVE_NAME))
+                    .proxy(CustomerRestEndpoint.class);
+            response = proxy.getLatestModifiedDate(ApplicationUserEnum.TEST_USER.name());
+
+            assertThat(response.getStatus(), equalTo(Response.Status.NOT_MODIFIED.getStatusCode()));
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+
+        // ___________________________________________
+        // 6. Next invocation: with header 'If-Modified-Since' and last modified
+        // date from last invocation. A empty response and status '304' is
+        // returned.
+        try {
+            // Set header with 'IF_MODIFIED_SINCE', use size from last invocation.
+            final RestClientIfModifiedSinceFilter restClientIfModifiedSinceFilter = new RestClientIfModifiedSinceFilter(
+                    strIfModifiedSinceRFC1123);
+            
+            // Setup resteasy client.
+            resteasyClient = new ResteasyClientBuilder()
+                    .connectionTTL(DEFAULT_REST_CLIENT_CONNECTION_TTL, TimeUnit.MILLISECONDS).build();
+            this.resteasyClient.register(restClientIfModifiedSinceFilter);
+            this.resteasyClient.register(new ResteasyClientLogger(logger, true));
+
+            // Invoke endpoint by proxy.
+            final CustomerRestEndpoint proxy = this.resteasyClient.target(this.buildUri(WEB_ARCHIVE_NAME))
+                    .proxy(CustomerRestEndpoint.class);
+            response = proxy.getLatestModifiedDate(ApplicationUserEnum.TEST_USER.name());
+
+            assertThat(response.getStatus(), equalTo(Response.Status.NOT_MODIFIED.getStatusCode()));
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+}
+```
+
+=== stanalone-full.xml
+
+```
+<?xml version='1.0' encoding='UTF-8'?>
+
+<server xmlns="urn:jboss:domain:7.0">
+    <extensions>
+        <extension module="org.jboss.as.clustering.infinispan"/>
+        <extension module="org.jboss.as.connector"/>
+        <extension module="org.jboss.as.deployment-scanner"/>
+        <extension module="org.jboss.as.ee"/>
+        <extension module="org.jboss.as.ejb3"/>
+        <extension module="org.jboss.as.jaxrs"/>
+        <extension module="org.jboss.as.jdr"/>
+        <extension module="org.jboss.as.jmx"/>
+        <extension module="org.jboss.as.jpa"/>
+        <extension module="org.jboss.as.jsf"/>
+        <extension module="org.jboss.as.jsr77"/>
+        <extension module="org.jboss.as.logging"/>
+        <extension module="org.jboss.as.mail"/>
+        <extension module="org.jboss.as.naming"/>
+        <extension module="org.jboss.as.pojo"/>
+        <extension module="org.jboss.as.remoting"/>
+        <extension module="org.jboss.as.sar"/>
+        <extension module="org.jboss.as.security"/>
+        <extension module="org.jboss.as.transactions"/>
+        <extension module="org.jboss.as.webservices"/>
+        <extension module="org.jboss.as.weld"/>
+        <extension module="org.wildfly.extension.batch.jberet"/>
+        <extension module="org.wildfly.extension.bean-validation"/>
+        <extension module="org.wildfly.extension.core-management"/>
+        <extension module="org.wildfly.extension.discovery"/>
+        <extension module="org.wildfly.extension.ee-security"/>
+        <extension module="org.wildfly.extension.elytron"/>
+        <extension module="org.wildfly.extension.io"/>
+        <extension module="org.wildfly.extension.messaging-activemq"/>
+        <extension module="org.wildfly.extension.request-controller"/>
+        <extension module="org.wildfly.extension.security.manager"/>
+        <extension module="org.wildfly.extension.undertow"/>
+        <extension module="org.wildfly.iiop-openjdk"/>
+    </extensions>
+    <management>
+        <security-realms>
+            <security-realm name="ManagementRealm">
+                <authentication>
+                    <local default-user="$local" skip-group-loading="true"/>
+                    <properties path="mgmt-users.properties" relative-to="jboss.server.config.dir"/>
+                </authentication>
+                <authorization map-groups-to-roles="false">
+                    <properties path="mgmt-groups.properties" relative-to="jboss.server.config.dir"/>
+                </authorization>
+            </security-realm>
+            <security-realm name="ApplicationRealm">
+                <server-identities>
+                    <ssl>
+                        <keystore path="application.keystore" relative-to="jboss.server.config.dir" keystore-password="password" alias="server" key-password="password" generate-self-signed-certificate-host="localhost"/>
+                    </ssl>
+                </server-identities>
+                <authentication>
+                    <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
+                    <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
+                </authentication>
+                <authorization>
+                    <properties path="application-roles.properties" relative-to="jboss.server.config.dir"/>
+                </authorization>
+            </security-realm>
+        </security-realms>
+        <audit-log>
+            <formatters>
+                <json-formatter name="json-formatter"/>
+            </formatters>
+            <handlers>
+                <file-handler name="file" formatter="json-formatter" path="audit-log.log" relative-to="jboss.server.data.dir"/>
+            </handlers>
+            <logger log-boot="true" log-read-only="false" enabled="false">
+                <handlers>
+                    <handler name="file"/>
+                </handlers>
+            </logger>
+        </audit-log>
+        <management-interfaces>
+            <http-interface security-realm="ManagementRealm">
+                <http-upgrade enabled="true"/>
+                <socket-binding http="management-http"/>
+            </http-interface>
+        </management-interfaces>
+        <access-control provider="simple">
+            <role-mapping>
+                <role name="SuperUser">
+                    <include>
+                        <user name="$local"/>
+                    </include>
+                </role>
+            </role-mapping>
+        </access-control>
+    </management>
+    <profile>
+        <subsystem xmlns="urn:jboss:domain:logging:5.0">
+            <console-handler name="CONSOLE">
+                <level name="INFO"/>
+                <formatter>
+                    <named-formatter name="COLOR-PATTERN"/>
+                </formatter>
+            </console-handler>
+            <console-handler name="SPY_TRACE">
+                <level name="TRACE"/>
+                <formatter>
+                    <named-formatter name="COLOR-PATTERN"/>
+                </formatter>
+            </console-handler>
+            <console-handler name="BOMC_CONSOLE">
+                <level name="DEBUG"/>
+                <formatter>
+                    <named-formatter name="BOMC-PATTERN"/>
+                </formatter>
+            </console-handler>
+            <periodic-rotating-file-handler name="FILE" autoflush="true">
+                <formatter>
+                    <named-formatter name="PATTERN"/>
+                </formatter>
+                <file relative-to="jboss.server.log.dir" path="server.log"/>
+                <suffix value=".yyyy-MM-dd"/>
+                <append value="true"/>
+            </periodic-rotating-file-handler>
+            <size-rotating-file-handler name="BOMC_HANDLER" autoflush="true">
+                <formatter>
+                    <named-formatter name="BOMC-PATTERN"/>
+                </formatter>
+                <file relative-to="jboss.server.log.dir" path="bomc_server.log"/>
+                <rotate-size value="100M"/>
+                <max-backup-index value="10"/>
+                <append value="true"/>
+            </size-rotating-file-handler>
+            <logger category="com.arjuna">
+                <level name="WARN"/>
+            </logger>
+            <logger category="org.jboss.as.config">
+                <level name="DEBUG"/>
+            </logger>
+            <logger category="sun.rmi">
+                <level name="WARN"/>
+            </logger>
+            <logger category="jboss.jdbc.spy" use-parent-handlers="false">
+                <level name="TRACE"/>
+                <handlers>
+                    <handler name="SPY_TRACE"/>
+                    <handler name="FILE"/>
+                </handlers>
+            </logger>
+            <logger category="de.bomc.poc" use-parent-handlers="false">
+                <level name="DEBUG"/>
+                <handlers>
+                    <handler name="BOMC_HANDLER"/>
+                    <handler name="BOMC_CONSOLE"/>
+                    <handler name="FILE"/>
+                </handlers>
+            </logger>
+            <root-logger>
+                <level name="INFO"/>
+                <handlers>
+                    <handler name="CONSOLE"/>
+                    <handler name="FILE"/>
+                </handlers>
+            </root-logger>
+            <formatter name="PATTERN">
+                <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
+            </formatter>
+            <formatter name="COLOR-PATTERN">
+                <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
+            </formatter>
+            <formatter name="BOMC-PATTERN">
+                <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%X{X-BOMC-REQUEST-ID}] [%X{X-BOMC-BASE-URI}] %-5p [%c] (%t) %s%e%n"/>
+            </formatter>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:batch-jberet:2.0">
+            <default-job-repository name="in-memory"/>
+            <default-thread-pool name="batch"/>
+            <job-repository name="in-memory">
+                <in-memory/>
+            </job-repository>
+            <thread-pool name="batch">
+                <max-threads count="10"/>
+                <keepalive-time time="30" unit="seconds"/>
+            </thread-pool>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:datasources:5.0">
+            <datasources>
+                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" spy="true">
+                    <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                    <driver>h2</driver>
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>
+                </datasource>
+                <drivers>
+                    <driver name="h2" module="com.h2database.h2">
+                        <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+                    </driver>
+                </drivers>
+            </datasources>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:deployment-scanner:2.0">
+            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:discovery:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:ee:4.0">
+            <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
+            <concurrent>
+                <context-services>
+                    <context-service name="default" jndi-name="java:jboss/ee/concurrency/context/default" use-transaction-setup-provider="true"/>
+                </context-services>
+                <managed-thread-factories>
+                    <managed-thread-factory name="default" jndi-name="java:jboss/ee/concurrency/factory/default" context-service="default"/>
+                </managed-thread-factories>
+                <managed-executor-services>
+                    <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-threshold="60000" keepalive-time="5000"/>
+                </managed-executor-services>
+                <managed-scheduled-executor-services>
+                    <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-threshold="60000" keepalive-time="3000"/>
+                </managed-scheduled-executor-services>
+            </concurrent>
+            <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/ExampleDS" jms-connection-factory="java:jboss/DefaultJMSConnectionFactory" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:ee-security:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:ejb3:5.0">
+            <session-bean>
+                <stateless>
+                    <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
+                </stateless>
+                <stateful default-access-timeout="5000" cache-ref="simple" passivation-disabled-cache-ref="simple"/>
+                <singleton default-access-timeout="5000"/>
+            </session-bean>
+            <mdb>
+                <resource-adapter-ref resource-adapter-name="${ejb.resource-adapter-name:activemq-ra.rar}"/>
+                <bean-instance-pool-ref pool-name="mdb-strict-max-pool"/>
+            </mdb>
+            <pools>
+                <bean-instance-pools>
+                    <strict-max-pool name="mdb-strict-max-pool" derive-size="from-cpu-count" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="slsb-strict-max-pool" derive-size="from-worker-pools" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                </bean-instance-pools>
+            </pools>
+            <caches>
+                <cache name="simple"/>
+                <cache name="distributable" passivation-store-ref="infinispan" aliases="passivating clustered"/>
+            </caches>
+            <passivation-stores>
+                <passivation-store name="infinispan" cache-container="ejb" max-size="10000"/>
+            </passivation-stores>
+            <async thread-pool-name="default"/>
+            <timer-service thread-pool-name="default" default-data-store="default-file-store">
+                <data-stores>
+                    <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
+                </data-stores>
+            </timer-service>
+            <remote connector-ref="http-remoting-connector" thread-pool-name="default">
+                <channel-creation-options>
+                    <option name="READ_TIMEOUT" value="${prop.remoting-connector.read.timeout:20}" type="xnio"/>
+                    <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
+                </channel-creation-options>
+            </remote>
+            <thread-pools>
+                <thread-pool name="default">
+                    <max-threads count="10"/>
+                    <keepalive-time time="100" unit="milliseconds"/>
+                </thread-pool>
+            </thread-pools>
+            <iiop enable-by-default="false" use-qualified-name="false"/>
+            <default-security-domain value="other"/>
+            <default-missing-method-permissions-deny-access value="true"/>
+            <log-system-exceptions value="true"/>
+        </subsystem>
+        <subsystem xmlns="urn:wildfly:elytron:3.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <providers>
+                <aggregate-providers name="combined-providers">
+                    <providers name="elytron"/>
+                    <providers name="openssl"/>
+                </aggregate-providers>
+                <provider-loader name="elytron" module="org.wildfly.security.elytron"/>
+                <provider-loader name="openssl" module="org.wildfly.openssl"/>
+            </providers>
+            <audit-logging>
+                <file-audit-log name="local-audit" path="audit.log" relative-to="jboss.server.log.dir" format="JSON"/>
+            </audit-logging>
+            <security-domains>
+                <security-domain name="ApplicationDomain" default-realm="ApplicationRealm" permission-mapper="default-permission-mapper">
+                    <realm name="ApplicationRealm" role-decoder="groups-to-roles"/>
+                    <realm name="local"/>
+                </security-domain>
+                <security-domain name="ManagementDomain" default-realm="ManagementRealm" permission-mapper="default-permission-mapper">
+                    <realm name="ManagementRealm" role-decoder="groups-to-roles"/>
+                    <realm name="local" role-mapper="super-user-mapper"/>
+                </security-domain>
+            </security-domains>
+            <security-realms>
+                <identity-realm name="local" identity="$local"/>
+                <properties-realm name="ApplicationRealm">
+                    <users-properties path="application-users.properties" relative-to="jboss.server.config.dir" digest-realm-name="ApplicationRealm"/>
+                    <groups-properties path="application-roles.properties" relative-to="jboss.server.config.dir"/>
+                </properties-realm>
+                <properties-realm name="ManagementRealm">
+                    <users-properties path="mgmt-users.properties" relative-to="jboss.server.config.dir" digest-realm-name="ManagementRealm"/>
+                    <groups-properties path="mgmt-groups.properties" relative-to="jboss.server.config.dir"/>
+                </properties-realm>
+            </security-realms>
+            <mappers>
+                <simple-permission-mapper name="default-permission-mapper" mapping-mode="first">
+                    <permission-mapping>
+                        <principal name="anonymous"/>
+                        <permission-set name="default-permissions"/>
+                    </permission-mapping>
+                    <permission-mapping match-all="true">
+                        <permission-set name="login-permission"/>
+                        <permission-set name="default-permissions"/>
+                    </permission-mapping>
+                </simple-permission-mapper>
+                <constant-realm-mapper name="local" realm-name="local"/>
+                <simple-role-decoder name="groups-to-roles" attribute="groups"/>
+                <constant-role-mapper name="super-user-mapper">
+                    <role name="SuperUser"/>
+                </constant-role-mapper>
+            </mappers>
+            <permission-sets>
+                <permission-set name="login-permission">
+                    <permission class-name="org.wildfly.security.auth.permission.LoginPermission"/>
+                </permission-set>
+                <permission-set name="default-permissions">
+                    <permission class-name="org.wildfly.extension.batch.jberet.deployment.BatchPermission" module="org.wildfly.extension.batch.jberet" target-name="*"/>
+                    <permission class-name="org.wildfly.transaction.client.RemoteTransactionPermission" module="org.wildfly.transaction.client"/>
+                    <permission class-name="org.jboss.ejb.client.RemoteEJBPermission" module="org.jboss.ejb-client"/>
+                </permission-set>
+            </permission-sets>
+            <http>
+                <http-authentication-factory name="application-http-authentication" security-domain="ApplicationDomain" http-server-mechanism-factory="global">
+                    <mechanism-configuration>
+                        <mechanism mechanism-name="BASIC">
+                            <mechanism-realm realm-name="Application Realm"/>
+                        </mechanism>
+                        <mechanism mechanism-name="FORM"/>
+                    </mechanism-configuration>
+                </http-authentication-factory>
+                <http-authentication-factory name="management-http-authentication" security-domain="ManagementDomain" http-server-mechanism-factory="global">
+                    <mechanism-configuration>
+                        <mechanism mechanism-name="DIGEST">
+                            <mechanism-realm realm-name="ManagementRealm"/>
+                        </mechanism>
+                    </mechanism-configuration>
+                </http-authentication-factory>
+                <provider-http-server-mechanism-factory name="global"/>
+            </http>
+            <sasl>
+                <sasl-authentication-factory name="application-sasl-authentication" sasl-server-factory="configured" security-domain="ApplicationDomain">
+                    <mechanism-configuration>
+                        <mechanism mechanism-name="JBOSS-LOCAL-USER" realm-mapper="local"/>
+                        <mechanism mechanism-name="DIGEST-MD5">
+                            <mechanism-realm realm-name="ApplicationRealm"/>
+                        </mechanism>
+                    </mechanism-configuration>
+                </sasl-authentication-factory>
+                <sasl-authentication-factory name="management-sasl-authentication" sasl-server-factory="configured" security-domain="ManagementDomain">
+                    <mechanism-configuration>
+                        <mechanism mechanism-name="JBOSS-LOCAL-USER" realm-mapper="local"/>
+                        <mechanism mechanism-name="DIGEST-MD5">
+                            <mechanism-realm realm-name="ManagementRealm"/>
+                        </mechanism>
+                    </mechanism-configuration>
+                </sasl-authentication-factory>
+                <configurable-sasl-server-factory name="configured" sasl-server-factory="elytron">
+                    <properties>
+                        <property name="wildfly.sasl.local-user.default-user" value="$local"/>
+                    </properties>
+                </configurable-sasl-server-factory>
+                <mechanism-provider-filtering-sasl-server-factory name="elytron" sasl-server-factory="global">
+                    <filters>
+                        <filter provider-name="WildFlyElytron"/>
+                    </filters>
+                </mechanism-provider-filtering-sasl-server-factory>
+                <provider-sasl-server-factory name="global"/>
+            </sasl>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:iiop-openjdk:2.0">
+            <orb socket-binding="iiop"/>
+            <initializers security="identity" transactions="spec"/>
+            <security server-requires-ssl="false" client-requires-ssl="false"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:infinispan:6.0">
+            <cache-container name="server" default-cache="default" module="org.wildfly.clustering.server">
+                <local-cache name="default">
+                    <transaction mode="BATCH"/>
+                </local-cache>
+            </cache-container>
+            <cache-container name="web" default-cache="passivation" module="org.wildfly.clustering.web.infinispan">
+                <local-cache name="passivation">
+                    <locking isolation="REPEATABLE_READ"/>
+                    <transaction mode="BATCH"/>
+                    <file-store passivation="true" purge="false"/>
+                </local-cache>
+            </cache-container>
+            <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
+                <local-cache name="passivation">
+                    <locking isolation="REPEATABLE_READ"/>
+                    <transaction mode="BATCH"/>
+                    <file-store passivation="true" purge="false"/>
+                </local-cache>
+            </cache-container>
+            <cache-container name="hibernate" module="org.infinispan.hibernate-cache">
+                <local-cache name="entity">
+                    <transaction mode="NON_XA"/>
+                    <object-memory size="10000"/>
+                    <expiration max-idle="100000"/>
+                </local-cache>
+                <local-cache name="local-query">
+                    <object-memory size="10000"/>
+                    <expiration max-idle="100000"/>
+                </local-cache>
+                <local-cache name="timestamps"/>
+            </cache-container>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:io:3.0">
+            <worker name="default"/>
+            <buffer-pool name="default"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:jca:5.0">
+            <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
+            <bean-validation enabled="true"/>
+            <default-workmanager>
+                <short-running-threads>
+                    <core-threads count="50"/>
+                    <queue-length count="50"/>
+                    <max-threads count="50"/>
+                    <keepalive-time time="10" unit="seconds"/>
+                </short-running-threads>
+                <long-running-threads>
+                    <core-threads count="50"/>
+                    <queue-length count="50"/>
+                    <max-threads count="50"/>
+                    <keepalive-time time="10" unit="seconds"/>
+                </long-running-threads>
+            </default-workmanager>
+            <cached-connection-manager/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:jmx:1.3">
+            <expose-resolved-model/>
+            <expose-expression-model/>
+            <remoting-connector/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jpa:1.1">
+            <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jsf:1.1"/>
+        <subsystem xmlns="urn:jboss:domain:jsr77:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:mail:3.0">
+            <mail-session name="default" jndi-name="java:jboss/mail/Default">
+                <smtp-server outbound-socket-binding-ref="mail-smtp"/>
+            </mail-session>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:messaging-activemq:3.0">
+            <server name="default">
+                <security-setting name="#">
+                    <role name="guest" send="true" consume="true" create-non-durable-queue="true" delete-non-durable-queue="true"/>
+                </security-setting>
+                <address-setting name="#" dead-letter-address="jms.queue.DLQ" expiry-address="jms.queue.ExpiryQueue" max-size-bytes="10485760" page-size-bytes="2097152" message-counter-history-day-limit="10"/>
+                <http-connector name="http-connector" socket-binding="http" endpoint="http-acceptor"/>
+                <http-connector name="http-connector-throughput" socket-binding="http" endpoint="http-acceptor-throughput">
+                    <param name="batch-delay" value="50"/>
+                </http-connector>
+                <in-vm-connector name="in-vm" server-id="0">
+                    <param name="buffer-pooling" value="false"/>
+                </in-vm-connector>
+                <http-acceptor name="http-acceptor" http-listener="default"/>
+                <http-acceptor name="http-acceptor-throughput" http-listener="default">
+                    <param name="batch-delay" value="50"/>
+                    <param name="direct-deliver" value="false"/>
+                </http-acceptor>
+                <in-vm-acceptor name="in-vm" server-id="0">
+                    <param name="buffer-pooling" value="false"/>
+                </in-vm-acceptor>
+                <jms-queue name="ExpiryQueue" entries="java:/jms/queue/ExpiryQueue"/>
+                <jms-queue name="DLQ" entries="java:/jms/queue/DLQ"/>
+                <connection-factory name="InVmConnectionFactory" entries="java:/ConnectionFactory" connectors="in-vm"/>
+                <connection-factory name="RemoteConnectionFactory" entries="java:jboss/exported/jms/RemoteConnectionFactory" connectors="http-connector"/>
+                <pooled-connection-factory name="activemq-ra" entries="java:/JmsXA java:jboss/DefaultJMSConnectionFactory" connectors="in-vm" transaction="xa"/>
+            </server>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:naming:2.0">
+            <remote-naming/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:remoting:4.0">
+            <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:resource-adapters:5.0"/>
+        <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:security:2.0">
+            <security-domains>
+                <security-domain name="other" cache-type="default">
+                    <authentication>
+                        <login-module code="Remoting" flag="optional">
+                            <module-option name="password-stacking" value="useFirstPass"/>
+                        </login-module>
+                        <login-module code="RealmDirect" flag="required">
+                            <module-option name="password-stacking" value="useFirstPass"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
+                <security-domain name="jboss-web-policy" cache-type="default">
+                    <authorization>
+                        <policy-module code="Delegating" flag="required"/>
+                    </authorization>
+                </security-domain>
+                <security-domain name="jboss-ejb-policy" cache-type="default">
+                    <authorization>
+                        <policy-module code="Delegating" flag="required"/>
+                    </authorization>
+                </security-domain>
+                <security-domain name="jaspitest" cache-type="default">
+                    <authentication-jaspi>
+                        <login-module-stack name="dummy">
+                            <login-module code="Dummy" flag="optional"/>
+                        </login-module-stack>
+                        <auth-module code="Dummy"/>
+                    </authentication-jaspi>
+                </security-domain>
+            </security-domains>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
+            <deployment-permissions>
+                <maximum-set>
+                    <permission class="java.security.AllPermission"/>
+                </maximum-set>
+            </deployment-permissions>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:transactions:4.0">
+            <core-environment>
+                <process-id>
+                    <uuid/>
+                </process-id>
+            </core-environment>
+            <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
+            <object-store path="tx-object-store" relative-to="jboss.server.data.dir"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:undertow:6.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other">
+            <buffer-cache name="default"/>
+            <server name="default-server">
+                <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
+                <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm" enable-http2="true"/>
+                <host name="default-host" alias="localhost">
+                    <location name="/" handler="welcome-content"/>
+                    <http-invoker security-realm="ApplicationRealm"/>
+                </host>
+            </server>
+            <servlet-container name="default">
+                <jsp-config/>
+                <websockets/>
+            </servlet-container>
+            <handlers>
+                <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
+            </handlers>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:webservices:2.0">
+            <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
+            <endpoint-config name="Standard-Endpoint-Config"/>
+            <endpoint-config name="Recording-Endpoint-Config">
+                <pre-handler-chain name="recording-handlers" protocol-bindings="##SOAP11_HTTP ##SOAP11_HTTP_MTOM ##SOAP12_HTTP ##SOAP12_HTTP_MTOM">
+                    <handler name="RecordingHandler" class="org.jboss.ws.common.invocation.RecordingServerHandler"/>
+                </pre-handler-chain>
+            </endpoint-config>
+            <client-config name="Standard-Client-Config"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:weld:4.0"/>
+    </profile>
+    <interfaces>
+        <interface name="management">
+            <inet-address value="${jboss.bind.address.management:127.0.0.1}"/>
+        </interface>
+        <interface name="public">
+            <inet-address value="${jboss.bind.address:127.0.0.1}"/>
+        </interface>
+        <interface name="unsecure">
+            <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
+        </interface>
+    </interfaces>
+    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
+        <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
+        <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9993}"/>
+        <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
+        <socket-binding name="http" port="${jboss.http.port:8080}"/>
+        <socket-binding name="https" port="${jboss.https.port:8443}"/>
+        <socket-binding name="txn-recovery-environment" port="4712"/>
+        <socket-binding name="txn-status-manager" port="4713"/>
+        <socket-binding name="iiop" interface="unsecure" port="3528"/>
+        <socket-binding name="iiop-ssl" interface="unsecure" port="3529"/>
+        <outbound-socket-binding name="mail-smtp">
+            <remote-destination host="localhost" port="25"/>
+        </outbound-socket-binding>
+    </socket-binding-group>
+</server>
+```

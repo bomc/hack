@@ -1,0 +1,326 @@
+== Microservice REST API
+
+© _Created by Michael Börner_
+
+=== Überblick
+Das Dokument beschreibt den Aufbau des Projektes, sowie den Aufbau und Umgang mit dem API für den Microservice.
+
+==== Aufbau der 'pom.xml'-Datei
+Das Projekt ist für die Java EE7 (Java Platform, Enterprise Edition) und Wildfly 13.0.0.Final ausgelegt. 
+Die notwendigen Dependencies sind unten angegeben.
+
+```
+	<dependency>
+		<groupId>org.wildfly.bom</groupId>
+		<artifactId>wildfly-javaee7-with-tools</artifactId>
+		<version>${version.wildlfy.bom}</version>
+		<type>pom</type>
+		<scope>import</scope>
+	</dependency>
+	<dependency>
+		<groupId>javax</groupId>
+		<artifactId>javaee-api</artifactId>
+		<version>${version.javaee-api}</version>
+	</dependency>
+```
+
+Im pom.xml gibt es mehrere '_profiles_', die verschiedene Artefakte liefern und kurz vorgestellt werden:
+
+   - profile '*default*':
+   kompiliert den Source-Code und führt alle Modultests aus. Integrationstests werden *nicht* ausgeführt.
+   `mvn clean install`
+
+> Modultest-Klassen müssen *unbedingt* folgender Namenskonvention folgen: `MeineTestKlasse*Test.java`.
+   
+   - profile '*skipTest*':
+   kompiliert den Source-Code und es werden keine Tests durchgeführt.
+   `mvn clean install -PskipTest`
+   
+   - profile '*arq-wildfly-remote*':
+   kompiliert den Source-Code und es werden alle Integrationstests mit _Arquillian_ ausgeführt.
+   `mvn clean install -Parq-wildfly-remote`
+   Soll ein bestimmter Test ausgeführt werden, muss der Maven-Befehl, wie folgt angegeben werden:
+   `mvn clean install -Parq-wildfly-remote -Dtest=MeineTestKlasseIT#auszuführendeMethode`
+   
+> *Bemerkung:*
+> Integrationstest-Klassen müssen *unbedingt* folgender Namenskonvention folgen: `MeineTestKlasse*TestIT*.java`.
+> Es muss beim Ausführen dieses Profiles unbedingt der Wildfly gestartet sein.
+> Die Verbindung zwischen Maven und Wildfly wird über das folgende Property im pom.xml gesteuert und nicht über den Debug-Port (in der Regel 8787, wird beim Aufstarten im Log-file angezeigt):    
+> ```
+	<arq.wildfly.management.port>${wildfly.port}</arq.wildfly.management.port>
+> ```
+
+   - profile '*arq-wildfly-managed-dist*':
+   kompiliert den Source-Code und es werden alle Modultests und Integrationstests ausgeführt. Dieses Profil soll auf dem Jenkins verwendet werden.
+   `mvn clean install verify -Parq-wildfly-managed-dist`
+
+
+   - profile '*swagger*':
+   kompiliert den Source-Code und erzeugt ein neues .war-Archive in dem das Swagger-UI enthalten ist.
+   `mvn clean install -Pswagger`
+   Das Archive muss im Applikationserver deployed werden und ist dann unter folgender URL erreichbar:
+   `http://127.0.0.1:8180/${artifactId}/swagger-ui`
+   
+> *Bemerkung:*
+> Der angegegbene _Port: 8180_ setzt voraus, dass der Applikationserver mit einem Port-Offset von _100_ gstartet wurde.
+
+   - profile '*apidocs*':
+   erzeugt dieses Dokument in 4 verschiedenen Medienformaten: pdf, html, epub3 und docbook. Die generierten Dokumente sind in den folgenden Verzeichnis zu finden:
+   `\${artifactId}\target\asciidoc`
+   Folgende Metainformationen in diesem Dokument werden im pom, im folgenden Abschnitt gesetzt:
+
+```   
+	<info>
+   		<title>API Dokumentation für den Microservice</title>
+		<version>${project.version}</version>
+		<description>API Referenz Dokument</description>
+		<contact>
+			<email>bomc@bomc.org</email>
+			<name>Michael Börner</name>
+		</contact>
+	</info>
+```   
+
+=== Default-Service Endpoints
+Jeder Microservice muss bestimmte Endpoints implementieren, damit er als Teil des Gesamt-Ensembles seine Funktion ausführen kann.
+
+==== Version-Endpoint
+Der _Versions-Endpoint_ liefert die aktuelle Version aus dem *S*ource *C*ode *R*epository (SCR) zurück. Die aktuelle Version wird während des compile/build erzeugt und in die `version.properties`-Datei geschrieben. Zur Laufzeit kann die Version über den Endpoint _Versions-Endpoint_ ausgelesen werden.
+`curl -v -H "Accept: application/vnd.version-v1+json" -H "Content-Type: application/vnd.version-v1+json" -H "X-BOMC-REQUEST-ID: SET-BY-CURL-123" -H "X-BOMC-AUTHORIZATION: BOMC_USER" -X GET "127.0.0.1:8180/${artifactId}/rest/version/current-version"`
+Annotationen die den REST-Service beschreiben, im Context von JaxRS und Swagger, werden im jeweiligen Interface definiert.
+
+```   
+@Path(JaxRsActivator.VERSION_ENDPOINT_PATH)
+@Produces({ VersionRestEndpoint.MEDIA_TYPE_JSON_V1 })
+@Api(value = "/version", description = "Show the current version of the deployed service.")
+public interface VersionRestEndpoint {
+
+	String MEDIA_TYPE_JSON_V1 = "application/vnd.version-v1+json";
+	MediaType MEDIA_TYPE_JSON_V1_TYPE = new MediaType("application", "vnd.version-v1+json");
+
+	@ApiOperation(value = "Read the current version from 'version.properties'.", response = String.class)
+	@ApiResponses({ @ApiResponse(code = 404, message = "Endpoint not found."),
+			@ApiResponse(code = 200, message = "The current version as response object that wraps the 				javax.json.JsonObject as a string.") })
+	@GET
+	@Path("/current-version")
+	Response getVersion();
+```  
+
+==== ApiOverview-Endpoint
+Der _ApiOverview-Endpoint_ liefert einen Überbllick aller deploy-ten REST Endpoints im json-Format.
+`curl -v -H "Accept: application/vnd.overview-v1+json" -H "Content-Type: application/vnd.overview-v1+json" -H "X-BOMC-REQUEST-ID: SET-BY-CURL-123" -H "X-BOMC-AUTHORIZATION: BOMC_USER" -X GET "127.0.0.1:8180/${artifactId}/rest/overview/endpoints"`
+
+==== MBean Metriken
+Die Applikation sammelt Metriken über die Endpoints. Hierzu zählt die Performance, Anzahl der Aufrufe, sowie die Durchschnittsdauer eines Aufrufes. Desweiteren können Abweichungen vom Durchschnittswert in ein Monitoringsystem emittiert werden.
+
+> Der Durchschnittswert wird nach den ersten 100 Aufrufen des jeweiligen Endpoints ermittelt. 
+> Sollten danach bei Endpoint-Aufrufe in der Performance Abweichungen >25% auftreten, können diese in ein Monitoringsystem emittiert werden.
+> Die folgende Klasse ist als Listener registriert 
+> `de.bomc.poc.application.jmx.ThresholdNotificationListener` 
+> und ist für das emittieren der Monitoring-Nachrichten zuständig.
+
+Damit ein Endpoint für das Sammeln von Metriken teilnehmen kann, muss der Endpoint wie folgt annotiert werden:
+
+```
+...
+
+	@PerformanceTrackingQualifier
+	public class ApiOverviewRestEndpointImpl implements ApiOverviewRestEndpoint {
+
+...
+
+```
+
+Weiterhin muss das _beans.xml_ um folgendes ergänzt werden:
+
+```
+...
+
+	<interceptors>
+		<class>de.bomc.poc.application.performance.interceptor.PerformanceTrackingInterceptor</class>
+	</interceptors>
+
+...
+
+```
+
+Das Performance Tracking wird mit JMX MBeans implementiert. Dies hat den Vorteil, dass die Metriken auch über die JMX-Schnittstelle verfügbar sind und damit auch von anderen Monitoring Tools ausgelesen und visualisiert werden können.
+Um sich die Metriken über die JMX-Schnittstelle anzuschauen, muss die _Java & Monitoring Console_ gestartet werden und mit der VM des Wildfly-Applikationserver verbunden werden (WILDFLY_HOME\bin\jconsole.bat). In dem Tool den Reiter MBeans aus wählen und in der MBean-Struktur nach dem entsprechenden Domainnamen suchen.
+
+> Der Domainname wird in der Klasse `AbstractMBean`, Attribute `DOMAIN_NAME` gesetzt.   
+
+In der MBean-Struktur muss das `PerformanceTracking`-MBean ausgewählt werden. Das MBean bietet die Methode `dump` an. Der _Dump_ zeigt alle aufgerufenen Metoden mit seinen Metriken an.  
+`PerformanceTracking#dumpSorted - [Entry [service=de.bomc.poc.interfaces.rest.v1.overview.ApiOverviewRestEndpointImpl, method=getAvailableEndpoints, avg=16.0, invocationCounter=1, min=16, max=16 , sum=16, callsQueue=[success_2018-11-14 12:52:24.003], callsBufferLength=100, isMonitoringEnabled=false, limitInPercent=25.0, notifyDataQueue.size=0]]`
+
+=== Contract-First Development
+
+Contract-First bietet eine weitere Möglichkeit zum Definieren von APIs - in dem zuerst das Interface beschrieben wird (swagger bzw. OpenApi - Programmiersprachen-unabhängig) und daraus der benötigte Sourcecode (API, DTOs) generiert wird (analog WSDL2Java).
+
+Als Editor bietet sich hierbei der https://editor.swagger.io/[Online-Editor von swagger] an, den es auch als https://swagger.io/tools/swagger-editor/[Offlineversion] gibt.
+
+==== Build Konfiguration
+Der folgende POM-Auszug zeigt eine Beispielkonfiguration zum Generieren des Source-Codes auf Basis einer `api.yaml` mit dem `swagger-codegen-maven-plugin`. Dabei handelt es sich um die Minimalkonfiguration - siehe auch https://github.com/swagger-api/swagger-codegen/tree/master/modules/swagger-codegen-maven-plugin[alle verfügbaren Optionen].
+
+Details:
+
+* language: `jaxrs-spec` - definiert was effektiv generiert wird. In diesem Fall nur die Spezifikation, d.h. API-Interface(s) sowie DTOs. Weitere Informationen zu den diversen unterstützten Outputs finden sich in der https://swagger.io/tools/swagger-codegen/[Swagger Codegen Documentation].
+* apiPackage & modelPackage: definiert die entsprechenden Package-Namen, die für die generierten Klassen verwendet werden
+* generateSupportingFiles: `false` - dadurch werden nur die benötigten Java-Klassen generiert, überschüssige Dateien (z.B. pom.xml) werden weggelassen.
+
+.pom.xml
+[source,xml]
+----
+    ...
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-codegen-maven-plugin</artifactId>
+                <version>2.3.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/api.yaml</inputSpec>
+                            <language>jaxrs-spec</language>
+                            <apiPackage>ch.bs.zid.egov.privateaccount.api</apiPackage>
+                            <modelPackage>ch.bs.zid.egov.privateaccount.dto</modelPackage>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    ...
+----
+
+=== Logging
+Es wird vorgegeben, dass beim Eintreten einer Methode eine Logmeldung ausgegeben wird, bei der der Klassenname, Methodenname und optional die übergebenen Parameter in das Logfile geschrieben werden.
+
+```
+	private static final String LOG_PREFIX = "VersionRestEndpointImpl#";
+	@Inject
+	@LoggerQualifier
+	private Logger logger;
+
+	public Response getVersion() {
+		this.logger.debug(LOG_PREFIX + "getVersion");
+```
+
+Im Logfile ergibt sich daraus eine Logmeldung im folgenden Format (`VersionRestEndpointImpl#getVersion`):
+`2018-11-14 11:45:27,877 [ec9b6fa6-c9df-483d-8035-447628c102b2] [>>127.0.0.1:8180/${artifactId}/rest/] DEBUG [de.bomc.poc.interfaces.rest.v1.version.VersionRestEndpointImpl] (default task-26) VersionRestEndpointImpl#getVersion`
+
+=== RequestId
+Damit ein Request in einer Microservice-Architektur geloggt werden kann, muss jeder Request einen eindeutigen Identifier mitliefern.
+Der Einstieg in die Applikation ist der REST-Endpoint. Es wird zwingend davon ausgegangen, dass der eindeutige Identifier als Header `X-BOMC-REQUEST-ID` Information bei jedem Request mitgeliefert wird. Der eindeutige Identifier muss zwingend dem Format einer UID folgen, z.B. `ec9b6fa6-c9df-483d-8035-447628c102b2`
+Das Auswerten der RequestId erfolgt im `MDCFilter`, der Teil der Logging-Library ist.
+
+```
+	<dependency>
+		<groupId>de.bomc.poc</groupId>
+		<artifactId>logging-lib</artifactId>
+		<version>${version.logging-lib}</version>
+	</dependency>
+```
+
+Ziel ist es, das zu jeder Logmeldung automatisch die RequestId geloggt wird, ohne dass diese bei jeder Logmeldung immer wieder erneut gesetzt werden muss.
+Hier zu wird der *M*apped *D*iagnostic *C*ontext (MDC) von Log4j verwendet, der das gewünschte Verhalten unterstützt. Die RequestId wird im LocalThread des ausführenden Threads im MDC gesetzt und gelöscht.
+
+> Bei Ausführung des Requests in einem neuen Thread, muss der MDC im alten MDC gelöscht und im neuen LocalThread gesetzt werden.
+
+Damit die Informationen im Logfile auftauchen müssen folgende Konfigurationen im standalone.xml hinzugfügt werden.
+
+```
+	<subsystem xmlns="urn:jboss:domain:logging:5.0">
+		<console-handler name="CONSOLE">
+			<level name="INFO"/>
+			<formatter>
+				<named-formatter name="COLOR-PATTERN"/>
+			</formatter>
+		</console-handler>
+		<console-handler name="BOMC_CONSOLE">
+			<level name="DEBUG"/>
+			<formatter>
+				<named-formatter name="BOMC-PATTERN"/>
+			</formatter>
+		</console-handler>
+
+		...
+		
+		<logger category="de.bomc.poc" use-parent-handlers="false">
+			<level name="DEBUG"/>
+				<handlers>
+					<handler name="BOMC_CONSOLE"/>
+				</handlers>
+		</logger>
+
+		...
+		
+		<formatter name="BOMC-PATTERN">
+			<pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%X{X-BOMC-REQUEST-ID}] [%X{X-BOMC-BASE-URI}] %-5p [%c] (%t) %s%e%n"/>
+		</formatter>
+	</subsystem> 
+```
+	
+=== Onion-Architektur
+Die Projektstruktur dieses Projekts ist nach der Onion Architektur aufgebaut und soll folgend kurz erklärt werden.
+Zuerst soll das bekannte Layer.Modell erklärt werden, um den Unterschied zur Onion-Architektur hervorzuheben. 
+ 
+==== Das N-Layer-Modell
+Das Layer-Pattern soll helfen, Applikationen zu strukturieren, indem sie in Gruppen von Subtasks – die wiederum Subtasks bis hin zu einer bestimmten Stufe an Granularität enthalten – zerlegt werden. All das bildet die Grundlage des originalen N-Layer-Modells.	
+ 
+
+In der Hierarchie höher angesiedelt Layer (Layer N+1) nutzen ausschließlich Dienste der darunterliegenden Layer (Layer N). Es sind keine weiteren direkten oder indirekten Abhängigkeiten zwischen den Layern erlaubt. Dadurch schützt jeder Layer die darunterliegenden Layer vor direktem Zugriff. Auf diese Weise wird das Prinzip von Datenkapselung (Information Hiding) erfüllt. Alle Komponenten innerhalb eines individuellen Layers besitzen denselben Abstraktionsgrad. Dieser Ansatz wird als _striktes_ Layering bezeichnet. Dass so genannte flexible Layering ist weniger restriktiv in Bezug auf Beziehungen zwischen den Layern. Jeder Layer darf die Dienste aller darunterliegenden Layer verwenden. Dieser Ansatz bietet durch reduziertes Mapping der Daten zwischen den Layern in der Regel mehr Flexibilität und Performance. Allerdings auf Kosten einer reduzierten Wartbarkeit. Es gibt in der Regel die definierten Layer - den Präsentations- oder Client-Layer, den Prozess- oder Service-Layer, den Domänen- oder Geschäftslogik-Layer und den Datenzugriffs- oder Infrastruktur-Layer. 
+Aus der definierten Layer-Struktur, ist der Präsentations-Layer vom Applikations-Layer und dann vom Domänen-Layer und schlussendlich vom Datenzugriffs-Layer abhängig. Dies bedeutet, dass jeder Layer mit dem darunterliegenden Layer gekoppelt ist. Die darunterliegenden Layer sind wiederum jeweils an die Infrastruktur gekoppelt. Zwar braucht eine Applikation Kopplung, um überhaupt eine sinnvolle Aufgabe erfüllen zu können, jedoch kreiert dieser Ansatz unnötige Kopplungen.
+Das grösste Problem ist die Kopplung der Benutzerschnittstelle und Geschäftslogik zum Datenzugriffs-Layer. *Die Benutzerschnittstelle ist gekoppelt zum Datenzugriffs-Layer?* Transitive Abhängigkeiten sind ebenfalls Abhängigkeiten. Die Benutzerschnittstelle kann nicht funktionieren, wenn die Geschäftslogik nicht vorhanden ist. Die Geschäftslogik kann nicht funktionieren. Wenn die beschriebene Architektur analysiert wird, kann festgestellt werden, dass der Datenzugriffs-Layer das Fundament der gesamten Applikationsstruktur bildet. Er wird zum kritischen Layer. Alle Änderungen auf dem Datenzugriffs- aber auch auf dem Infrastruktur-Layer betreffen alle darüberliegenden Layer. Das bedeutet, dass solche Änderungen von unten nach oben durch alle Schichten der Applikation durchstoßen.
+Dieses Architektur-Pattern stützt sich fast vollständig auf die Infrastruktur. Der Code, der die eigentliche Geschäftslogik abbildet, füllt die Lücken zwischen den Infrastruktur-Bits. Wenn sich ein Prozess- oder Domänen-Layer an die Infrastruktur koppelt, ist dies eine unnötige Kopplung, und es kann zu Komplikationen beim Testen des Layers kommen. Gerade dieser Layer sollte fast nichts über Infrastruktur wissen. Die Infrastruktur sollte die Geschäftslogik unterstützen und nicht umgekehrt. Ebenso sollten Entwicklungen ausgehend von der Geschäftslogik starten und nicht ausgehend vom Datenzugriffscode. Zudem sollte die nötige Infrastrukturverdrahtung ein Implementationsdetail sein.
+
+==== Prinzip der Onion Architektur
+Das Prinzip der Onion Architektur ist sehr einfach. Alle Infrastruktur- und Datenzugriffsbelange werden in das Äußere der Applikation verschoben.
+	
+![Abbildung 1](/extensions/overview/onion-architecture.png)
+
+Jeffrey Palermo erwähnte diesen Ansatz, genannt Zwiebelarchitektur (Onion Architecture), das erste Mal auf seinem Blog im Jahre 2008. Die Bezeichnung soll es erleichtern, sich das dahinterliegende Architekturmuster besser merken zu können. Der Ansatz ist allerdings nicht neu. Ähnliche Ansätze wurden bereits in Ports and Adapters (Cockburn), Screaming Architecture (Robert C. Martin), Data Context Interaction (DCI, James Coplien und Trygve Reenskaug) und BCE (A Use Case Driven Approach von Ivar Jacobson) vorgestellt.
+
+Das Hauptversprechen der Onion-Architektur ist, dass sie die Kopplung besser in den Griff bekommt. Die fundamentale Regel besagt, dass Code von Ringen abhängig sein darf, die nahe am Zentrum liegen, nicht aber von Ringen, die weiter außerhalb liegen. In anderen Worten: Alle Kopplung geht in die Richtung des Zentrums. Der Architekturansatz bevorzugt die objektorientierte Programmierung und stellt Objekte über alles andere.
+
+Darüber hinaus basiert die Onion Architektur auf den Prinzipien von Domain-driven Design (siehe: Vernon, Vaughn: "Implementing Domain-Driven Design", Addison-Wesley Professional, Chapter 4 Hexagonal or Ports and Adapters).
+
+Im Innern ist das Domänenmodell, das den Zustand und das Verhalten modelliert, das den Geschäftsprozess der jeweiligen Applikationsdomäne abbildet (alles Wichtige für die Geschäftsdomäne wie Domänenmodell, Validierungsregeln, Geschäftsprozesse etc.). Die Anzahl der Ringe im Applikationskern kann stark variieren, doch das Domänenmodell ist immer der innerste Ring. Weil alle Kopplung nach innen geht, ist das Domänenmodell nur mit sich selbst gekoppelt.
+
+Der erste Ring um das Domänenmodell ist typischerweise der Ring, in dem die Schnittstellen zu finden sind, die es erlauben, Objekte zu speichern oder zu laden (z.B. Repository-Schnittstellen). Das Verhalten selbst (also die Implementation der Schnittstelle) ist nicht im Applikationskern, weil dabei typischerweise ein Speichermedium involviert ist (was wiederum ein Infrastrukturaspekt ist). Nur die Schnittstellen sind im Kern.
+
+In den äußeren Ringen finden wir die Benutzerschnittstelle, die Infrastruktur und die Tests. Die äußeren Ringe sind reserviert für Dinge, die sich oft ändern. Mit diesem Ansatz wird abgesichert, dass der Applikationskern nicht geändert werden muss, wenn sich die Benutzerschnittstelle, der Datenzugriff, die REST-Services, die Nachrichteninfrastruktur oder die I/O-Technik ändert.
+
+Die Onion-Architektur basiert auf dem so genannten Dependency-Inversion-Prinzip [^1]. Der Applikationskern braucht Implementationen der Kernschnittstellen. Weil die Implementationen in den äußeren Ringen abgelegt sind, braucht es einen Mechanismus, der die Implementationen zur Laufzeit an die Schnittstellen bindet und dem Kern übergibt.
+
+Die Applikation ist um ein unabhängiges Objektmodell konstruiert. Der komplette Applikationskern ist unabhängig, weil er keine externen Bibliotheken referenziert und somit keinen technologiespezifischen Code beinhaltet. Die inneren Ringe definieren die Schnittstellen. Diese Schnittstellen müssen den Geschäftsfall abbilden, nicht aber technische Aspekte. Dies bedeutet, dass die Form der Schnittstelle direkt auf den Geschäftsfall passt und somit konsumentengetrieben ist.
+
+Der Kern übernimmt die Verantwortung über die Schnittstellen. Die Klassen und Komponenten in den äußeren Ringen implementieren die Schnittstellen, d.h. aller technologiespezifische Code ist in den äußeren Ringen. Der äußerste Ring kann Referenzen zu externen Bibliotheken haben. So kann ermöglicht werden, die Komplexität der Infrastruktur (welche nichts mit der Geschäftslogik zu tun hat) so weit wie möglich an den Rand der Applikation zu verschieben, wodurch die Kopplung immer mehr in Richtung Zentrum geht. Dieser Ansatz macht die Applikation unabhängig von verschiedenen Infrastruktur- und Querschnittsbelangen:
+
+Datenbank: Da die Geschäftsregeln unabhängig von der Datenbank sind, kann das Speichermedium ausgetauscht werden.
+Benutzerschnittstelle: Sie kann Änderungen vornehmen, ohne den Rest des Systems zu beeinflussen.
+Frameworks: Die Architektur ist nicht abhängig von der Existenz einer bestimmten Bibliothek oder eines Frameworks. Die Frameworks können daher als Tools betrachtet werden, und das System muss nicht in ihre Einschränkungen gepresst werden.
+Dies führt uns direkt zum ultimativen Vorteil dieses Ansatzes. Der Applikationskern ist zu 100 Prozent überprüfbar und unabhängig (siehe: Growing Object Oriented Software Guided by Tests, Designing for Maintainability Page 47-49).
+
+[^1]: Link zum Dependency-Inversion-Prinzip.
+
+==== Jacoco Report Analysis
+JaCoCo reports help you visually analyze code coverage by using diamonds with colors for branches and background colors for lines:
+
+- Red diamond means that no branches have been exercised during the test phase.
+- Yellow diamond shows that the code is partially covered – some branches have not been exercised.
+- Green diamond means that all branches have been exercised during the test.
+The same color code applies to the background color, but for lines coverage.
+
+JaCoCo mainly provides three important metrics:
+
+- Lines coverage reflects the amount of code that has been exercised based on the number of Java byte code instructions called by the tests.
+- Branches coverage shows the percent of exercised branches in the code – typically related to if/else and switch statements.
+- Cyclomatic complexity reflects the complexity of code by giving the number of paths needed to cover all the possible paths in a code through linear combination.
+To take a trivial example, if there is no if or switch statements in the code, the cyclomatic complexity will be 1, as we only need one execution path to cover the entire code.
+
+Generally the cyclomatic complexity reflects the number of test cases we need to implement in order to cover the entire code.

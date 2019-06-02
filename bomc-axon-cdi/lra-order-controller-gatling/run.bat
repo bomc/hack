@@ -1,0 +1,1 @@
+mvn -Pgatling -Dgatling.simulation.Class=de.bomc.poc.axon.gatling.LoadScenarioSimulation gatling:execute

@@ -1,0 +1,58 @@
+# Einführung
+
+Der Zweck des Dokumentes ist die Beschreibung der Lagacy-Upload-Schnittstelle.
+
+## Benutzung der API
+Das Application Programming Interface (API) ist eine Programmierschnittstelle, die das Hochladen ermöglicht.
+
+Ein HTTP POST-Request sieht wie folgt aus:
+
+- einem eindeutigen Request-Identifier
+- und dem zu validierenden Dateiinhalt
+
+verschickt.
+
+Der Body des POST-Requests ist in drei Teile unterteilt:
+```
+1. Content-Disposition: enthält den Dateinamen.
+2. Content-Type: multipart.
+3. der zu validierende Dateiinhalt.
+```
+Anfang und Ende des Body's sind mit einem 'boundary'-Tag gekennzeichnet.
+
+### Beispiel für ein Request:
+
+```
+POST http://127.0.0.1:8180/bomc-upload-lagacy/rest/api/validate?requestId=ab33e2ee-9443-4302-9142-e0df8e5b3cb9
+Accept: application/vnd.lagacy-upload-v1+json
+Accept-Encoding: gzip, deflate
+Authorization: Basic aG9rby11c2VybmFtZTpob2tvLXBhc3N3b3Jk
+Connection: Keep-Alive
+Content-Length: 138180856
+Content-Type: multipart/form-data; boundary=0b2e10c0-ef88-4b9d-a493-99e5431c3905
+Host: 127.0.0.1:8180
+User-Agent: Apache-HttpClient/4.3.6 (java 1.5)
+--0b2e10c0-ef88-4b9d-a493-99e5431c3905
+Content-Disposition: form-data; name="attachment"; filename="bomc.csv"
+Content-Type: multipart/form-data
+
+bomc1;bomc2;bomc3;bomc4; ...
+
+--0b2e10c0-ef88-4b9d-a493-99e5431c3905
+```
+
+### Authentication
+Die Authentifizierung besteht in der Identifizierung, ob ein Client berechtigt ist, auf eine Ressource zuzugreifen.
+Das HTTP-Protokoll unterstützt die Authentifizierung zum Aushandeln des Zugriffs auf eine sichere Ressource durch das 'Basic Authentication' Verfahren.
+Die Authentifizierung wird im Header übertragen und ist unten, wie folgt dargestellt:
+```
+Authorization: Basic aG9rby11c2VybmFtZTpob2tvLXBhc3N3b3Jk
+```
+
+'Authorization' ist der Header-Key.
+'aG9rby11c2VybmFtZTpob2tvLXBhc3N3b3Jk' ist die Base64-Codierung von 'upload-username:upload-password' und steht damit für Benutzername='upload-username' und Passwort='upload-password'.
+
+Es gilt zu beachten, dass Benutzername und Passwort bei diesem Verfahren nur codiert und nicht verschlüsselt sind.
+
+### Abgrenzung
+Das API-Dokument definiert nicht die Struktur, die Form und den Inhalt der zu übertragenen Dateien.

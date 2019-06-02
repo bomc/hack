@@ -1,0 +1,430 @@
+== bomc-poc Service REST API
+
+:bomc-swagger-ref: http://192.168.4.1:8180/bomc-swagger/swagger-ui
+
+=== Überblick
+Das Dokument beschreibt die API für den +bomc-poc+ service.
+
+Link zum Aufruf vom Swagger-UI aus dem {bomc-swagger-ref}[bomc-swagger] Service. 
+
+.Beschreibt die Anwendung von Swagger Annotations in DTOs.
+
+
+```java
+package ch.bs.zid.egov.authorization.api;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+@ApiModel(value = "RoleDTO", description = "Represents a role in authorization context")
+public class RoleDTO implements Serializable {
+
+    @ApiModelProperty(value = "The given id (technical db id)", required = true)
+    private Long roleId;
+    @ApiModelProperty(value = "The given name of role", required = true)
+    private String name;
+
+    public RoleDTO() {
+        // Indicates a POJO.
+    }
+
+    public Long getRoleId() {
+        return this.roleId;
+    }
+
+    public void setRoleId(final Long roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+}
+```
+
+weitere Beispiele für Anwendung von Swagger Annotationen bei REST endpoints.
+
+```java
+@Path("authorization/service")
+@Consumes({AuthorizationRESTResource.MEDIA_TYPE_JSON_V})
+@Produces({AuthorizationRESTResource.MEDIA_TYPE_JSON_V})
+@Api(value = "/authorization/service", description = "Provides a API for Account - Person - Role relationship handling.")
+public interface AuthorizationRESTResource {
+
+    String MEDIA_TYPE_JSON_V = "application/vnd.authorization-v1+json";
+    // Must be same as defined in logger-lib project.
+    String HEADER_REQUEST_ID_ATTR = "X-EGOV-REQUEST-ID";
+
+    @GET
+    @Path("/account-person-role/permissions")
+    @ApiOperation(notes = "Returns true if the user has the permission to access the given account, otherwise false. Check permission by given parameter.", value = "hasPersonPermissionsToAccount", nickname = "hasPersonPermissionsToAccount", httpMethod = "GET", position = 1)
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful finished.", response = Boolean.class),
+                           @ApiResponse(code = 500, message = "Unexpected server error.", response = String.class)})
+    Response hasPersonPermissionsToAccount(@ApiParam(value = "The security context, e.g. 'EGOV_FORM'.", required = true) @NotNull @Size(min = 1, max = 255) @QueryParam("contextName") String contextName,
+                                           @ApiParam(value = "The referenced account. This id is the account id that references ('ForeignKey') the account in the accountService, e.g. '700000001'.", required = true) @NotNull @QueryParam("account-id") Long accountId,
+                                           @ApiParam(value = "The permission to check, e.g. 'read'.", required = true) @NotNull @Size(min = 1, max = 255) @QueryParam("permission") String permission,
+                                           @ApiParam(value = "The referenced person, e.g. '123456789'. This is not a technical id, this id references the person id in the accountService.", required = true)@QueryParam("user-id") String userId);
+
+    @POST
+    @Path("/account-person-role/relationships")
+    @ApiOperation(notes = "Returns the technical id, created by db. Create a Account-Person-Role relationship with given roleId, e.g. 'EGOV_KK_PRIVATE_OWNER'.", value = "createAccountPersonRoleRelationship", nickname = "createAccountPersonRoleRelationship", httpMethod = "POST", position = 2)
+    @ApiResponses(value = {@ApiResponse(code = 201, message = "Successful created."),
+                           @ApiResponse(code = 500, message = "Unexpected server error.", response = String.class)})
+    Response createAccountPersonRoleRelationship(@ApiParam(value = "Relationship data.", required = true) @NotNull AccountPersonRoleDTO accountPersonRoleDTO);
+
+...
+```
+
+. Beschreibt wie implizite Parameter beschrieben werden können.
+
+```java
+    @ApiOperation(httpMethod = "GET", value = "Resource to get a user", response = SampleData.class, nickname = "getUser")
+    @ApiResponses({@ApiResponse(code = 400, message = "Invalid input", response = io.swagger.sample.model.ApiResponse
+            .class)})
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "User ID", required = true, dataType = "integer", paramType =
+                    "query"),
+            @ApiImplicitParam(name = "name", value = "User's name", required = true, dataType = "string", paramType =
+                    "query"),
+            @ApiImplicitParam(name = "email", value = "User's email", required = true, dataType = "string", paramType
+                    = "query"),
+            @ApiImplicitParam(name = "age", value = "User's age", required = true, dataType = "integer", paramType =
+                    "query"),
+            @ApiImplicitParam(name = "dateOfBirth", value = "User's date of birth, in dd-MM-yyyy format", required =
+                    true, dataType = "java.util.Date", paramType = "query")})
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String result;
+        try {
+            final Integer id = Integer.parseInt(request.getParameter("id"));
+            final String name = request.getParameter("name");
+            final String email = request.getParameter("email");
+            final Integer age = Integer.parseInt(request.getParameter("age"));
+            final Date dateOfBirth = new SimpleDateFormat("dd-MM-yyyy").parse(request.getParameter("dateOfBirth"));
+            result = Json.pretty(new SampleData(id, name, email, age, dateOfBirth));
+        } catch (Exception ex) {
+            result = Json.pretty(new io.swagger.sample.model.ApiResponse(400, ex.getMessage()));
+        }
+
+        response.getOutputStream().write(result.getBytes(StandardCharsets.UTF_8));
+    }
+```
+
+=== Zwei Maven Profile zur Anwendung für Swagger
+
+.Maven Profile für die Erstellung des Swagger-UIs +apidocs-ui+ und der verschiedenen Dokumentationsarten +apidocs-doc+
+
+```xml
+        <!-- A profile that generates a war-archive with swagger-ui. -->
+        <!-- Use it with 'http://192.168.4.1:8180/bomc-swagger/swagger-ui'. -->
+        <profile>
+            <id>apidocs-ui</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <runOrder>alphabetical</runOrder>
+                            <!-- Excludes integration tests when unit tests are running. -->
+                            <excludes>
+                                <exclude>**/*IT.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.kongchen</groupId>
+                        <artifactId>swagger-maven-plugin</artifactId>
+                        <version>${version.swagger-maven-plugin}</version>
+                        <configuration>
+                            <apiSources>
+                                <apiSource>
+                                    <locations>de.bomc.poc.rest.endpoints.v1</locations>
+                                    <schemes>http</schemes>
+                                    <host>${swagger.ui.host}</host>
+                                    <basePath>${application.context.root}/rest</basePath>
+                                    <info>
+                                        <title>API Dokumentation for bomc-swagger poc.</title>
+                                        <version>${project.version}</version>
+                                        <description>API Reference Documentation</description>
+                                        <contact>
+                                            <email>bomc@bomc.org</email>
+                                            <name>Michael Boerner</name>
+                                        </contact>
+                                    </info>
+                                    <swaggerDirectory>${project.build.directory}/swagger-ui/META-INF/resources/webjars/swagger-ui/${version.swagger-ui}</swaggerDirectory>
+                                    <outputFormats>json</outputFormats>
+                                </apiSource>
+                            </apiSources>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Step 1. - Download Swagger UI webjar -->
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>swagger ui</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.webjars</groupId>
+                                            <artifactId>swagger-ui</artifactId>
+                                            <version>${version.swagger-ui}</version>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${project.build.directory}/swagger-ui</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Step 2. Add Swagger-ui Resources to the WAR -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <configuration>
+                            <webResources combine.children="append">
+                                <resource>
+                                    <directory>${project.build.directory}/swagger-ui/META-INF/resources/webjars/swagger-ui/${version.swagger-ui}</directory>
+                                    <includes>
+                                        <include>**/*.*</include>
+                                    </includes>
+                                    <targetPath>swagger-ui</targetPath>
+                                </resource>
+                            </webResources>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <version>${version.replacer}</version>
+                        <executions>
+                            <execution>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <file>${project.build.directory}/swagger-ui/META-INF/resources/webjars/swagger-ui/${version.swagger-ui}/index.html</file>
+                            <replacements>
+                                <replacement>
+                                    <token>http://petstore.swagger.io/v2/swagger.json</token>
+                                    <value>http://${swagger.ui.host}${application.context.root}/swagger-ui/swagger.json</value>
+                                </replacement>
+                            </replacements>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>apidocs-doc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.kongchen</groupId>
+                        <artifactId>swagger-maven-plugin</artifactId>
+                        <version>${version.swagger-maven-plugin}</version>
+                        <configuration>
+                            <apiSources>
+                                <apiSource>
+                                    <locations>de.bomc.poc.rest.endpoints.v1</locations>
+                                    <schemes>http</schemes>
+                                    <host>${swagger.ui.host}</host>
+                                    <basePath>${application.context.root}/rest</basePath>
+                                    <info>
+                                        <title>API Dokumentation for the bomc-swagger Service</title>
+                                        <version>${project.version}</version>
+                                        <description>API Reference Documentation</description>
+                                        <contact>
+                                            <email>bomc@bomc.org</email>
+                                            <name>Michael Boerner</name>
+                                        </contact>
+                                    </info>
+                                    <swaggerDirectory>${project.build.directory}/swagger-doc</swaggerDirectory>
+                                    <outputFormats>json</outputFormats>
+                                </apiSource>
+                            </apiSources>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- First, use the swagger2markup plugin to generate asciidoc -->
+                    <plugin>
+                        <groupId>io.github.swagger2markup</groupId>
+                        <artifactId>swagger2markup-maven-plugin</artifactId>
+                        <version>${version.swagger2markup-maven-plugin}</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>io.github.swagger2markup</groupId>
+                                <artifactId>swagger2markup-import-files-ext</artifactId>
+                                <version>${version.swagger2markup-import-files-ext}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>io.github.swagger2markup</groupId>
+                                <artifactId>swagger2markup-spring-restdocs-ext</artifactId>
+                                <version>${version.swagger2markup-spring-restdocs-ext}</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <swaggerInput>${project.build.directory}/swagger-doc/swagger.json</swaggerInput>
+                            <outputDir>${generated.asciidoc.directory}</outputDir>
+                            <config>
+                                <swagger2markup.markupLanguage>ASCIIDOC</swagger2markup.markupLanguage>
+                                <swagger2markup.pathsGroupedBy>TAGS</swagger2markup.pathsGroupedBy>
+                                <swagger2markup.outputLanguage>DE</swagger2markup.outputLanguage>
+                                <swagger2markup.generatedExamplesEnabled>true</swagger2markup.generatedExamplesEnabled>
+                                <swagger2markup.extensions.dynamicOverview.contentPath>${project.basedir}/src/docs/asciidoc/extensions/overview</swagger2markup.extensions.dynamicOverview.contentPath>
+                                <swagger2markup.extensions.dynamicDefinitions.contentPath>${project.basedir}/src/docs/asciidoc/extensions/definitions</swagger2markup.extensions.dynamicDefinitions.contentPath>
+                                <swagger2markup.extensions.dynamicPaths.contentPath>${project.basedir}/src/docs/asciidoc/extensions/paths</swagger2markup.extensions.dynamicPaths.contentPath>
+                                <swagger2markup.extensions.dynamicSecurity.contentPath>${project.basedir}src/docs/asciidoc/extensions/security/</swagger2markup.extensions.dynamicSecurity.contentPath>
+                            </config>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>convertSwagger2markup</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Run the generated asciidoc through Asciidoctor to generate
+                         other documentation types, such as PDFs or HTML5 -->
+                    <plugin>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctor-maven-plugin</artifactId>
+                        <version>${version.asciidoctor-maven-plugin}</version>
+                        <!-- Include Asciidoctor PDF for pdf generation -->
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.asciidoctor</groupId>
+                                <artifactId>asciidoctorj-pdf</artifactId>
+                                <version>${version.asciidoctorj-pdf}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.asciidoctor</groupId>
+                                <artifactId>asciidoctorj-epub3</artifactId>
+                                <version>${version.asciidoctorj-epub3}</version>
+                            </dependency>
+                        </dependencies>
+                        <!-- Configure generic document generation settings -->
+                        <configuration>
+                            <!-- defaults to ${basedir}/src/main/asciidoc -->
+                            <sourceDirectory>${asciidoctor.input.directory}</sourceDirectory>
+                            <!-- an override to process a single source file; defaults to all files in ${sourceDirectory} -->
+                            <sourceDocumentName>apiDocBomc.adoc</sourceDocumentName>														<1>
+                            <!-- enables and sets the source highlighter; currently coderay and highlightjs are supported -->
+                            <sourceHighlighter>coderay</sourceHighlighter>
+                            <!-- a Map<String,String> of attributes to pass to Asciidoctor, defaults to null -->
+                            <attributes>
+                                <doctype>book</doctype>
+                                <toc>left</toc>
+                                <toclevels>3</toclevels>
+                                <numbered></numbered>
+                                <hardbreaks></hardbreaks>
+                                <sectlinks></sectlinks>
+                                <sectanchors></sectanchors>
+                                <generated>${generated.asciidoc.directory}</generated>
+                            </attributes>
+                        </configuration>
+                        <!-- Since each execution can only handle one backend, run
+                             separate executions for each desired output type -->
+                        <executions>
+                            <execution>
+                                <id>output-html</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>html5</backend>
+                                    <outputDirectory>${asciidoctor.html.output.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>output-pdf</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>pdf</backend>
+                                    <outputDirectory>${asciidoctor.pdf.output.directory}</outputDirectory>
+                                    <attributes>
+                                        <pdf-stylesdir>${project.basedir}/src/docs/asciidoc/theme</pdf-stylesdir>
+                                        <pdf-style>custom</pdf-style>
+                                        <!--<pdf-fontsdir>${project.basedir}/src/docs/asciidoc/fonts</pdf-fontsdir>-->
+                                        <icons>font</icons>
+                                        <pagenums/>
+                                        <toc/>
+                                        <idprefix/>
+                                        <idseparator>-</idseparator>
+                                        <sectnums>true</sectnums>
+                                    </attributes>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>output-epub3</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>epub3</backend>
+                                    <outputDirectory>${asciidoctor.epub3.output.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>output-docbook</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>docbook</backend>
+                                    <outputDirectory>${asciidoctor.docbook.output.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+```
+
+<1> Definition des Dokumentennamens.
+

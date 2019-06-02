@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.bomc.poc</groupId>
+    <artifactId>bomc-wildfly-dist</artifactId>	   
+    <packaging>jar</packaging>
+	<version>1.00.00-SNAPSHOT</version>
+	
+	<name>Bomc-WildFly: Distribution</name>
+
+    <properties>		    
+        <!-- Explicitly declaring the source encoding eliminates the following 
+            message: -->
+        <!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered 
+            resources, i.e. build is platform dependent! -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		
+		<final.dist.name>wildfly-13.0.0.Final</final.dist.name>
+		<version.release.plugin>2.5.2</version.release.plugin>
+		<version.resources.plugin>2.7</version.resources.plugin>
+		<version.wagon.webdav>2.9</version.wagon.webdav>
+		<version.assembly.plugin>2.5.5</version.assembly.plugin>
+    </properties>
+  
+	<scm>
+		<connection>scm:svn:http://subversion.example.com/svn/project/trunk/</connection>
+		<developerConnection>scm:svn:https://subversion.example.com/svn/project/trunk/</developerConnection>
+		<url>http://subversion.example.com/svn/project/trunk/</url>
+	</scm>
+	
+    <build>
+        <finalName>${final.dist.name}</finalName>
+		<extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-webdav-jackrabbit</artifactId>
+                <version>${version.wagon.webdav}</version>
+            </extension>
+        </extensions>
+        <plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>${version.release.plugin}</version>			
+			</plugin>		
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+				<version>${version.resources.plugin}</version>
+                <executions>
+                    <execution>
+                        <id>distribution-configuration</id>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>${basedir}/target/${final.dist.name}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/distribution/resources</directory>
+									<!--<filtering>true</filtering>-->
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+			<id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+						<version>${version.assembly.plugin}</version>
+                        <executions>
+                            <execution>
+                                <id>assemble</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>${basedir}/src/assembly/assembly.xml</descriptor>
+                                    </descriptors>  
+									<recompressZippedFiles>true</recompressZippedFiles>									
+                                    <finalName>${final.dist.name}</finalName>
+									<!-- Verhindert das die Assembly Id im Filenamen auftaucht. -->
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>									
+                                    <workDirectory>${project.build.directory}/assembly/work</workDirectory>
+									<tarLongFileMode>gnu</tarLongFileMode>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

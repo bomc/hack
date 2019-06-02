@@ -1,0 +1,30 @@
+import javax.xml.bind.JAXB;
+import java.io.StringReader;
+import java.io.StringWriter;
+
+public class JAXBUtils
+{
+	/**
+	 * Unmarshal an XML string
+	 * @param xml     The XML string
+	 * @param type    The JAXB class type.
+	 * @return The unmarshalled object.
+	 */
+	public <T> T unmarshal(String xml, Class<T> type)
+	{
+		StringReader reader = new StringReader(xml);
+		return javax.xml.bind.JAXB.unmarshal(reader, type);
+	}
+
+	/**
+	 * Marshal an Object to XML.
+	 * @param object    The object to marshal.
+	 * @return The XML string representation of the object.
+	 */
+	public String marshal(Object object)
+	{
+		StringWriter stringWriter = new StringWriter();
+		JAXB.marshal(object, stringWriter);
+		return stringWriter.toString();
+	}
+}
