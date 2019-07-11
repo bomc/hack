@@ -1,2 +1,2 @@
 #!/bin/bash
-mvn clean install && docker build -t bomc/bomc-order:v1.0.0 .
+mvn clean install -PskipTest && docker build -t bomc/bomc-order:v1.0.0 .

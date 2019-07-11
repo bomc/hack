@@ -2,18 +2,18 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: bomc-order
+  name: bomc-invoice
   namespace: bomc-app
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: bomc-order
+        app: bomc-invoice
     spec:
       containers:
-      - name: bomc-order
-        image: bomc/bomc-order:v1.0.0
+      - name: bomc-invoice
+        image: bomc/bomc-invoice:v1.0.0
         imagePullPolicy: IfNotPresent
         resources:
           requests:
@@ -22,18 +22,19 @@ spec:
         - containerPort: 8080
           protocol: TCP
         livenessProbe:
-          exec:
-            command:
-            - /bin/bash
-            - -c
-            - curl -f localhost:8080/
-          initialDelaySeconds: 10
+          httpGet:
+            path: /bomc-invoice/rest/health/liveness
+            port: 8080
+          initialDelaySeconds: 25
+          timeoutSeconds: 1
+          periodSeconds: 30
+          failureThreshold: 1
         readinessProbe:
-          exec:
-            command:
-            - /bin/bash
-            - -c
-            - curl -f localhost:8080/bomc-order/rest/version/current-version
-          initialDelaySeconds: 20
-      restartPolicy: Always
+          httpGet:
+            path: /bomc-invoice/rest/health/readiness
+            port: 8080
+          initialDelaySeconds: 25
+          timeoutSeconds: 1
+          periodSeconds: 30
+          failureThreshold: 1
 ---

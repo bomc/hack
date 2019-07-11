@@ -1,5 +1,6 @@
 # Allow HTTP traffic on Port 80, for all hosts.
-# The gateway now allows access in port 80 but it has no concept where to route the requests.#
+# The gateway now allows access in port 80 but it has no concept where to route the requests.
+#
 # That is achieved using Virtual Services. 
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway

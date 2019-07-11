@@ -41,19 +41,19 @@ import java.util.logging.Logger;
 
 /**
  * A client logger for REST to log the traffic.
- * @author <a href="mailto:bomc@bomc.org">Michael Börner</a>
+ * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 14.07.2016
  */
 //Smaller numbers are first in the chain.
-@Priority(value = Priorities.AUTHORIZATION + 100)
-public class RestClientLogger implements ClientRequestFilter, ClientResponseFilter, WriterInterceptor {
+@Priority(value = Priorities.AUTHORIZATION + 300)
+public class ResteasyClientLogger implements ClientRequestFilter, ClientResponseFilter, WriterInterceptor {
 
-    private static final Logger LOGGER = Logger.getLogger(RestClientLogger.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ResteasyClientLogger.class.getName());
     private static final String LOG_PREFIX = "RestClientLogger#";
     private static final String NOTIFICATION_PREFIX = "* ";
     private static final String REQUEST_PREFIX = "> ";
     private static final String RESPONSE_PREFIX = "< ";
-    private static final String ENTITY_LOGGER_PROPERTY = RestClientLogger.class.getName() + ".entityLogger";
+    private static final String ENTITY_LOGGER_PROPERTY = ResteasyClientLogger.class.getName() + ".entityLogger";
     /**
      * <pre>
      * 	private static final Comparator<Map.Entry<String, List<String>> COMPARATOR = (o1, o2) -> o1.getKey().compareToIgnoreCase(o2.getKey()));
@@ -75,7 +75,7 @@ public class RestClientLogger implements ClientRequestFilter, ClientResponseFilt
     /**
      * Create a logging filter logging the request and response to a default JDK logger, named as the fully qualified class name of this class. Entity logging is turned off by default.
      */
-    public RestClientLogger() {
+    public ResteasyClientLogger() {
         this(LOGGER, false);
     }
 
@@ -84,7 +84,7 @@ public class RestClientLogger implements ClientRequestFilter, ClientResponseFilt
      * @param logger      the logger to log requests and responses.
      * @param printEntity if true, entity will be logged as well up to the default maxEntitySize, which is 8KB
      */
-    public RestClientLogger(final Logger logger, final Boolean printEntity) {
+    public ResteasyClientLogger(final Logger logger, final Boolean printEntity) {
         this.logger = logger;
         this.printEntity = printEntity;
         this.maxEntitySize = DEFAULT_MAX_ENTITY_SIZE;
@@ -96,7 +96,7 @@ public class RestClientLogger implements ClientRequestFilter, ClientResponseFilt
      * @param maxEntitySize maximum number of entity bytes to be logged (and buffered) - if the entity is larger, logging filter will print (and buffer in memory) only the specified number of bytes and print "...more..."
      *                      string at the end.
      */
-    public RestClientLogger(final Logger logger, final int maxEntitySize) {
+    public ResteasyClientLogger(final Logger logger, final int maxEntitySize) {
         this.logger = logger;
         this.printEntity = true;
         this.maxEntitySize = maxEntitySize;
@@ -249,8 +249,8 @@ public class RestClientLogger implements ClientRequestFilter, ClientResponseFilt
             // write entity to the builder
             final byte[] entity = this.baos.toByteArray();
 
-            this.b.append(new String(entity, 0, Math.min(entity.length, RestClientLogger.this.maxEntitySize), "UTF-8"));
-            if (entity.length > RestClientLogger.this.maxEntitySize) {
+            this.b.append(new String(entity, 0, Math.min(entity.length, ResteasyClientLogger.this.maxEntitySize), "UTF-8"));
+            if (entity.length > ResteasyClientLogger.this.maxEntitySize) {
                 this.b.append("...more...");
             }
             this.b.append('\n');
@@ -260,7 +260,7 @@ public class RestClientLogger implements ClientRequestFilter, ClientResponseFilt
 
         @Override
         public void write(final int i) throws IOException {
-            if (this.baos.size() <= RestClientLogger.this.maxEntitySize) {
+            if (this.baos.size() <= ResteasyClientLogger.this.maxEntitySize) {
                 this.baos.write(i);
             }
             this.inner.write(i);

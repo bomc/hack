@@ -21,22 +21,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
-import org.eclipse.microprofile.rest.client.annotation.RegisterProviders;
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-
-import de.bomc.poc.invoice.interfaces.rest.filter.MDCFilter;
-import de.bomc.poc.invoice.interfaces.rest.filter.RestClientLogger;
-
 /**
  * Handles the ordering use case.
  * 
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 03.02.2019
  */
-@RegisterRestClient
-@RegisterProviders({ @RegisterProvider(MDCFilter.class), @RegisterProvider(RestClientLogger.class)/*,
-		@RegisterProvider(RestClientHeaderIfModifiedSinceFilter.class)*/ })
 @Path(OrderRestEndpoint.ORDER_ENDPOINT_PATH)
 @Produces({ OrderRestEndpoint.MEDIA_TYPE_JSON_V1 })
 @Consumes({ OrderRestEndpoint.MEDIA_TYPE_JSON_V1 })
@@ -48,6 +38,7 @@ public interface OrderRestEndpoint {
 	 */
 	String MEDIA_TYPE_JSON_V1 = "application/vnd.order-v1+json";
 	String ORDER_ENDPOINT_PATH = "/order";
+	String BOMC_USER_ID_HEADER = "x-bomc-user-id";
 
 	/**
 	 * <pre>
@@ -57,5 +48,5 @@ public interface OrderRestEndpoint {
 	 */
 	@GET
 	@Path("/latest-modified-date")
-	Response getLatestModifiedDate(@HeaderParam("X-BOMC-USER-ID") String userId);
+	Response getLatestModifiedDate(@HeaderParam(BOMC_USER_ID_HEADER) String userId);
 }

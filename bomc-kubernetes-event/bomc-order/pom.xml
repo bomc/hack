@@ -149,9 +149,10 @@
 		<version.swagger-maven-plugin>3.1.7</version.swagger-maven-plugin>
 		<version.asciidoctor-maven-plugin>1.5.7.1</version.asciidoctor-maven-plugin>
 		<version.swagger2markup-maven-plugin>1.3.3</version.swagger2markup-maven-plugin>
-		<!-- ch.netzwerg:paleo-core:jar:0.11.0 not available in mvn repo <version.swagger-maven-plugin>3.1.8</version.swagger-maven-plugin> 
-			<version.asciidoctor-maven-plugin>1.5.7.1</version.asciidoctor-maven-plugin> 
-			<version.swagger2markup-maven-plugin>1.3.7</version.swagger2markup-maven-plugin> -->
+		<!-- ch.netzwerg:paleo-core:jar:0.11.0 not available in mvn repo 
+		  <version.swagger-maven-plugin>3.1.8</version.swagger-maven-plugin> 
+		  <version.asciidoctor-maven-plugin>1.5.7.1</version.asciidoctor-maven-plugin> 
+	      <version.swagger2markup-maven-plugin>1.3.7</version.swagger2markup-maven-plugin> -->
 	</properties>
 
 	<dependencyManagement>

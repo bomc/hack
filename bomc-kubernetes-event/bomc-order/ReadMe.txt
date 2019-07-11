@@ -178,4 +178,4 @@ docker rmi -f $(docker images -f "dangling=true" -q)
 
 
 http://192.168.99.100:31380/bomc-order/swagger-ui/
-
+kubectl get services -o wide

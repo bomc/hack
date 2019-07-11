@@ -20,9 +20,11 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityTransaction;
+import javax.persistence.TypedQuery;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -344,7 +346,7 @@ public class OrderTest extends AbstractUnitTest {
         
         assertThat(true, equalTo(orderLineEntity1.getCreateDateTime().isBefore(LocalDateTime.now().plusSeconds(1L))));
         assertThat(orderLineEntity1.getModifyUser(), nullValue());
-        assertThat(orderLineEntity1.getModifyDateTime(), nullValue());
+        assertThat(orderLineEntity1.getModifyDateTime(), notNullValue());
         assertThat(orderLineEntity1.getQuantity(), equalTo(COUNT_ITEM1));
 
         assertThat(orderLineEntity1.getItem().getId(), equalTo(itemId));
@@ -353,13 +355,13 @@ public class OrderTest extends AbstractUnitTest {
         assertThat(orderLineEntity1.getItem().getCreateUser(), equalTo(CREATE_USER));
         assertThat(orderLineEntity1.getItem().getCreateDateTime(), notNullValue());
         assertThat(orderLineEntity1.getItem().getModifyUser(), nullValue());
-        assertThat(orderLineEntity1.getItem().getModifyDateTime(), nullValue()) ;
+        assertThat(orderLineEntity1.getItem().getModifyDateTime(), notNullValue()) ;
 
         assertThat(orderLineEntity2.getId(), notNullValue());
         assertThat(orderLineEntity2.getCreateUser(), equalTo(CREATE_USER + "_2"));
         assertThat(true, equalTo(orderLineEntity2.getCreateDateTime().isBefore(LocalDateTime.now().plusSeconds(1L))));
         assertThat(orderLineEntity2.getModifyUser(), nullValue());
-        assertThat(orderLineEntity2.getModifyDateTime(), nullValue());
+        assertThat(orderLineEntity2.getModifyDateTime(), notNullValue());
         assertThat(orderLineEntity2.getQuantity(), equalTo(COUNT_ITEM2));
 
         assertThat(orderLineEntity2.getItem().getId(), equalTo(itemId));
@@ -368,14 +370,14 @@ public class OrderTest extends AbstractUnitTest {
         assertThat(orderLineEntity2.getItem().getCreateUser(), equalTo(CREATE_USER));
         assertThat(orderLineEntity2.getItem().getCreateDateTime(), notNullValue());
         assertThat(orderLineEntity2.getItem().getModifyUser(), nullValue());
-        assertThat(orderLineEntity2.getItem().getModifyDateTime(), nullValue());
+        assertThat(orderLineEntity2.getItem().getModifyDateTime(), notNullValue());
     }
 
     /**
      * <pre>
-     *  mvn clean install -Dtest=OrderTest#test030_removeOrderLine_pass
+     *  mvn clean install -Dtest=OrderTest#test040_removeOrderLine_pass
      *
-     * <b><code>test030_removeOrderLine_pass</code>:</b><br>
+     * <b><code>test040_removeOrderLine_pass</code>:</b><br>
      *  Tests... 
      *  
      * <b>Preconditions:</b><br>
@@ -393,8 +395,8 @@ public class OrderTest extends AbstractUnitTest {
      * </pre>
      */
     @Test
-    public void test030_removeOrderLine_pass() {
-        LOGGER.debug(LOG_PREFIX + "test030_removeOrderLine_pass");
+    public void test040_removeOrderLine_pass() {
+        LOGGER.debug(LOG_PREFIX + "test040_removeOrderLine_pass");
 
         // ___________________________________________
         // Do the test preparation.
@@ -427,6 +429,91 @@ public class OrderTest extends AbstractUnitTest {
         assertThat(this.entityManager.find(ItemEntity.class, itemEntity.getId()), notNullValue());
     }
 
+    /**
+     * <pre>
+     *  mvn clean install -Dtest=OrderTest#test050_findByAllOlderThanGivenDate_pass
+     *
+     * <b><code>test050_findByAllOlderThanGivenDate_pass</code>:</b><br>
+     *  
+     *  
+     * <b>Preconditions:</b><br>
+     *  - Create three ItemEntity instances.
+     *  - Create a OrderEntity instance with a billing- and a shippingAddress.
+     *  - Add three lines by invoking the addLine method.
+     *
+     * <b>Scenario:</b><br>
+     *  The following steps are executed:
+     *  - Persist OrderEntity instance to db.
+     *
+     * <b>Postconditions:</b><br>
+     *  - Check asserts below.
+     * </pre>
+     */
+    @Test
+    public void test050_findByAllOlderThanGivenDate_pass() {
+        LOGGER.debug(LOG_PREFIX + "test050_findByAllOlderThanGivenDate_pass");
+
+        // ___________________________________________
+        // Do the test preparation.
+        // -------------------------------------------
+        final ItemEntity itemEntity1 = new ItemEntity(ITEM1_NAME, ITEM1_PRICE);
+        itemEntity1.setCreateUser(CREATE_USER);
+
+        final ItemEntity itemEntity2 = new ItemEntity(ITEM2_NAME, ITEM2_PRICE);
+        itemEntity2.setCreateUser(CREATE_USER);
+
+        final ItemEntity itemEntity3 = new ItemEntity(ITEM3_NAME, ITEM3_PRICE);
+        itemEntity3.setCreateUser(CREATE_USER);
+
+        final CustomerEntity customerEntity = new CustomerEntity();
+        customerEntity.setCreateUser(CREATE_USER);
+        customerEntity.setFirstname(FIRST_NAME);
+        customerEntity.setName(NAME);
+        customerEntity.setUsername(USER_NAME);
+
+        final OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setCreateUser(CREATE_USER);
+
+        orderEntity.setBillingAddress(this.createAddress("billingAddress"));
+        orderEntity.setShippingAddress(this.createAddress("shippingAddress"));
+
+        orderEntity.setCustomer(customerEntity);
+
+        // Persist order and the lines.
+        this.utx.begin();
+
+        orderEntity.addLine(COUNT_ITEM1, itemEntity1, CREATE_USER);
+        this.entityManager.persist(orderEntity);
+
+        this.utx.commit();
+
+        this.utx.begin();
+        // A new transaction set the modify date on the orderEntity.
+        orderEntity.addLine(COUNT_ITEM2, itemEntity2, CREATE_USER);
+        this.entityManager.persist(orderEntity);
+
+        orderEntity.addLine(COUNT_ITEM3, itemEntity3, CREATE_USER);
+        this.entityManager.persist(orderEntity);
+
+        this.utx.commit();
+
+        LOGGER.debug(LOG_PREFIX + "test050_findByAllOlderThanGivenDate_pass [createDate=" + orderEntity.getCreateDateTime() + ", modifyDate=" + orderEntity.getModifyDateTime() + ", comparableDate=" + LocalDateTime.now().minusMinutes(1L) + "]");
+        
+        // ___________________________________________
+        // Perform actual test, run the namedQuery.
+        // -------------------------------------------
+        final TypedQuery<OrderEntity> query = this.entityManager.createNamedQuery(OrderEntity.NQ_FIND_ALL_MODIFIED_ORDERS, OrderEntity.class);
+        query.setParameter("createDateTime", LocalDateTime.now().minusMinutes(1L));
+        query.setParameter("modifyDateTime", LocalDateTime.now().minusMinutes(1L));
+        
+        final List<OrderEntity> resultList = query.getResultList();
+        
+        // ___________________________________________
+        // Do asserts.
+        // -------------------------------------------
+        assertThat(resultList.size(), equalTo(1));
+    }
+    
     private AddressEntity createAddress(final String prefix) {
 
         final AddressEntity addressEntity = new AddressEntity(prefix + "_street", prefix + "_zip", prefix + "_city");

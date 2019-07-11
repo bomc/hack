@@ -117,7 +117,7 @@ public class CustomerTest extends AbstractUnitTest {
         // Do asserts.
         // -------------------------------------------
         assertThat(customer.getId(), notNullValue());
-        assertThat(customer.getModifyDateTime(), nullValue());
+        assertThat(customer.getModifyDateTime(), notNullValue());
         assertThat(customer.getModifyUser(), nullValue());
         assertThat(customer.getCreateUser(), equalTo(CREATE_USER));
         assertThat(customer.getCreateDateTime(), notNullValue());

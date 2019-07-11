@@ -78,7 +78,7 @@ public class JpaOrderDaoImpl extends AbstractJpaDao<OrderEntity> implements JpaO
         params.put("createDateTime", modifyDateTime);
         params.put("modifyDateTime", modifyDateTime);
         
-        final List<OrderEntity> orderEntityList = findByNamedParameters(OrderEntity.NQ_FIND_ALL_OLDER_THAN_GIVEN_DATE, params);
+        final List<OrderEntity> orderEntityList = findByNamedParameters(OrderEntity.NQ_FIND_ALL_MODIFIED_ORDERS, params);
         
         return orderEntityList;
     }

@@ -20,7 +20,9 @@ import javax.ws.rs.core.Application;
 import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.info.Contact;
 import org.eclipse.microprofile.openapi.annotations.info.Info;
+import org.eclipse.microprofile.openapi.annotations.info.License;
 import org.eclipse.microprofile.openapi.annotations.servers.Server;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 /**
  * A class extending {@link Application} and annotated with @ApplicationPath is
@@ -33,14 +35,28 @@ import org.eclipse.microprofile.openapi.annotations.servers.Server;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 05.04.2018
  */
-@ApplicationPath(JaxRsActivator.APPLICATION_PATH)
 @OpenAPIDefinition(
-		info = @Info(title = "Invoice service, health", version = "1.00.00-SNAPSHOT", 
-		contact = @Contact(name = "bomc", email = "bomc@bomc.org", url = "http://www.bomc.wordpress.com")), 
-		servers = {
-				@Server(url = "/rest", description = "localhost") 
-		}
-)
+        info = @Info(
+                title = "bomc-invoice microservice",
+                version = "1.00.00-SNAPSHOT",
+                description = "bomc-invoice API",
+                license = @License(
+                        name = "Foo License",
+                        url = "https://foo.bar/license"),
+                contact = @Contact(
+                        email = "bomc@bomc.org",
+                        name = "bomc",
+                        url = "https://bomc.org"),
+                termsOfService = "https://foo.bar/terms"),
+        servers = @Server(
+                description = "localhost",
+                url = "/bomc-invoice"
+                ),
+        tags = @Tag(
+                name = "Type",
+                description = "API type")
+        )
+@ApplicationPath(JaxRsActivator.APPLICATION_PATH)
 public class JaxRsActivator extends Application {
 
 	// Defines the base URI for all resource URIs

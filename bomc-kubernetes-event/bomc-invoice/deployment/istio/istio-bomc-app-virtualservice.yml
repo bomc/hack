@@ -13,7 +13,7 @@ spec:
   http:
   - route:
     - destination:
-        host: bomc-order
+        host: bomc-invoice
         port:
           number: 80
         # subset: v1

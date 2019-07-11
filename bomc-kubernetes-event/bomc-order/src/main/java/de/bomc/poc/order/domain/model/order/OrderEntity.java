@@ -46,7 +46,7 @@ import de.bomc.poc.order.domain.model.item.ItemEntity;
 @Table(name = "T_ORDER")
 @NamedQueries({
         @NamedQuery(name = OrderEntity.NQ_FIND_BY_LATEST_MODIFIED_DATE_TIME_ORDER, query = "select max(o.modifyDateTime) from OrderEntity o"),
-        @NamedQuery(name = OrderEntity.NQ_FIND_ALL_OLDER_THAN_GIVEN_DATE, query = "select o from OrderEntity o where o.createDateTime < :createDateTime or o.modifyDateTime < :modifyDateTime") })
+        @NamedQuery(name = OrderEntity.NQ_FIND_ALL_MODIFIED_ORDERS, query = "select o from OrderEntity o where o.createDateTime >= :createDateTime or o.modifyDateTime >= :modifyDateTime") })
 public class OrderEntity extends AbstractEntity<OrderEntity> implements Serializable {
 
     /**
@@ -79,7 +79,7 @@ public class OrderEntity extends AbstractEntity<OrderEntity> implements Serializ
      * Query to find latest modified date.
      * </pre>
      */
-    public static final String NQ_FIND_ALL_OLDER_THAN_GIVEN_DATE = NQ_PREFIX + "findByAllOlderThanGivenDate";
+    public static final String NQ_FIND_ALL_MODIFIED_ORDERS = NQ_PREFIX + "findAllModifiedOrders";
     
     /* --------------------- embeddables ---------------------------- */
     @Embedded

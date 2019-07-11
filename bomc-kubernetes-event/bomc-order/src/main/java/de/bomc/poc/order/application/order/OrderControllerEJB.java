@@ -66,7 +66,6 @@ public class OrderControllerEJB implements OrderController {
     public List<ItemDTO> findAllItems(final String userId) {
 
         final List<ItemEntity> itemEntityList = this.jpaItemDao.findAll();
-
         final List<ItemDTO> itemDTOList = DTOEntityItemMapper.INSTANCE.mapEntityListToDTOList(itemEntityList);
 
         return itemDTOList;

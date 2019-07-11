@@ -39,8 +39,9 @@ public class RestClientHeaderIfModifiedSinceFilter implements ClientRequestFilte
 	private final String lastModifiedDate;
 
 	public RestClientHeaderIfModifiedSinceFilter(final String lastModifiedDate) {
+		LOGGER.log(Level.INFO, LOG_PREFIX + "co - [lastModifiedDate=" + lastModifiedDate + "]");
+		
 		this.lastModifiedDate = lastModifiedDate;
-
 	}
 
 	@Override

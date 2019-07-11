@@ -51,7 +51,8 @@ public interface OrderRestEndpoint {
      * "{@value #MEDIA_TYPE_JSON_V1}" media type .
      */
     String MEDIA_TYPE_JSON_V1 = "application/vnd.order-v1+json";
-
+    String X_BOMC_USER_ID_HEADER = "x-bomc-user-id";
+    
     /**
      * <pre>
      *  TODO Get from swagger gui invocation.
@@ -64,7 +65,7 @@ public interface OrderRestEndpoint {
     @GET
     @Path("/latest-modified-date")
     Response getLatestModifiedDate(
-            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam("X-BOMC_USER_ID") String userId);
+            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam(X_BOMC_USER_ID_HEADER) String userId);
 
     /**
      * <pre>
@@ -78,7 +79,7 @@ public interface OrderRestEndpoint {
     @POST
     @Path("/create")
     Response createOrder(@ApiParam(value = "The user data.") final OrderDTO orderDTO,
-            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam("X-BOMC_USER_ID") String userId);
+            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam(X_BOMC_USER_ID_HEADER) String userId);
 
     /**
      * <pre>
@@ -92,7 +93,7 @@ public interface OrderRestEndpoint {
     @GET
     @Path("/find/item")
     Response findAllItems(
-            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam("X-BOMC_USER_ID") String userId);
+            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam(X_BOMC_USER_ID_HEADER) String userId);
 
     /**
      * <pre>
@@ -106,7 +107,7 @@ public interface OrderRestEndpoint {
     @GET
     @Path("/find/order")
     Response findAllOrder(
-            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam("X-BOMC_USER_ID") String userId);
+            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam(X_BOMC_USER_ID_HEADER) String userId);
 
     /**
      * <pre>
@@ -120,7 +121,7 @@ public interface OrderRestEndpoint {
     @Path("/find/{orderId}/order")
     @GET
     Response findOrderById(@ApiParam(value = "The technical order id.") @PathParam("orderId") Long orderId,
-            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam("X-BOMC_USER_ID") String userId);
+            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam(X_BOMC_USER_ID_HEADER) String userId);
 
     /**
      * <pre>
@@ -134,7 +135,7 @@ public interface OrderRestEndpoint {
     @POST
     @Path("/add/orderline")
     Response addLine(@ApiParam(value = "The given orderline data.") OrderDTO orderDTO,
-            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam("X-BOMC_USER_ID") String userId);
+            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam(X_BOMC_USER_ID_HEADER) String userId);
 
     /**
      * <pre>
@@ -148,5 +149,5 @@ public interface OrderRestEndpoint {
     @DELETE
     @Path("/delete/{orderId}/order")
     Response deleteOrderById(@ApiParam(value = "The technical order id.") @PathParam("orderId") Long orderId,
-            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam("X-BOMC_USER_ID") String userId);
+            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam(X_BOMC_USER_ID_HEADER) String userId);
 }

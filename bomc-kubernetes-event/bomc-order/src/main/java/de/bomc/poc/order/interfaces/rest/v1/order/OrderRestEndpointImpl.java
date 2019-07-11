@@ -26,11 +26,13 @@ import javax.json.JsonObjectBuilder;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.log4j.Logger;
+import org.jboss.resteasy.util.DateUtil;
 
 import de.bomc.poc.exception.cdi.interceptor.ExceptionHandlerInterceptor;
 import de.bomc.poc.logging.qualifier.LoggerQualifier;
@@ -66,6 +68,9 @@ public class OrderRestEndpointImpl implements OrderRestEndpoint {
     @EJB
     private OrderController orderControllerEJB;
 
+    @Context
+    private HttpHeaders headers;
+
     /**
      * <code>curl -X GET "http://localhost:8180/bomc-order/rest/customer/latest-modified-date" -H "accept: application/vnd.customer-v1+json" 
      * -H "X-BOMC_USER_ID: admin"</code>
@@ -75,11 +80,14 @@ public class OrderRestEndpointImpl implements OrderRestEndpoint {
         ResponseBuilder responseBuilder = null;
 
         final LocalDateTime lastModifiedLocalDateTime = this.orderControllerEJB.findLatestModifiedDateTime(userId);
+        this.logger.info(LOG_PREFIX + "getLatestModifiedDate [lastModifiedLocalDateTime=" + lastModifiedLocalDateTime
+                + ", userId=" + userId + "]");
 
         if (lastModifiedLocalDateTime != null) {
 
-            final Date convertedRFC1132Date = DomainObjectUtils.convertLocalDateTimeToDate(lastModifiedLocalDateTime);
-            responseBuilder = request.evaluatePreconditions(convertedRFC1132Date);
+            final Date convertedLastModifiedDate = DomainObjectUtils
+                    .convertLocalDateTimeToDate(lastModifiedLocalDateTime);
+            responseBuilder = this.evaluatePreconditions(convertedLastModifiedDate);
 
             if (responseBuilder == null) {
                 // The precondition are met, this means there are modified
@@ -94,22 +102,60 @@ public class OrderRestEndpointImpl implements OrderRestEndpoint {
                 final GenericEntity<List<OrderDTO>> entity = new GenericEntity<List<OrderDTO>>(orderDTOList) {
                 };
 
-                responseBuilder = Response.ok().entity(entity).cacheControl(cacheControl).lastModified(convertedRFC1132Date);
+                responseBuilder = Response.ok().entity(entity).cacheControl(cacheControl)
+                        .lastModified(convertedLastModifiedDate);
             } else {
                 // No modified resources. Return the automatically generated
                 // response.
                 this.logger.info(LOG_PREFIX + "getLatestModifiedDate - No modified resources - HTTP 304 status.");
-
-                responseBuilder = Response.notModified();
             }
         } else {
             //
             // lastModifiedLocalDateTime is null, no orders available.
             responseBuilder = Response.notModified();
         }
-        
+
         return responseBuilder.build();
-        
+
+    }
+
+    /**
+     * Why is the method of RestRequestImpl not used? When using Istio, the
+     * header If-Modified-Since is replaced by x-if-modified-since and can
+     * therefore not be used.
+     * 
+     * @param lastModified
+     *            the date of the last modified order.
+     * @return a responseBuilder instance, with state 'Not-Modified', or null a
+     *         resource is modified.
+     */
+    private Response.ResponseBuilder evaluatePreconditions(final Date lastModified) {
+        Response.ResponseBuilder builder = null;
+
+        final String ifModifiedSinceDate = headers.getRequestHeaders().getFirst("x-if-modified-since");
+
+        if (ifModifiedSinceDate != null) {
+            builder = ifModifiedSince(ifModifiedSinceDate, lastModified);
+        }
+
+        return builder;
+    }
+
+    private Response.ResponseBuilder ifModifiedSince(final String strDate, final Date lastModified) {
+
+        final Date date = DateUtil.parseDate(strDate);
+
+        // 'lastModified' is accurate to the millisecond. However, both dates
+        // must be accurate to the second and must be compared to the second.
+        if ((lastModified.getTime() - date.getTime()) > 0 && (lastModified.getTime() - date.getTime()) < 1000) {
+            //
+            // This means both values are equal.
+            return Response.notModified();
+        } else if (date.getTime() + 1000 >= lastModified.getTime()) {
+            return Response.notModified();
+        }
+
+        return null;
     }
 
     /**

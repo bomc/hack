@@ -115,6 +115,9 @@ public class OrderRestEndpointTestIT extends ArquillianBase {
 
         System.out.println(LOG_PREFIX + "createDeployment: " + webArchive.toString(true));
 
+        // Remove persistence.xml from archive.
+        webArchive.delete("WEB-INF/classes/META-INF/persistence.xml");
+        
         return webArchive;
     }
 

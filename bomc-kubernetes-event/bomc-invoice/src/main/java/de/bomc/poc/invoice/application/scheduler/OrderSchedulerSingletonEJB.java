@@ -15,7 +15,6 @@
 package de.bomc.poc.invoice.application.scheduler;
 
 import java.net.MalformedURLException;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,11 +30,8 @@ import javax.ejb.TimerService;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.rest.client.RestClientDefinitionException;
-import org.jboss.logging.MDC;
 
 import de.bomc.poc.invoice.application.internal.ApplicationUserEnum;
-import de.bomc.poc.invoice.interfaces.rest.filter.MDCFilter;
 
 /**
  * Schedules for new orders from bomc-order service.
@@ -56,7 +52,9 @@ public class OrderSchedulerSingletonEJB {
 	// -----------------------------------------------
 	private static final String SCHEDULE_ORDER_DELAY_KEY = "schedule.order.delay";
 	private static final String SCHEDULE_ORDER_START_DELAY_KEY = "schedule.order.startdelay";
-	private static final String DEFAULT_EXPRESSION_VALUE = "10000";
+	private static final String DEFAULT_EXPRESSION_VALUE = "15000";
+	//private static final String INITIAL_LAST_MODIFIED_DATE = "Thu, 01 Jan 1970 00:00:01 GMT";
+	
 	// _______________________________________________
 	// Injected configuration application variables (microprofile-config).
 	// -----------------------------------------------
@@ -105,16 +103,17 @@ public class OrderSchedulerSingletonEJB {
 	 * 
 	 * @param timer the expired timer.
 	 * @throws MalformedURLException
-	 * @throws RestClientDefinitionException
 	 * @throws IllegalStateException
 	 */
 	@Timeout
 	public void timerRunningOff(final Timer timer) {
 		LOGGER.log(Level.INFO, LOG_PREFIX + "timerRunningOff - [timer.info=" + timer.getInfo() + "]");
 
-		// Set MDC header.
-		MDC.put(MDCFilter.HEADER_REQUEST_ID_ATTR, UUID.randomUUID().toString());
+		// Set MDC header, do userId
+//		MDC.put(MDCFilter.HEADER_REQUEST_ID_ATTR, UUID.randomUUID().toString());
 
+		//
+		// Get new orders by given date.
 		this.lastModifiedDate = this.orderSchedulerService.doWork(this.lastModifiedDate);
 
 		// Print out next timeout.

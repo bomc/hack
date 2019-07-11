@@ -21,7 +21,6 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.WriterInterceptor;
@@ -43,11 +42,10 @@ import java.util.logging.Logger;
 
 /**
  * Universal logging filter on server.
- * @author <a href="mailto:bomc@bomc.org@bs.ch">bomc</a>
+ * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 17.04.2019
  */
 @Provider
-@PreMatching
 //Smaller numbers are first in the chain.
 @Priority(value = Priorities.AUTHORIZATION + 100)
 public class ResteasyServerLogger implements ContainerRequestFilter, ContainerResponseFilter, WriterInterceptor {

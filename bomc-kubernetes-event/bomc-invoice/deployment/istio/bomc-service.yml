@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bomc-order
+  name: bomc-invoice
   namespace: bomc-app
   labels:
-    app: bomc-order
+    app: bomc-invoice
 spec:
   selector:
-    app: bomc-order
+    app: bomc-invoice
   ports:
   - protocol: TCP
     port: 80

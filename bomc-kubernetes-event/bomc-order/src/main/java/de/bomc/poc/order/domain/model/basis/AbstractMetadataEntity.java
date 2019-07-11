@@ -76,6 +76,7 @@ public abstract class AbstractMetadataEntity implements DomainObject {
 
         if (this.isNew()) {
             this.setCreateDateTime(LocalDateTime.now());
+            this.setModifyDateTime(LocalDateTime.now());
         } else {
             this.setModifyDateTime(LocalDateTime.now());
         }
@@ -87,6 +88,7 @@ public abstract class AbstractMetadataEntity implements DomainObject {
 
         if (this.isNew()) {
             this.setCreateDateTime(LocalDateTime.now());
+            this.setModifyDateTime(LocalDateTime.now());
         } else {
             this.setModifyDateTime(LocalDateTime.now());
         }

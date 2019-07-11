@@ -38,7 +38,10 @@ public enum AppErrorCodeEnum implements ErrorCode {
     // Indicates connection error (10500-10599)
     //
     // Application error codes (10600-10699)
-    APP_REST_CLIENT_FAILURE_10600(10600, Category.ERROR, "Could not invoke remote service - connection failure!"); 
+    APP_REST_CLIENT_FAILURE_10600(10600, Category.ERROR, "Could not invoke remote service - connection failure! "),
+    APP_REST_CLIENT_FAILURE_10601(10601, Category.ERROR, "Request failed on remote service! [response.status=404]"), 
+    APP_ILLEGAL_ARGUMENT_10604(10604, Category.ERROR, "Illegal argument parameter! "),
+	APP_LIVENESS_READINESS_10605(10605, Category.ERROR, "Could not read readiness/liveness values !");
     //
     // Member variables.
     private static final String LOG_PREFIX = "AppErrorCodeEnum#";
