@@ -1,5 +1,5 @@
 /**
- * Project: bomc-onion-architecture
+ * Project: bomc-invoice
  * <pre>
  *
  * Last change:
@@ -41,22 +41,29 @@ public class OrderRestClientExceptionMapper implements ResponseExceptionMapper<A
 	@Override
 	public boolean handles(final int statusCode, final MultivaluedMap<String, Object> headers) {
 		if (headers != null) {
-			final String strHeaders = headers.entrySet().stream()
-					.map(entry -> entry.getKey() + " - " + entry.getValue()).collect(Collectors.joining(", "));
+			String strHeaders = headers.entrySet().stream().map(entry -> entry.getKey() + " - " + entry.getValue())
+					.collect(Collectors.joining(", "));
+			if (strHeaders.isEmpty()) {
+				strHeaders = "isEmpty";
+			}
 
 			LOGGER.log(Level.INFO, LOG_PREFIX + "handles [statusCode=" + statusCode + ", headers=" + strHeaders + "]");
 		} else {
 			LOGGER.log(Level.INFO, LOG_PREFIX + "handles [statusCode=" + statusCode + ", headers=null]");
 		}
 
-		return statusCode == 404 // Not Found
+		final boolean retValue = statusCode == 404 // Not Found
 				|| statusCode == 409 // Conflict
-				|| statusCode == 500; // App exception
+				|| statusCode == 500;
+
+		LOGGER.log(Level.INFO, LOG_PREFIX + "handles [retValue=" + retValue + "]");
+
+		return retValue;
 	}
 
 	@Override
 	public AppRuntimeException toThrowable(final Response response) {
-		LOGGER.log(Level.INFO, LOG_PREFIX + "toThrowable ");
+		LOGGER.log(Level.FINE, LOG_PREFIX + "toThrowable ");
 
 		String errMsg = "";
 		AppRuntimeException appRuntimeException;

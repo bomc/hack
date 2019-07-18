@@ -30,7 +30,7 @@ import javax.ws.rs.client.ClientRequestFilter;
  * @since 16.04.2019
  */
 //Smaller numbers are first in the chain.
-@Priority(value = Priorities.AUTHORIZATION + 200)
+@Priority(value = Priorities.AUTHORIZATION + 300)
 public class RestClientHeaderIfModifiedSinceFilter implements ClientRequestFilter {
 
 	private static final String LOG_PREFIX = "RestClientHeaderIfModifiedSinceFilter#";
@@ -39,14 +39,14 @@ public class RestClientHeaderIfModifiedSinceFilter implements ClientRequestFilte
 	private final String lastModifiedDate;
 
 	public RestClientHeaderIfModifiedSinceFilter(final String lastModifiedDate) {
-		LOGGER.log(Level.INFO, LOG_PREFIX + "co - [lastModifiedDate=" + lastModifiedDate + "]");
+		LOGGER.log(Level.FINE, LOG_PREFIX + "co - [lastModifiedDate=" + lastModifiedDate + "]");
 		
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
 	@Override
 	public void filter(ClientRequestContext requestContext) throws IOException {
-		LOGGER.log(Level.INFO, LOG_PREFIX + "filter [lastModifiedDate=" + this.lastModifiedDate + "]");
+		LOGGER.log(Level.FINE, LOG_PREFIX + "filter [lastModifiedDate=" + this.lastModifiedDate + "]");
 
 		if (requestContext.getHeaders().containsKey(IF_MODIFIED_SINCE)) {
 			requestContext.getHeaders().remove(IF_MODIFIED_SINCE);

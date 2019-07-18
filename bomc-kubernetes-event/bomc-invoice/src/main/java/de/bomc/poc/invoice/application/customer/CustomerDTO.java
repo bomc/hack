@@ -1,5 +1,5 @@
 /**
- * Project: bomc-onion-architecture
+ * Project: bomc-invoice
  * <pre>
  *
  * Last change:
@@ -17,7 +17,7 @@ package de.bomc.poc.invoice.application.customer;
 import java.io.Serializable;
 
 /**
- * A data transfer object for handling {@link CustomerEntity} transformmation to
+ * A data transfer object for handling {@link InvoiceEntity} transformmation to
  * a DTO.
  * 
  * @author <a href="mailto:bomc@bomc.org">bomc</a>

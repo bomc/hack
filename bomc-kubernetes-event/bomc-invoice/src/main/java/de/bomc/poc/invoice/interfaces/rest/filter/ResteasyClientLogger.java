@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  * @since 14.07.2016
  */
 //Smaller numbers are first in the chain.
-@Priority(value = Priorities.AUTHORIZATION + 300)
+@Priority(value = Priorities.AUTHORIZATION + 400)
 public class ResteasyClientLogger implements ClientRequestFilter, ClientResponseFilter, WriterInterceptor {
 
     private static final Logger LOGGER = Logger.getLogger(ResteasyClientLogger.class.getName());

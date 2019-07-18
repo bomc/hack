@@ -33,8 +33,8 @@ public class MDCFilter implements ContainerRequestFilter, ContainerResponseFilte
 
 	private static final Logger LOGGER = Logger.getLogger(MDCFilter.class);
 	private static final String LOG_PREFIX = "MDCFilter#";
-	public static final String HEADER_REQUEST_ID_ATTR = "X-BOMC-REQUEST-ID";
-	private static final String MDC_REQUEST_BASE_URI = "X-BOMC-BASE-URI";
+	public static final String HEADER_REQUEST_ID_ATTR = "x-bomc-request-id";
+	private static final String MDC_REQUEST_BASE_URI = "x-bomc-base-uri";
 
 	/**
 	 * Filter method called after a response has been provided for a request

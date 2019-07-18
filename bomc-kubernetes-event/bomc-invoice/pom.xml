@@ -28,17 +28,31 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
+		<!-- automatically run annotation processors within the incremental compilation -->
+		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
+		
 		<!-- All used dependencies -->
 		<version.exception-lib-ext>1.00.00-SNAPSHOT</version.exception-lib-ext>
-		<version.rest-lib>1.00.00-SNAPSHOT</version.rest-lib>
 
 		<version.thorntail>2.4.0.Final</version.thorntail>
+		<version.swagger-ui>1.0.2</version.swagger-ui>
 		<version.javaee-api>8.0</version.javaee-api>
+		<version.postgresql>9.4.1212</version.postgresql>
+		<version.h2>1.4.197</version.h2>
+		<version.javax.json>1.0.3</version.javax.json>
+		<version.mapstruct-jdk8>1.3.0.Final</version.mapstruct-jdk8>
+		<version.mapstruct>1.3.0.Final</version.mapstruct>
+		<version.mapstruct-processor>1.3.0.Final</version.mapstruct-processor>
+		<version.junit>4.12</version.junit>
+		<version.hamcrest>2.1</version.hamcrest>
+		
 		<!-- <version.arquillian-bom>1.1.12.Final</version.arquillian-bom> -->
 
 		<!-- Other plugins -->
+		<version.maven-compiler-plugin>3.5.1</version.maven-compiler-plugin>
+		<version.maven-processor-plugin>3.1.0</version.maven-processor-plugin>
+		
 		<!-- <version.maven-clean-plugin>3.0.0</version.maven-clean-plugin> -->
-		<!-- <version.maven-compiler-plugin>3.5.1</version.maven-compiler-plugin> -->
 		<!-- <version.maven-failsafe-plugin>2.19.1</version.maven-failsafe-plugin> -->
 		<!-- <version.maven-surefire-plugin>2.19.1</version.maven-surefire-plugin> -->
 		<!-- <version.maven-war-plugin>2.6</version.maven-war-plugin> -->
@@ -67,9 +81,13 @@
 				<filtering>true</filtering>
 				<includes>
 					<include>project-defaults.yml</include>
-					<include>META-INF/microprofile-config.properties</include>
+					<include>project-kubernetes.yml</include>
 					<include>openapi.png</include>
+					<include>modules/com/h2database/h2/main/module.xml</include>
+					<include>modules/org/postgresql/main/module.xml</include>
+					<include>META-INF/microprofile-config.properties</include>
 					<include>META-INF/beans.xml</include>
+					<include>META-INF/persistence.xml</include>
 				</includes>
 			</resource>
 		</resources>
@@ -104,6 +122,60 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${version.maven-compiler-plugin}</version>
+				<configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+					<encoding>UTF-8</encoding>
+					<showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${version.mapstruct-processor}</version>
+						</path>
+					</annotationProcessorPaths>
+					<generatedSourcesDirectory>${project.build.directory}/generated-sources</generatedSourcesDirectory>
+					<compilerArgs>
+						<arg>-parameters</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<version>${version.maven-processor-plugin}</version>
+				<configuration>
+					<defaultOutputDirectory>${project.build.directory}/generated-sources</defaultOutputDirectory>
+					<processors>
+						<processor>org.mapstruct.ap.MappingProcessor</processor>
+					</processors>
+					<options>
+						<mapstruct.suppressGeneratorTimestamp>true</mapstruct.suppressGeneratorTimestamp>
+						<mapstruct.defaultComponentModel>default</mapstruct.defaultComponentModel>
+					</options>
+				</configuration>
+				<executions>
+					<execution>
+						<id>process-mapstruct</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>process</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.mapstruct</groupId>
+						<artifactId>mapstruct-processor</artifactId>
+						<version>${version.mapstruct-processor}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -129,48 +201,79 @@
 			<artifactId>ejb</artifactId>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>io.thorntail</groupId> -->
-<!-- 			<artifactId>microprofile-config</artifactId> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>io.thorntail</groupId>
+			<artifactId>datasources</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.thorntail</groupId>
+			<artifactId>jpa</artifactId>
+		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>io.thorntail</groupId> -->
-<!-- 			<artifactId>microprofile-fault-tolerance</artifactId> -->
-<!-- 		</dependency> -->
-
-<!-- 		<dependency> -->
-<!-- 			<groupId>io.thorntail</groupId> -->
-<!-- 			<artifactId>swagger</artifactId> -->
-<!-- 			<version>${version.thorntail}</version> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>io.thorntail</groupId> -->
-<!-- 			<artifactId>swagger-webapp</artifactId> -->
-<!-- 			<version>${version.thorntail}</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>io.thorntail</groupId>
+			<artifactId>transactions</artifactId>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.microprofile-ext.openapi-ext</groupId>
 			<artifactId>swagger-ui</artifactId>
-			<version>1.0.2</version>
+			<version>${version.swagger-ui}</version>
 		</dependency>
+
 <!-- 		<dependency> -->
 <!-- 		    <groupId>org.webjars.bower</groupId> -->
 <!-- 		    <artifactId>swagger-ui-themes</artifactId> -->
 <!-- 		    <version>3.0.0</version> -->
 <!-- 		    <scope>runtime</scope> -->
 <!-- 		</dependency> -->
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
-		</dependency>
+
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>
-			<version>1.0.3</version>
+			<version>${version.javax.json}</version>
 		</dependency>
-
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${version.postgresql}</version>
+        </dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>${version.h2}</version>
+		</dependency>
+		
+		<!-- mapstruct -->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${version.mapstruct}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-jdk8</artifactId>
+			<version>${version.mapstruct-jdk8}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-processor</artifactId>
+			<version>${version.mapstruct-processor}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${version.junit}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest</artifactId>
+			<version>${version.hamcrest}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

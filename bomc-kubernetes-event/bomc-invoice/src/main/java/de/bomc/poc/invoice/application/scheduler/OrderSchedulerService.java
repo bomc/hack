@@ -35,8 +35,10 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 import de.bomc.poc.exception.core.ExceptionUtil;
 import de.bomc.poc.exception.core.app.AppRuntimeException;
+import de.bomc.poc.invoice.application.controller.InvoiceComposition;
 import de.bomc.poc.invoice.application.internal.AppErrorCodeEnum;
 import de.bomc.poc.invoice.application.internal.ApplicationUserEnum;
+import de.bomc.poc.invoice.application.log.LoggerQualifier;
 import de.bomc.poc.invoice.application.order.OrderDTO;
 import de.bomc.poc.invoice.interfaces.rest.client.OrderRestEndpoint;
 import de.bomc.poc.invoice.interfaces.rest.filter.RestClientHeaderIfModifiedSinceFilter;
@@ -53,7 +55,9 @@ import io.smallrye.restclient.RestClientProxy;
 public class OrderSchedulerService {
 
 	private static final String LOG_PREFIX = "OrderSchedulerService#";
-	private static final Logger LOGGER = Logger.getLogger(OrderSchedulerService.class.getName());
+	@Inject
+	@LoggerQualifier
+	private Logger logger;
 	// _______________________________________________
 	// Config constants
 	// -----------------------------------------------
@@ -81,26 +85,29 @@ public class OrderSchedulerService {
 	@Inject
 	@ConfigProperty(name = ENV_PORT_KEY, defaultValue = DEFAULT_ENV_PORT_KEY)
 	private String envPortKey;
-
 	// Contains host and port from system environment.
 	private String orderEndpointHost = null;
 	private String orderEndpointPort = null;
-
+	//
+	// Other member variables.
+	@Inject
+	public InvoiceComposition invoiceController; 
+	
 	@PostConstruct
 	public void init() {
-		LOGGER.log(Level.INFO, LOG_PREFIX + "init");
+		this.logger.log(Level.FINE, LOG_PREFIX + "init");
 
 		orderEndpointHost = System.getenv(envHostKey);
 		orderEndpointPort = System.getenv(envPortKey);
 
 		if (orderEndpointHost == null || orderEndpointPort == null) {
-			LOGGER.log(Level.WARNING, LOG_PREFIX
+			this.logger.log(Level.WARNING, LOG_PREFIX
 					+ "init - ### BOMC_ORDER_SERVICE_HOST and BOMC_ORDER_SERVICE_PORT are null. Set environment variables! ### ");
 
 			throw new IllegalArgumentException(LOG_PREFIX + "init - host or port could not be injected");
 		}
 
-		LOGGER.log(Level.INFO, LOG_PREFIX + "init [host=" + orderEndpointHost + ", port=" + orderEndpointPort + "]");
+		this.logger.log(Level.INFO, LOG_PREFIX + "init [host=" + orderEndpointHost + ", port=" + orderEndpointPort + "]");
 	}
 
 	/**
@@ -124,7 +131,7 @@ public class OrderSchedulerService {
 	 * </pre>
 	 */
 	public String doWork(final String lastModifiedDate) {
-		LOGGER.log(Level.INFO, LOG_PREFIX + "doWork [lastModifiedDate=" + lastModifiedDate /*+ ", requestId="
+		this.logger.log(Level.FINE, LOG_PREFIX + "doWork [lastModifiedDate=" + lastModifiedDate /*+ ", requestId="
 				+ MDC.get(MDCFilter.HEADER_REQUEST_ID_ATTR)*/ + "]");
 
 		Response response = null;
@@ -140,21 +147,21 @@ public class OrderSchedulerService {
 			if (lastModifiedDate != null && !lastModifiedDate.isEmpty()) {
 				//
 				// Set 'If-Modified-Since'-header.
-				LOGGER.log(Level.INFO,
+				this.logger.log(Level.INFO,
 						LOG_PREFIX + "doWork - invoke remote order-service *** WITH *** 'If-Modified-Since' header.");
 
 				restClientHeaderIfModifiedSinceFilter = new RestClientHeaderIfModifiedSinceFilter(lastModifiedDate);
 				orderRestClient = RestClientBuilder.newBuilder().register(new UIDHeaderRequestFilter())
 						.register(restClientHeaderIfModifiedSinceFilter).register(OrderRestClientExceptionMapper.class)
-						.register(new ResteasyClientLogger(LOGGER, true)).baseUri(apiUri)
+						.register(new ResteasyClientLogger(this.logger, true)).baseUri(apiUri)
 						.build(OrderRestEndpoint.class);
 			} else {
 				//
 				// Startup request without 'If-Modified-Since' header.
-				LOGGER.log(Level.INFO, LOG_PREFIX
+				this.logger.log(Level.INFO, LOG_PREFIX
 						+ "doWork - invoke remote order-service *** WITHOUT *** 'If-Modified-Since' header.");
 				orderRestClient = RestClientBuilder.newBuilder().register(new UIDHeaderRequestFilter())
-						.register(OrderRestClientExceptionMapper.class).register(new ResteasyClientLogger(LOGGER, true))
+						.register(OrderRestClientExceptionMapper.class).register(new ResteasyClientLogger(this.logger, true))
 						.baseUri(apiUri).build(OrderRestEndpoint.class);
 			}
 
@@ -169,18 +176,22 @@ public class OrderSchedulerService {
 				// ___________________________________
 				// Create here the invoice.
 				// -----------------------------------
-				LOGGER.log(Level.INFO, LOG_PREFIX + "doWork - create and send the invoice. [oderDtoList.size="
+				this.logger.log(Level.INFO, LOG_PREFIX + "doWork - create and send the invoice. [oderDtoList.size="
 						+ oderDtoList.size() + "]");
 
+				if(oderDtoList.size() > 0) {
+					invoiceController.createInvoice(oderDtoList);
+				}
+				
 				if (retLastModifiedDate != null) {
 					return this.convertToRfc1132DateAsString(retLastModifiedDate);
 				} else {
-					LOGGER.log(Level.SEVERE,
+					this.logger.log(Level.SEVERE,
 							LOG_PREFIX + "doWork - get response and extracted last-modified-date is null!]");
 				}
 			}	
 		} catch (final Exception exception) {
-			LOGGER.log(Level.SEVERE, LOG_PREFIX + "doWork - remote endpoint invocation failed!", exception);
+			this.logger.log(Level.SEVERE, LOG_PREFIX + "doWork - remote endpoint invocation failed!", exception);
 
 			if (ExceptionUtil.is(exception, java.net.ConnectException.class)) {
 				//
@@ -188,12 +199,12 @@ public class OrderSchedulerService {
 				final String errMsg = LOG_PREFIX + "timerRunningOff - invocation to remote endpoint failed!";
 				final AppRuntimeException appRuntimeException = new AppRuntimeException(errMsg,
 						AppErrorCodeEnum.APP_REST_CLIENT_FAILURE_10600);
-				LOGGER.log(Level.SEVERE, appRuntimeException.stackTraceToString());
+				this.logger.log(Level.SEVERE, appRuntimeException.stackTraceToString());
 
 				throw appRuntimeException;
 			} else {
 				//
-				LOGGER.log(Level.SEVERE, LOG_PREFIX + "timerRunningOff - remote endpoint invocation failed!");
+				this.logger.log(Level.SEVERE, LOG_PREFIX + "timerRunningOff - remote endpoint invocation failed!");
 			}
 		} finally {
 			//
@@ -217,7 +228,7 @@ public class OrderSchedulerService {
 	 * @return the formatted string.
 	 */
 	private String convertToRfc1132DateAsString(final Date lastModifiedDate) {
-		LOGGER.log(Level.INFO, LOG_PREFIX + "convertToRfc1132DateAsString [lastModifiedDate=" + lastModifiedDate + "]");
+		this.logger.log(Level.FINE, LOG_PREFIX + "convertToRfc1132DateAsString [lastModifiedDate=" + lastModifiedDate + "]");
 
 		// Convert java.util.Date to LocalDateTime in RFC1123.
 

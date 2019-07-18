@@ -14,6 +14,8 @@
  */
 package de.bomc.poc.invoice.interfaces.rest.filter;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.MultivaluedMap;
@@ -32,6 +34,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 17.04.2019
  */
+//Smaller numbers are first in the chain.
+@Priority(value = Priorities.AUTHORIZATION + 200)
 public class UIDHeaderRequestFilter implements ClientRequestFilter {
 
 	private static final Logger LOGGER = Logger.getLogger(UIDHeaderRequestFilter.class.getName());
@@ -43,7 +47,7 @@ public class UIDHeaderRequestFilter implements ClientRequestFilter {
 	 */
 	public UIDHeaderRequestFilter() {
 		//
-		LOGGER.log(Level.INFO, LOG_PREFIX + "co");
+		LOGGER.log(Level.FINE, LOG_PREFIX + "co");
 	}
 
 	/**
@@ -53,7 +57,7 @@ public class UIDHeaderRequestFilter implements ClientRequestFilter {
 	 *                  - a new one will be generaded
 	 */
 	public UIDHeaderRequestFilter(final String requestId) {
-		LOGGER.log(Level.INFO, LOG_PREFIX + "co [requestId=" + requestId + "]");
+		LOGGER.log(Level.FINE, LOG_PREFIX + "co [requestId=" + requestId + "]");
 
 		this.requestId = requestId;
 	}
@@ -67,7 +71,7 @@ public class UIDHeaderRequestFilter implements ClientRequestFilter {
 	 */
 	@Override
 	public void filter(final ClientRequestContext requestContext) {
-		LOGGER.log(Level.INFO, LOG_PREFIX + "filter [requestId=" + this.requestId + "]");
+		LOGGER.log(Level.FINE, LOG_PREFIX + "filter [requestId=" + this.requestId + "]");
 
 		final MultivaluedMap<String, Object> headers = requestContext.getHeaders();
 

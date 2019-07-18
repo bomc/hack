@@ -2,19 +2,18 @@
 	<profile>
 		<subsystem xmlns="urn:jboss:domain:logging:3.0">
             <console-handler name="BOMC_CONSOLE">
-                <level name="INFO"/>
                 <formatter>
                     <named-formatter name="BOMC-PATTERN"/>
                 </formatter>
             </console-handler>
 			<root-logger>
-				<level name="INFO" />
+				<level name="INFO"/>
 				<handlers>
 					<handler name="BOMC_CONSOLE" />
 				</handlers>
 			</root-logger>
             <logger category="de.bomc.poc" use-parent-handlers="false">
-                <level name="INFO"/>
+                <level name="FINE"/>
                 <handlers>
                     <handler name="BOMC_CONSOLE"/>
                 </handlers>

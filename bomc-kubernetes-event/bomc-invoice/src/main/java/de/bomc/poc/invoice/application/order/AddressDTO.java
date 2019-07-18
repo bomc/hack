@@ -1,5 +1,5 @@
 /**
- * Project: bomc-onion-architecture
+ * Project: bomc-invoice
  * <pre>
  *
  * Last change:

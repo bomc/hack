@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import de.bomc.poc.invoice.application.internal.ApplicationUserEnum;
+import de.bomc.poc.invoice.application.log.LoggerQualifier;
 
 /**
  * Schedules for new orders from bomc-order service.
@@ -45,8 +46,10 @@ import de.bomc.poc.invoice.application.internal.ApplicationUserEnum;
 @Singleton
 public class OrderSchedulerSingletonEJB {
 
-	private static final String LOG_PREFIX = "OrderSchedulerEJB#";
-	private static final Logger LOGGER = Logger.getLogger(OrderSchedulerSingletonEJB.class.getName());
+	private static final String LOG_PREFIX = "OrderSchedulerSingletonEJB#";
+	@Inject
+	@LoggerQualifier
+	private Logger logger;
 	// _______________________________________________
 	// Configuration application constants.
 	// -----------------------------------------------
@@ -76,14 +79,14 @@ public class OrderSchedulerSingletonEJB {
 
 	@PostConstruct
 	public void init() {
-		LOGGER.log(Level.INFO, LOG_PREFIX + "init [inject.scheduleOrderStartDelay=" + this.scheduleOrderStartDelay
+		this.logger.log(Level.FINE, LOG_PREFIX + "init [inject.scheduleOrderStartDelay=" + this.scheduleOrderStartDelay
 				+ ", inject.scheduleOrderDelay=" + this.scheduleOrderDelay + "]");
 
 		this.initScheduler(scheduleOrderStartDelay, scheduleOrderDelay);
 	}
 
 	public void initScheduler(final String scheduleOrderStartDelay, final String scheduleOrderDelay) {
-		LOGGER.log(Level.INFO, LOG_PREFIX + "initScheduler [scheduleOrderStartDelay=" + this.scheduleOrderStartDelay
+		this.logger.log(Level.FINE, LOG_PREFIX + "initScheduler [scheduleOrderStartDelay=" + this.scheduleOrderStartDelay
 				+ ", scheduleOrderDelay=" + this.scheduleOrderDelay + "]");
 
 		// Cleanup all timers.
@@ -107,7 +110,7 @@ public class OrderSchedulerSingletonEJB {
 	 */
 	@Timeout
 	public void timerRunningOff(final Timer timer) {
-		LOGGER.log(Level.INFO, LOG_PREFIX + "timerRunningOff - [timer.info=" + timer.getInfo() + "]");
+		this.logger.log(Level.FINE, LOG_PREFIX + "timerRunningOff - [timer.info=" + timer.getInfo() + "]");
 
 		// Set MDC header, do userId
 //		MDC.put(MDCFilter.HEADER_REQUEST_ID_ATTR, UUID.randomUUID().toString());
@@ -121,7 +124,7 @@ public class OrderSchedulerSingletonEJB {
 	}
 
 	public void printoutNextTimeout(final String userId) {
-		this.timerService.getTimers().forEach(t -> LOGGER.log(Level.INFO, LOG_PREFIX + "printoutNextTimeout [timeout="
+		this.timerService.getTimers().forEach(t -> this.logger.log(Level.INFO, LOG_PREFIX + "printoutNextTimeout [timeout="
 				+ t.getNextTimeout() + ", timer.info=" + t.getInfo() + "]"));
 	}
 
@@ -130,7 +133,7 @@ public class OrderSchedulerSingletonEJB {
 	 */
 	@PreDestroy
 	public void cleanup() {
-		LOGGER.log(Level.FINE, LOG_PREFIX + "cleanup - cancel running timers!");
+		this.logger.log(Level.FINE, LOG_PREFIX + "cleanup - cancel running timers!");
 
 		if (this.timerService != null) {
 			this.timerService.getTimers().forEach(t -> t.cancel());

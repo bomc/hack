@@ -33,7 +33,10 @@ public enum AppErrorCodeEnum implements ErrorCode {
     // _______________________________________________
     // Add here new errorCodes.
     // -----------------------------------------------
-    // MAJOR /general response errors (10000-10499)
+    // MAJOR /general response errors (10000-10399)
+	//
+    // Indicates jpa/persistence error (10400-10499)
+    JPA_PERSISTENCE_10400(10400, Category.ERROR, "Error occurs with entityManager handling."),
     //
     // Indicates connection error (10500-10599)
     //

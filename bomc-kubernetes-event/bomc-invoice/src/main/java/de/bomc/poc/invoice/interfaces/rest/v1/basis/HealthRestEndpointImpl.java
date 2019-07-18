@@ -31,6 +31,7 @@ import org.eclipse.microprofile.faulttolerance.Timeout;
 
 import de.bomc.poc.exception.core.app.AppRuntimeException;
 import de.bomc.poc.invoice.application.internal.AppErrorCodeEnum;
+import de.bomc.poc.invoice.application.log.LoggerQualifier;
 
 /**
  * The implementation that reads the current version of this project from
@@ -58,7 +59,9 @@ public class HealthRestEndpointImpl implements HealthRestEndpoint {
 	private static final String FALLBACK_METHOD = "doWorkFallback";
 	private static final int BULKHEAD = 3;
 	// The logger
-	public static final Logger LOGGER = Logger.getLogger(HealthRestEndpointImpl.class.getSimpleName());
+	@Inject
+	@LoggerQualifier
+	private Logger logger;
 	@Inject
 	@ConfigProperty(name = VERSION_KEY_NAME, defaultValue = DEFAULT_VALUE)
 	private String version;
@@ -78,7 +81,7 @@ public class HealthRestEndpointImpl implements HealthRestEndpoint {
 			jsonObjectBuilder.add(VERSION_KEY_NAME, version);
 			jsonObjectBuilder.add(BUILD_DATE_KEY_NAME, buildDate);
 
-			LOGGER.log(Level.INFO, LOG_PREFIX + "getLiveness [response=" + jsonObjectBuilder.build() + "]");
+			this.logger.log(Level.INFO, LOG_PREFIX + "getLiveness [response=" + jsonObjectBuilder.build() + "]");
 			
 			return Response.ok().entity(jsonObjectBuilder.build()).build();
 		} catch (final Exception exception) {
@@ -87,7 +90,7 @@ public class HealthRestEndpointImpl implements HealthRestEndpoint {
 
 			final AppRuntimeException appRuntimeException = new AppRuntimeException(errMsg,
 					AppErrorCodeEnum.APP_LIVENESS_READINESS_10605);
-			LOGGER.log(Level.SEVERE, errMsg + appRuntimeException.stackTraceToString());
+			this.logger.log(Level.SEVERE, errMsg + appRuntimeException.stackTraceToString());
 
 			throw appRuntimeException;
 		}
@@ -105,7 +108,7 @@ public class HealthRestEndpointImpl implements HealthRestEndpoint {
 			jsonObjectBuilder.add(VERSION_KEY_NAME, version);
 			jsonObjectBuilder.add(BUILD_DATE_KEY_NAME, buildDate);
 
-			LOGGER.log(Level.INFO, LOG_PREFIX + "getLiveness [response=" + jsonObjectBuilder.build() + "]");
+			this.logger.log(Level.INFO, LOG_PREFIX + "getLiveness [response=" + jsonObjectBuilder.build() + "]");
 
 			return Response.ok().entity(jsonObjectBuilder.build()).build();
 		} catch (final Exception exception) {
@@ -114,7 +117,7 @@ public class HealthRestEndpointImpl implements HealthRestEndpoint {
 
 			final AppRuntimeException appRuntimeException = new AppRuntimeException(errMsg,
 					AppErrorCodeEnum.APP_LIVENESS_READINESS_10605);
-			LOGGER.log(Level.SEVERE, errMsg + appRuntimeException.stackTraceToString());
+			this.logger.log(Level.SEVERE, errMsg + appRuntimeException.stackTraceToString());
 
 			throw appRuntimeException;
 		}
@@ -125,7 +128,7 @@ public class HealthRestEndpointImpl implements HealthRestEndpoint {
 	 * 
 	 */
 	public Response doWorkFallback() {
-		LOGGER.log(Level.INFO, LOG_PREFIX + "doWorkFallback - a error occurs during method invocation.");
+		this.logger.log(Level.FINE, LOG_PREFIX + "doWorkFallback - a error occurs during method invocation.");
 
 		return Response.serverError().build();
 	}

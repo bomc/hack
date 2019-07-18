@@ -76,7 +76,7 @@ public class ResteasyServerLogger implements ContainerRequestFilter, ContainerRe
     }
 
     private void log(final StringBuilder b) {
-        this.logger.debug(LOG_PREFIX + "log:\n" + b.toString());
+        this.logger.info(LOG_PREFIX + "log:\n" + b.toString());
     }
 
     private StringBuilder prefixId(final StringBuilder b, final long id) {

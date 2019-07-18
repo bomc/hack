@@ -87,7 +87,7 @@ public class ResteasyClientLogger implements ClientRequestFilter, ClientResponse
 
     private void log(final StringBuilder b) {
         if (this.logger != null) {
-            this.logger.debug(LOG_PREFIX + "log:\n" + b);
+            this.logger.info(LOG_PREFIX + "log:\n" + b);
         }
     }
 
