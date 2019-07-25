@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
+import javax.interceptor.Interceptors;
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 import javax.ws.rs.core.Response;
@@ -29,6 +30,7 @@ import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.faulttolerance.Timeout;
 
+import de.bomc.poc.exception.cdi.interceptor.ExceptionHandlerInterceptor;
 import de.bomc.poc.exception.core.app.AppRuntimeException;
 import de.bomc.poc.invoice.application.internal.AppErrorCodeEnum;
 import de.bomc.poc.invoice.application.log.LoggerQualifier;
@@ -40,6 +42,7 @@ import de.bomc.poc.invoice.application.log.LoggerQualifier;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 08.11.2018
  */
+@Interceptors({ExceptionHandlerInterceptor.class})
 public class HealthRestEndpointImpl implements HealthRestEndpoint {
 
 	private static final String LOG_PREFIX = "VersionRestEndpointImpl#";

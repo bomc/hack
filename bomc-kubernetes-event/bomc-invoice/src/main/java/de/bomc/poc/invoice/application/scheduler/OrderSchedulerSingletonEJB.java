@@ -15,6 +15,8 @@
 package de.bomc.poc.invoice.application.scheduler;
 
 import java.net.MalformedURLException;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -115,9 +117,19 @@ public class OrderSchedulerSingletonEJB {
 		// Set MDC header, do userId
 //		MDC.put(MDCFilter.HEADER_REQUEST_ID_ATTR, UUID.randomUUID().toString());
 
+		String iid = "";
+		
+		if(this.lastModifiedDate != null) {
+			iid = "iid_" + UUID.nameUUIDFromBytes(this.lastModifiedDate.getBytes());
+		} else {
+			//
+			// At startup, lastModifiedDate is not set.
+			iid = "iid_" + UUID.nameUUIDFromBytes(LocalDateTime.MIN.toString().getBytes());
+		}
+		
 		//
 		// Get new orders by given date.
-		this.lastModifiedDate = this.orderSchedulerService.doWork(this.lastModifiedDate);
+		this.lastModifiedDate = this.orderSchedulerService.doWork(this.lastModifiedDate, ApplicationUserEnum.SYSTEM_USER.name(), iid);
 
 		// Print out next timeout.
 		this.printoutNextTimeout(ApplicationUserEnum.SYSTEM_USER.name());

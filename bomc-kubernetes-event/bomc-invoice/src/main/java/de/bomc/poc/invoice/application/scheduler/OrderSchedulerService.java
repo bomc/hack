@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.interceptor.Interceptors;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
@@ -36,6 +37,8 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import de.bomc.poc.exception.core.ExceptionUtil;
 import de.bomc.poc.exception.core.app.AppRuntimeException;
 import de.bomc.poc.invoice.application.controller.InvoiceComposition;
+import de.bomc.poc.invoice.application.idempotent.annotation.Idempotent;
+import de.bomc.poc.invoice.application.idempotent.interceptor.IdempotentFilterInterceptor;
 import de.bomc.poc.invoice.application.internal.AppErrorCodeEnum;
 import de.bomc.poc.invoice.application.internal.ApplicationUserEnum;
 import de.bomc.poc.invoice.application.log.LoggerQualifier;
@@ -44,7 +47,7 @@ import de.bomc.poc.invoice.interfaces.rest.client.OrderRestEndpoint;
 import de.bomc.poc.invoice.interfaces.rest.filter.RestClientHeaderIfModifiedSinceFilter;
 import de.bomc.poc.invoice.interfaces.rest.filter.ResteasyClientLogger;
 import de.bomc.poc.invoice.interfaces.rest.filter.UIDHeaderRequestFilter;
-import io.smallrye.restclient.RestClientProxy;
+//import io.smallrye.restclient.RestClientProxy;
 
 /**
  * A service that invokes the remote order-service for new orders. java -jar
@@ -52,6 +55,7 @@ import io.smallrye.restclient.RestClientProxy;
  * 
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
+@Interceptors({IdempotentFilterInterceptor.class})
 public class OrderSchedulerService {
 
 	private static final String LOG_PREFIX = "OrderSchedulerService#";
@@ -130,8 +134,9 @@ public class OrderSchedulerService {
 	 * Bulkhead: Limits the number of concurrent requests.
 	 * </pre>
 	 */
-	public String doWork(final String lastModifiedDate) {
-		this.logger.log(Level.FINE, LOG_PREFIX + "doWork [lastModifiedDate=" + lastModifiedDate /*+ ", requestId="
+	@Idempotent
+	public String doWork(final String lastModifiedDate, final String userId, final String idempotentId) {
+		this.logger.log(Level.FINE, LOG_PREFIX + "doWork [lastModifiedDate=" + lastModifiedDate + ", userId=" + userId + ", idempotentId=" + idempotentId/*+ ", requestId="
 				+ MDC.get(MDCFilter.HEADER_REQUEST_ID_ATTR)*/ + "]");
 
 		Response response = null;
@@ -180,7 +185,7 @@ public class OrderSchedulerService {
 						+ oderDtoList.size() + "]");
 
 				if(oderDtoList.size() > 0) {
-					invoiceController.createInvoice(oderDtoList);
+					invoiceController.createInvoice(oderDtoList, userId);
 				}
 				
 				if (retLastModifiedDate != null) {
@@ -213,11 +218,11 @@ public class OrderSchedulerService {
 				response.close();
 			}
 
-			if (orderRestClient != null) {
-				((RestClientProxy) orderRestClient).close();
-			}
+//			if (orderRestClient != null) {
+//				((RestClientProxy) orderRestClient).close();
+//			}
 		}
-
+		
 		return lastModifiedDate;
 	}
 

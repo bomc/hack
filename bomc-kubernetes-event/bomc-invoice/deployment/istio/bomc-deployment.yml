@@ -21,20 +21,20 @@ spec:
         ports:
         - containerPort: 8080
           protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /bomc-invoice/rest/health/liveness
-            port: 8080
-          initialDelaySeconds: 25
-          timeoutSeconds: 1
-          periodSeconds: 30
-          failureThreshold: 1
-        readinessProbe:
-          httpGet:
-            path: /bomc-invoice/rest/health/readiness
-            port: 8080
-          initialDelaySeconds: 25
-          timeoutSeconds: 1
-          periodSeconds: 30
-          failureThreshold: 1
+#        livenessProbe:
+#          httpGet:
+#            path: /bomc-invoice/rest/health/liveness
+#            port: 8080
+#          initialDelaySeconds: 25
+#          timeoutSeconds: 1
+#          periodSeconds: 30
+#          failureThreshold: 1
+#        readinessProbe:
+#          httpGet:
+#            path: /bomc-invoice/rest/health/readiness
+#            port: 8080
+#          initialDelaySeconds: 25
+#          timeoutSeconds: 1
+#          periodSeconds: 30
+#          failureThreshold: 1
 ---
