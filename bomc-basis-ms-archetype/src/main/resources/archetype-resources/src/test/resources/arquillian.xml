@@ -22,7 +22,7 @@
     </engine>
 
     <extension qualifier="jacoco">
-    	<!-- NOTE@MVN: Will be changed by mvn project generation -->
+        <!-- NOTE@MVN: Will be changed by mvn project generation -->
         <property name="includes">${package}.*</property>
     </extension>
 

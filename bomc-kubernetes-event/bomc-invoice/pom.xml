@@ -31,10 +31,17 @@
 		<!-- automatically run annotation processors within the incremental compilation -->
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
 
+		<!-- Jacoco test coverage properties. -->
+		<jacoco.instruction.coveredratio>0.01</jacoco.instruction.coveredratio>
+		<jacoco.complexity.coveredratio>0.01</jacoco.complexity.coveredratio>
+		<jacoco.line.coveredratio>0.01</jacoco.line.coveredratio>
+		<jacoco.branch.coveredratio>0.01</jacoco.branch.coveredratio>
+
 		<!-- All used dependencies -->
 		<version.exception-lib-ext>1.00.00-SNAPSHOT</version.exception-lib-ext>
 
-		<version.thorntail>2.4.0.Final</version.thorntail>
+		<version.thorntail>2.5.0.Final</version.thorntail>
+		<version.arquillian-bom>1.4.1.Final</version.arquillian-bom>
 		<version.swagger-ui>1.0.2</version.swagger-ui>
 		<version.javaee-api>8.0</version.javaee-api>
 		<version.postgresql>9.4.1212</version.postgresql>
@@ -48,16 +55,14 @@
 		<version.hamcrest>2.1</version.hamcrest>
 		<version.hibernate-entitymanager>5.4.0.Final</version.hibernate-entitymanager>
 		<!-- <version.arquillian-bom>1.1.12.Final</version.arquillian-bom> -->
-
+		<version.org.jacoco.core>0.8.4</version.org.jacoco.core>
+		<version.arquillian-jacoco>1.0.0.Alpha10</version.arquillian-jacoco>
 		<!-- Other plugins -->
 		<version.maven-compiler-plugin>3.5.1</version.maven-compiler-plugin>
 		<version.maven-processor-plugin>3.1.0</version.maven-processor-plugin>
-
-		<!-- <version.maven-clean-plugin>3.0.0</version.maven-clean-plugin> -->
-		<!-- <version.maven-failsafe-plugin>2.19.1</version.maven-failsafe-plugin> -->
-		<!-- <version.maven-surefire-plugin>2.19.1</version.maven-surefire-plugin> -->
-		<!-- <version.maven-war-plugin>2.6</version.maven-war-plugin> -->
-		<!-- <version.build-helper-maven-plugin>1.10</version.build-helper-maven-plugin> -->
+		<version.jacoco-maven-plugin>0.8.4</version.jacoco-maven-plugin>
+		<version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
+		<version.maven-failsafe-plugin>2.22.2</version.maven-failsafe-plugin>
 	</properties>
 
 	<dependencyManagement>
@@ -69,6 +74,13 @@
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
+			<dependency>
+				<groupId>org.jboss.arquillian</groupId>
+				<artifactId>arquillian-bom</artifactId>
+				<version>${version.arquillian-bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -77,34 +89,6 @@
 
 		<!-- <pluginManagement> -->
 		<plugins>
-			<plugin>
-				<groupId>io.thorntail</groupId>
-				<artifactId>thorntail-maven-plugin</artifactId>
-				<version>${version.thorntail}</version>
-				<configuration>
-					<!-- <properties> -->
-					<!-- <swarm.port.offset>100</swarm.port.offset> -->
-					<!-- <swarm.jaeger.service-name>bomc-invoice</swarm.jaeger.service-name> -->
-
-					<!-- <thorntail.jaeger.remote-reporter-http-endpoint>http://localhost:14268/api/traces</thorntail.jaeger.remote-reporter-http-endpoint> -->
-					<!-- <thorntail.jaeger.reporter-log-spans>true</thorntail.jaeger.reporter-log-spans> -->
-					<!-- <thorntail.jaeger.sampler-type>const</thorntail.jaeger.sampler-type> -->
-					<!-- <thorntail.jaeger.sampler-parameter>1</thorntail.jaeger.sampler-parameter> -->
-					<!-- <thorntail.jaeger.enable-b3-header-propagation>true</thorntail.jaeger.enable-b3-header-propagation> -->
-					<!-- </properties> -->
-					<!-- <jvmArguments> -->
-					<!-- <jvmArgument>-Xmx256m</jvmArgument> -->
-					<!-- </jvmArguments> -->
-				</configuration>
-				<executions>
-					<execution>
-						<!-- <id>package</id> -->
-						<goals>
-							<goal>package</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -165,11 +149,9 @@
 	<profiles>
 		<profile>
 			<id>k8</id>
-			
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
-
 			<build>
 				<!-- Used to write version and build timestamp to version.properties. -->
 				<resources>
@@ -193,21 +175,6 @@
 						<groupId>io.thorntail</groupId>
 						<artifactId>thorntail-maven-plugin</artifactId>
 						<version>${version.thorntail}</version>
-						<configuration>
-							<!-- <properties> -->
-							<!-- <swarm.port.offset>100</swarm.port.offset> -->
-							<!-- <swarm.jaeger.service-name>bomc-invoice</swarm.jaeger.service-name> -->
-
-							<!-- <thorntail.jaeger.remote-reporter-http-endpoint>http://localhost:14268/api/traces</thorntail.jaeger.remote-reporter-http-endpoint> -->
-							<!-- <thorntail.jaeger.reporter-log-spans>true</thorntail.jaeger.reporter-log-spans> -->
-							<!-- <thorntail.jaeger.sampler-type>const</thorntail.jaeger.sampler-type> -->
-							<!-- <thorntail.jaeger.sampler-parameter>1</thorntail.jaeger.sampler-parameter> -->
-							<!-- <thorntail.jaeger.enable-b3-header-propagation>true</thorntail.jaeger.enable-b3-header-propagation> -->
-							<!-- </properties> -->
-							<!-- <jvmArguments> -->
-							<!-- <jvmArgument>-Xmx256m</jvmArgument> -->
-							<!-- </jvmArguments> -->
-						</configuration>
 						<executions>
 							<execution>
 								<id>package</id>
@@ -220,10 +187,14 @@
 				</plugins>
 			</build>
 		</profile>
-		
+
+		<!-- ### To run tests with out starting fatJar run: ### -->
+		<!-- ### 'mvn clean install -Plocal' ### -->
 		<profile>
 			<id>local</id>
-
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
 			<build>
 				<!-- Used to write version and build timestamp to version.properties. -->
 				<resources>
@@ -242,14 +213,200 @@
 						</includes>
 					</resource>
 				</resources>
-
+ 
 				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${version.jacoco-maven-plugin}</version>
+						<executions>
+				            <!--
+        						Prepares the property pointing to the JaCoCo runtime agent which
+        						is passed as VM argument when Maven the Surefire plugin is executed.
+        					-->
+							<execution>
+								<id>pre-unit-test</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+              					<configuration>
+                					<!-- Sets the path to the file which contains the execution data. -->
+                					<destFile>${project.build.directory}/code-coverage/jacoco-ut.exec</destFile>
+                					<!--
+            							Sets the name of the property containing the settings
+            							for JaCoCo runtime agent.
+        							-->
+                					<propertyName>surefireArgLine</propertyName>
+              					</configuration>
+							</execution>
+							<!-- Ensures that the code coverage report for unit tests is created 
+								after unit tests have been run. -->
+            				<execution>
+              					<id>post-unit-test</id>
+              					<phase>test</phase>
+              					<goals>
+                					<goal>report</goal>
+              					</goals>
+              					<configuration>
+                					<!-- Sets the path to the file which contains the execution data. -->
+                					<dataFile>${project.build.directory}/code-coverage/jacoco-ut.exec</dataFile>
+                					<!-- Sets the output directory for the code coverage report. -->
+                					<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+              					</configuration>
+            				</execution>
+            				<execution>
+              					<id>pre-integration-test</id>
+              					<phase>pre-integration-test</phase>
+              					<goals>
+                					<goal>prepare-agent</goal>
+              					</goals>
+              					<configuration>
+                					<!-- Sets the path to the file which contains the execution data. -->
+                					<destFile>${project.build.directory}/code-coverage/jacoco-it.exec</destFile>
+                					<!--
+            							Sets the name of the property containing the settings
+            							for JaCoCo runtime agent.
+        							-->
+                					<propertyName>failsafeArgLine</propertyName>
+              					</configuration>
+            				</execution>
+            				<!--
+        						Ensures that the code coverage report for integration tests after
+        						integration tests have been run.
+        					-->
+            				<execution>
+              					<id>post-integration-test</id>
+              					<phase>post-integration-test</phase>
+              					<goals>
+                					<goal>report</goal>
+              					</goals>
+              					<configuration>
+                					<!-- Sets the path to the file which contains the execution data. -->
+                					<dataFile>${project.build.directory}/code-coverage/jacoco-it.exec</dataFile>
+                					<!-- Sets the output directory for the code coverage report. -->
+                					<outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+              					</configuration>
+            				</execution>
+							<execution>
+								<id>merge-ut-it-jacoco</id>
+								<goals>
+									<goal>merge</goal>
+									<goal>report</goal>
+								</goals>
+								<phase>post-integration-test</phase>
+								<configuration>
+									<fileSets>
+										<fileSet
+											implementation="org.apache.maven.shared.model.fileset.FileSet">
+											<directory>${project.build.directory}/code-coverage</directory>
+											<includes>
+												<include>*.exec</include>
+											</includes>
+										</fileSet>
+									</fileSets>
+									<destFile>${project.build.directory}/coverage-reports/jacoco-dev.exec</destFile>
+                					<!-- Sets the path to the file which contains the execution data. -->
+                					<dataFile>${project.build.directory}/coverage-reports/jacoco-dev.exec</dataFile>
+                					<!-- Sets the output directory for the code coverage report. -->
+                					<outputDirectory>${project.reporting.outputDirectory}/jacoco-merged</outputDirectory>
+								</configuration>
+							</execution>
+                            <execution>
+                                <id>jacoco-check</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <configuration>
+                                	<destFile>${project.build.directory}/coverage-reports/jacoco-dev.exec</destFile>
+                                    <rules>
+                                        <rule>
+                                            <element>BUNDLE</element>
+                                            <limits>
+                                                <!-- The supported counter options are: LINE, BRANCH, INSTRUCTION,
+                                                    COMPLEXITY, METHOD, CLASS (mvn clean verify). -->
+                                                <limit>
+                                                    <counter>LINE</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.line.coveredratio}</minimum>
+                                                </limit>
+                                                <limit>
+                                                    <counter>BRANCH</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.branch.coveredratio}</minimum>
+                                                </limit>
+                                                <limit>
+                                                    <counter>INSTRUCTION</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.instruction.coveredratio}</minimum>
+                                                </limit>
+                                                <limit>
+                                                    <counter>COMPLEXITY</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.complexity.coveredratio}</minimum>
+                                                </limit>
+                                            </limits>
+                                        </rule>
+                                    </rules>
+                                </configuration>
+                            </execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${version.maven-surefire-plugin}</version>
+						<configuration>
+							<!-- Junit tests werden hier ausgeführt. -->
+							<skip>false</skip>
+<!-- 							<forkCount>1</forkCount> -->
+<!-- 							<reuseForks>true</reuseForks> -->
+							<includes>
+								<include>**/*Test.java</include>
+							</includes>
+							<!-- Sets the VM argument line used when unit tests are run. -->
+							<argLine>${surefireArgLine}</argLine>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<version>${version.maven-failsafe-plugin}</version>
+						<executions>
+							<!-- Ensures that both integration-test and verify goals of the Failsafe 
+								Maven plugin are executed. -->
+							<execution>
+								<id>integration-tests</id>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+								<configuration>
+									<skip>false</skip>
+									<!-- Für jeden Test wird eine VM gestartet, in dieser VM wird jeweils 
+										ein separater Wildfly gestartet, das Test-Artefakt deployed und Wildfly anschliessend 
+										gestoppt. -->
+<!-- 									<forkCount>1</forkCount> -->
+<!-- 									<reuseForks>false</reuseForks> -->
+									<includes>
+										<include>**/*IT.java</include>
+									</includes>
+									<!-- Sets the VM argument line used when integration tests are run. -->
+									<argLine>${failsafeArgLine}</argLine>
+									
+<!--                         			<systemPropertyVariables> -->
+<!--                             			<jacoco.test>${failsafeArgLine}</jacoco.test> -->
+<!--                         			</systemPropertyVariables> -->
+                        			
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 					<plugin>
 						<groupId>io.thorntail</groupId>
 						<artifactId>thorntail-maven-plugin</artifactId>
 						<version>${version.thorntail}</version>
 						<configuration>
-
 							<jvmArguments>
 								<jvmArgument>-Xmx256m</jvmArgument>
 							</jvmArguments>
@@ -263,12 +420,20 @@
 							</execution>
 							<execution>
 								<id>start</id>
+<!-- 								<phase>pre-integration-test</phase> -->
+<!-- 								<goals> -->
+<!-- 									<goal>start</goal> -->
+<!-- 								</goals> -->
 								<configuration>
 									<arguments>-Slocal</arguments>
 								</configuration>
 							</execution>
 							<execution>
 								<id>stop</id>
+<!-- 								<phase>post-integration-test</phase> -->
+<!-- 								<goals> -->
+<!-- 									<goal>stop</goal> -->
+<!-- 								</goals> -->
 							</execution>
 						</executions>
 					</plugin>
@@ -314,6 +479,17 @@
 			<artifactId>transactions</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>io.thorntail</groupId>
+			<artifactId>undertow</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.thorntail</groupId>
+			<artifactId>arquillian</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.microprofile-ext.openapi-ext</groupId>
 			<artifactId>swagger-ui</artifactId>
@@ -387,6 +563,52 @@
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>${version.hibernate-entitymanager}</version>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- Test coverage -->
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>org.jacoco.core</artifactId>
+			<version>${version.org.jacoco.core}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- All needs to run arquillian tests. -->
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.protocol</groupId>
+            <artifactId>arquillian-protocol-servlet</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-container-test-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-jacoco</artifactId>
+			<version>${version.arquillian-jacoco}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-depchain</artifactId>
+			<scope>test</scope>
+			<type>pom</type>
 		</dependency>
 
 	</dependencies>

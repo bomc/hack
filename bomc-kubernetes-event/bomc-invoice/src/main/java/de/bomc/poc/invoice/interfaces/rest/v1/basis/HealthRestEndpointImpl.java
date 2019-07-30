@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.interceptor.Interceptors;
 import javax.json.Json;
+import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.ws.rs.core.Response;
 
@@ -83,10 +84,11 @@ public class HealthRestEndpointImpl implements HealthRestEndpoint {
 			final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
 			jsonObjectBuilder.add(VERSION_KEY_NAME, version);
 			jsonObjectBuilder.add(BUILD_DATE_KEY_NAME, buildDate);
-
-			this.logger.log(Level.INFO, LOG_PREFIX + "getLiveness [response=" + jsonObjectBuilder.build() + "]");
+			final JsonObject result = jsonObjectBuilder.build();
 			
-			return Response.ok().entity(jsonObjectBuilder.build()).build();
+			this.logger.log(Level.INFO, LOG_PREFIX + "getLiveness [response=" + result + "]");
+			
+			return Response.ok().entity(result).build();
 		} catch (final Exception exception) {
 			final String errMsg = LOG_PREFIX
 					+ "getLiveness - Could not read 'version' and 'build.date from configuration file. ";
@@ -110,10 +112,11 @@ public class HealthRestEndpointImpl implements HealthRestEndpoint {
 			final JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
 			jsonObjectBuilder.add(VERSION_KEY_NAME, version);
 			jsonObjectBuilder.add(BUILD_DATE_KEY_NAME, buildDate);
+			final JsonObject result = jsonObjectBuilder.build();
+			
+			this.logger.log(Level.INFO, LOG_PREFIX + "getLiveness [response=" + result + "]");
 
-			this.logger.log(Level.INFO, LOG_PREFIX + "getLiveness [response=" + jsonObjectBuilder.build() + "]");
-
-			return Response.ok().entity(jsonObjectBuilder.build()).build();
+			return Response.ok().entity(result).build();
 		} catch (final Exception exception) {
 			final String errMsg = LOG_PREFIX
 					+ "getLiveness - Could not read 'version' and 'build.date from configuration file. ";

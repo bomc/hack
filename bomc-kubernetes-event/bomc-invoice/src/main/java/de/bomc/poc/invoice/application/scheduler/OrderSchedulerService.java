@@ -47,7 +47,6 @@ import de.bomc.poc.invoice.interfaces.rest.client.OrderRestEndpoint;
 import de.bomc.poc.invoice.interfaces.rest.filter.RestClientHeaderIfModifiedSinceFilter;
 import de.bomc.poc.invoice.interfaces.rest.filter.ResteasyClientLogger;
 import de.bomc.poc.invoice.interfaces.rest.filter.UIDHeaderRequestFilter;
-//import io.smallrye.restclient.RestClientProxy;
 
 /**
  * A service that invokes the remote order-service for new orders. java -jar
