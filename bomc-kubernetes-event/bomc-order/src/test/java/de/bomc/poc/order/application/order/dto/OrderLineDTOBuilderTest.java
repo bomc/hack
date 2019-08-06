@@ -50,6 +50,7 @@ public class OrderLineDTOBuilderTest {
     private static final String ITEM_NAME = "myItem";
     private static final Double ITEM_PRICE = 2.99d;
     private static final Integer ORDERLINE_QUANTITY = 42;
+    private static final Long ORDER_ID = 42L;
     
     @Test
     public void test010_builder_pass() {
@@ -60,7 +61,7 @@ public class OrderLineDTOBuilderTest {
         // -------------------------------------------
         final ItemDTO itemDTO = ItemDTO.name(ITEM_NAME).price(ITEM_PRICE).build();
 
-        final OrderLineDTO orderLineDTO = OrderLineDTO.quantity(ORDERLINE_QUANTITY).item(itemDTO).build();
+        final OrderLineDTO orderLineDTO = OrderLineDTO.quantity(ORDERLINE_QUANTITY).item(itemDTO).orderId(ORDER_ID).build();
         
         LOGGER.debug(LOG_PREFIX + "test010_builder_pass [" + orderLineDTO + "]");
         
@@ -92,19 +93,19 @@ public class OrderLineDTOBuilderTest {
         // Perform test.
         // -------------------------------------------
         final ItemDTO itemDTO1 = ItemDTO.name(ITEM_NAME).price(ITEM_PRICE).build();
-        final OrderLineDTO orderLineDTO1 = OrderLineDTO.quantity(ORDERLINE_QUANTITY).item(itemDTO1).build();
+        final OrderLineDTO orderLineDTO1 = OrderLineDTO.quantity(ORDERLINE_QUANTITY).item(itemDTO1).orderId(ORDER_ID).build();
         
         final ItemDTO itemDTO2 = ItemDTO.name(ITEM_NAME).price(ITEM_PRICE).build();
-        final OrderLineDTO orderLineDTO2 = OrderLineDTO.quantity(ORDERLINE_QUANTITY).item(itemDTO2).build();
+        final OrderLineDTO orderLineDTO2 = OrderLineDTO.quantity(ORDERLINE_QUANTITY).item(itemDTO2).orderId(ORDER_ID).build();
         
         final ItemDTO itemDTO3 = ItemDTO.name(ITEM_NAME + "_3").price(ITEM_PRICE + 1).build();
-        final OrderLineDTO orderLineDTO3 = OrderLineDTO.quantity(ORDERLINE_QUANTITY + 1).item(itemDTO3).build();
+        final OrderLineDTO orderLineDTO3 = OrderLineDTO.quantity(ORDERLINE_QUANTITY + 1).item(itemDTO3).orderId(ORDER_ID).build();
         
         set.add(orderLineDTO1);
         set.add(orderLineDTO2);
         set.add(orderLineDTO3);
         
-        final OrderLineDTO orderLineDTO4 = OrderLineDTO.quantity(null).item(null).build();
+        final OrderLineDTO orderLineDTO4 = OrderLineDTO.quantity(null).item(null).orderId(null).build();
         final OrderLineDTO orderLineDTO5 = null;
         
         // ___________________________________________

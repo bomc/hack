@@ -20,9 +20,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.junit.FixMethodOrder;
@@ -64,7 +62,7 @@ public class DTOEntityOrderMapperTest {
     private static final String CUSTOMER_NAME = "name";
     private static final String CUSTOMER_FIRSTNAME = "firstname";
     private static final String CUSTOMER_USERNAME = "username";
-    private static final String ORDER_USER = "myUser";
+//    private static final String ORDER_USER = "myUser";
     private static final Integer QUANTITY = 42;
     private static final String ITEM_NAME = "itemName";
     private static final Double ITEM_PRICE = 42.42d;
@@ -103,7 +101,7 @@ public class DTOEntityOrderMapperTest {
         itemEntity1.setName(ITEM_NAME);
         itemEntity1.setPrice(ITEM_PRICE);
         itemEntity1.setId(42L);
-        orderEntity.addLine(QUANTITY, itemEntity1, ORDER_USER);
+//        orderEntity.addLine(QUANTITY, itemEntity1, ORDER_USER);
         
         // ___________________________________________
         // Do test
@@ -122,13 +120,13 @@ public class DTOEntityOrderMapperTest {
         assertThat(orderDTO.getCustomer().getFirstname(), equalTo(CUSTOMER_FIRSTNAME));
         assertThat(orderDTO.getCustomer().getName(), equalTo(CUSTOMER_NAME));
         assertThat(orderDTO.getCustomer().getUsername(), equalTo(CUSTOMER_USERNAME));
-        assertThat(orderDTO.getOrderLineDTOSet().size(), equalTo(1));
-        final OrderLineDTO orderLineDTO = orderDTO.getOrderLineDTOSet().iterator().next();
-        assertThat(orderLineDTO, notNullValue());
-        assertThat(orderLineDTO.getQuantity(), equalTo(QUANTITY));
-        assertThat(orderLineDTO.getItem(), notNullValue());
-        assertThat(orderLineDTO.getItem().getName(), equalTo(ITEM_NAME));
-        assertThat(orderLineDTO.getItem().getPrice(), equalTo(ITEM_PRICE));
+//        assertThat(orderDTO.getOrderLineDTOList().size(), equalTo(1));
+//        final OrderLineDTO orderLineDTO = orderDTO.getOrderLineDTOList().iterator().next();
+//        assertThat(orderLineDTO, notNullValue());
+//        assertThat(orderLineDTO.getQuantity(), equalTo(QUANTITY));
+//        assertThat(orderLineDTO.getItem(), notNullValue());
+//        assertThat(orderLineDTO.getItem().getName(), equalTo(ITEM_NAME));
+//        assertThat(orderLineDTO.getItem().getPrice(), equalTo(ITEM_PRICE));
     }
     
     /**
@@ -166,7 +164,7 @@ public class DTOEntityOrderMapperTest {
         itemEntity1.setName(ITEM_NAME);
         itemEntity1.setPrice(ITEM_PRICE);
         itemEntity1.setId(42L);
-        orderEntity1.addLine(QUANTITY, itemEntity1, ORDER_USER);
+//        orderEntity1.addLine(QUANTITY, itemEntity1, ORDER_USER);
         
         final OrderEntity orderEntity2 = new OrderEntity();
         orderEntity1.setId(24L);
@@ -178,7 +176,13 @@ public class DTOEntityOrderMapperTest {
         itemEntity2.setName(ITEM_NAME);
         itemEntity2.setPrice(ITEM_PRICE);
         itemEntity2.setId(24L);
-        orderEntity2.addLine(QUANTITY, itemEntity2, ORDER_USER);
+//        orderEntity2.addLine(QUANTITY, itemEntity2, ORDER_USER);
+
+//        final ItemEntity itemEntity3 = new ItemEntity();
+//        itemEntity3.setName(ITEM_NAME);
+//        itemEntity3.setPrice(ITEM_PRICE);
+//        itemEntity3.setId(4242L);
+//        orderEntity2.addLine(QUANTITY, itemEntity3, ORDER_USER);
         
         final List<OrderEntity> orderEntityList = new ArrayList<>();
         orderEntityList.add(orderEntity1);
@@ -196,8 +200,8 @@ public class DTOEntityOrderMapperTest {
         assertThat(orderDTOList.size(), equalTo(2));
         
         for (final OrderDTO orderDTO : orderDTOList) {
-            assertThat(orderDTO.getOrderLineDTOSet(), notNullValue());
-            assertThat(orderDTO.getOrderLineDTOSet().size(), equalTo(1));
+//            assertThat(orderDTO.getOrderLineDTOList(), notNullValue());
+//            assertThat(orderDTO.getOrderLineDTOList().size(), equalTo(1));
             assertThat(orderDTO.getShippingAddress(), notNullValue());
             assertThat(orderDTO.getShippingAddress(), notNullValue());
         }
@@ -267,7 +271,7 @@ public class DTOEntityOrderMapperTest {
         orderDTO.setBillingAddress(this.createAddressDTO(BILLING_ZIP, BILLING_STREET, BILLING_CITY));
         orderDTO.setShippingAddress(this.createAddressDTO(SHIPPING_ZIP, SHIPPING_STREET, SHIPPING_CITY));
         orderDTO.setCustomer(this.createCustomerDTO(CUSTOMER_FIRSTNAME, CUSTOMER_NAME, CUSTOMER_USERNAME));
-        orderDTO.setOrderLineDTOSet(this.createOrderLineSet());
+        orderDTO.setOrderLineDTOList(this.createOrderLineList());
         
         final OrderEntity orderEntity = DTOEntityOrderMapper.INSTANCE.mapDTOToEntity(orderDTO);
         
@@ -338,18 +342,18 @@ public class DTOEntityOrderMapperTest {
         orderEntity.setBillingAddress(null);
         orderEntity.setShippingAddress(null);
         orderEntity.setCustomer(null);
-        orderEntity.addLine(0, null, "createUser");
+//        orderEntity.addLine(0, null, "createUser");
         final OrderDTO orderDTO = DTOEntityOrderMapper.INSTANCE.mapEntityToDTO(orderEntity);
         
         assertThat(orderDTO, notNullValue());
         assertThat(orderDTO.getBillingAddress(), nullValue());
         assertThat(orderDTO.getShippingAddress(), nullValue());
         assertThat(orderDTO.getCustomer(), nullValue());
-        assertThat(orderDTO.getOrderLineDTOSet(), notNullValue());
-        
-        final OrderLineDTO orderLineDTO = orderDTO.getOrderLineDTOSet().iterator().next();
-        assertThat(orderLineDTO, notNullValue());
-        assertThat(orderLineDTO.getItem(), nullValue());
+//        assertThat(orderDTO.getOrderLineDTOList(), notNullValue());
+//        
+//        final OrderLineDTO orderLineDTO = orderDTO.getOrderLineDTOList().iterator().next();
+//        assertThat(orderLineDTO, notNullValue());
+//        assertThat(orderLineDTO.getItem(), nullValue());
     }
     
     
@@ -402,20 +406,21 @@ public class DTOEntityOrderMapperTest {
         return itemDTO;
     }
     
-    private Set<OrderLineDTO> createOrderLineSet() {
+    private List<OrderLineDTO> createOrderLineList() {
         
-        final Set<OrderLineDTO> orderLineDTOSet = new LinkedHashSet<>();
+        final List<OrderLineDTO> orderLineDTOList = new ArrayList<>();
+        
         final OrderLineDTO orderLineDTO1 = new OrderLineDTO();
         orderLineDTO1.setItem(this.createItemDTO(ITEM_PRICE, ITEM_NAME));
         orderLineDTO1.setQuantity(QUANTITY);
-        orderLineDTOSet.add(orderLineDTO1);
+        orderLineDTOList.add(orderLineDTO1);
         
         final OrderLineDTO orderLineDTO2 = new OrderLineDTO();
         orderLineDTO2.setItem(this.createItemDTO(ITEM_PRICE + 2d, ITEM_NAME + "_2"));
         orderLineDTO2.setQuantity(QUANTITY + 2);
-        orderLineDTOSet.add(orderLineDTO2);
+        orderLineDTOList.add(orderLineDTO2);
         
-        return orderLineDTOSet;
+        return orderLineDTOList;
         
     }
 }

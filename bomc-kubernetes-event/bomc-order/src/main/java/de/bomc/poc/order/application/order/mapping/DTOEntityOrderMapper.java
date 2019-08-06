@@ -30,7 +30,7 @@ import de.bomc.poc.order.domain.model.order.OrderEntity;
  * 
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
-@Mapper(uses = { DTOEntityCustomerMapper.class })
+@Mapper(uses = { DTOEntityCustomerMapper.class, DTOEntityOrderLineMapper.class })
 public interface DTOEntityOrderMapper {
 
     DTOEntityOrderMapper INSTANCE = Mappers.getMapper(DTOEntityOrderMapper.class);
@@ -46,7 +46,7 @@ public interface DTOEntityOrderMapper {
             @Mapping(target = "billingAddress.zip", source = "billingAddress.zip"),
             @Mapping(target = "billingAddress.city", source = "billingAddress.city"),
             @Mapping(target = "customer", source = "customer"),
-            @Mapping(target = "orderLineDTOSet", source = "orderLineSet"),
+            @Mapping(target = "orderLineDTOList", source = "orderLineSet"),
             @Mapping(target = "orderId", source = "id") })
     OrderDTO mapEntityToDTO(OrderEntity orderEntity);
 

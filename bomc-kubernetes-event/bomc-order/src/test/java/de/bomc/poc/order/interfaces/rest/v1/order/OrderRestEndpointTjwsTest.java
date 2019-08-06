@@ -17,6 +17,7 @@ package de.bomc.poc.order.interfaces.rest.v1.order;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,6 +47,7 @@ import de.bomc.poc.order.CategoryFastUnitTest;
 import de.bomc.poc.order.application.order.OrderController;
 import de.bomc.poc.order.application.order.dto.ItemDTO;
 import de.bomc.poc.order.application.order.dto.OrderDTO;
+import de.bomc.poc.order.application.order.dto.OrderLineDTO;
 import de.bomc.poc.order.interfaces.rest.PortFinder;
 
 /**
@@ -82,6 +84,7 @@ public class OrderRestEndpointTjwsTest {
     private static final Long TECHNICAL_ID = 42L;
     private static final String ITEM_NAME = "iPhone";
     private static final Double ITEM_PRICE = 1399.99;
+    private static final Integer QUANTITY = 10;
     private static final Long ORDER_ID = 42L;
     
     @Before
@@ -332,13 +335,21 @@ public class OrderRestEndpointTjwsTest {
         // ___________________________________________
         // GIVEN
         // -------------------------------------------
-        final OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setOrderId(ORDER_ID);
+        final ItemDTO itemDTO = new ItemDTO();
+        itemDTO.setName(ITEM_NAME);
+        itemDTO.setPrice(ITEM_PRICE);
+        
+        final OrderLineDTO orderLineDTO = new OrderLineDTO();
+        orderLineDTO.setItem(itemDTO);
+        orderLineDTO.setQuantity(QUANTITY);
+        orderLineDTO.setOrderId(ORDER_ID);
+        
+        doNothing().when(this.orderControllerEJB).addLine(orderLineDTO, USER_ID);
         
         // ___________________________________________
         // WHEN
         // -------------------------------------------
-        final Response response = sut.addLine(orderDTO, USER_ID);
+        final Response response = sut.addLine(orderLineDTO, USER_ID);
         
         // ___________________________________________
         // THEN
@@ -347,7 +358,7 @@ public class OrderRestEndpointTjwsTest {
         assertThat(response.getStatus(), equalTo(Status.NO_CONTENT.getStatusCode()));
         assertThat(response.getMediaType().toString(), equalTo(OrderRestEndpoint.MEDIA_TYPE_JSON_V1));
         
-        verify(orderControllerEJB).addLine(orderDTO, USER_ID);
+        verify(orderControllerEJB).addLine(orderLineDTO, USER_ID);
     }
     
     /**

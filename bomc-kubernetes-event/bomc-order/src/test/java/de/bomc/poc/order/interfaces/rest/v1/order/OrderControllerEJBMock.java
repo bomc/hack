@@ -16,9 +16,7 @@ package de.bomc.poc.order.interfaces.rest.v1.order;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.ejb.Local;
 import javax.ejb.Stateless;
@@ -73,8 +71,8 @@ public class OrderControllerEJBMock implements OrderController {
     }
 
     @Override
-    public void addLine(OrderDTO orderDTO, String userId) {
-        // TODO Auto-generated method stub
+    public void addLine(OrderLineDTO orderLineDTO, String userId) {
+        this.logger.debug(LOG_PREFIX + "findLatestModifiedDateTime [orderLineDTO=" + orderLineDTO + ", userId=" + userId + "]");
 
     }
 
@@ -88,12 +86,12 @@ public class OrderControllerEJBMock implements OrderController {
     public LocalDateTime findLatestModifiedDateTime(String userId) {
         this.logger.debug(LOG_PREFIX + "findLatestModifiedDateTime [userId=" + userId + "]");
 
-        if(userId != null) {
-            return LocalDateTime.now();    
+        if (userId != null) {
+            return LocalDateTime.now();
         } else {
             return null;
         }
-        
+
     }
 
     @Override
@@ -101,15 +99,16 @@ public class OrderControllerEJBMock implements OrderController {
         this.logger.debug(LOG_PREFIX + "findByAllOlderThanGivenDate [modifyDateTime=" + modifyDateTime + ", userId="
                 + userId + "]");
 
-        final Set<OrderLineDTO> orderLineDTOSet = new HashSet<>();
+        final List<OrderLineDTO> orderLineDTOList = new ArrayList<>();
         final List<OrderDTO> orderDTOList = new ArrayList<>();
-        
+
         if (userId != null) {
             final OrderDTO orderDTO = OrderDTO.orderId(1L).billingAddress(null).shippingAddress(null).customer(null)
-                    .orderLineSet(orderLineDTOSet).build();
-            
+                    .orderLineList(orderLineDTOList).build();
+
             orderDTOList.add(orderDTO);
-        } 
+        }
+        
         return orderDTOList;
     }
 

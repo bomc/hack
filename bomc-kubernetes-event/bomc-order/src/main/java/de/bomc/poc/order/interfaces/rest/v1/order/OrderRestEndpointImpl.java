@@ -41,6 +41,7 @@ import de.bomc.poc.order.application.basis.performance.qualifier.PerformanceTrac
 import de.bomc.poc.order.application.order.OrderController;
 import de.bomc.poc.order.application.order.dto.ItemDTO;
 import de.bomc.poc.order.application.order.dto.OrderDTO;
+import de.bomc.poc.order.application.order.dto.OrderLineDTO;
 import de.bomc.poc.order.domain.shared.DomainObjectUtils;
 import de.bomc.poc.order.infrastructure.rest.cache.qualifier.CacheControlConfigQualifier;
 
@@ -159,12 +160,12 @@ public class OrderRestEndpointImpl implements OrderRestEndpoint {
     }
 
     /**
-     * <code>curl -X POST "http://localhost:8180/bomc-order/rest/order/create" -H "accept: application/vnd.order-v1+json" 
-     * -H "X-BOMC_USER_ID: admin" -H "Content-Type: application/vnd.order-v1+json" -d 
-     * "{ \"shippingAddress\": { \"street\": \"myShippingStreet\", \"zip\": \"myShippingZip\", \"city\": \"myShippingCity\" }, 
-     * \"billingAddress\": { \"street\": \"myBillingStreet\", \"zip\": \"myBillingZip\", \"city\": \"myBillingCity\" }, 
-     * \"customer\": { \"name\": \"admin\", \"firstname\": \"admin\", \"username\": \"admin@admin.org\" }, \"orderLineDTOSet\": 
-     * [ { \"quantity\": 42, \"item\": { \"name\": \"Apple Watch\", \"price\": 0 } } ], \"orderId\": 0}"</code>
+     * <code>curl -X POST "http://192.168.99.119:31380/bomc-order/rest/order/create" -H "accept: application/vnd.order-v1+json" 
+     * -H "x-bomc-user-id: brexit" -H "Content-Type: application/vnd.order-v1+json" -d "{\"shippingAddress\": 
+     * {\"street\": \"Downingstreet 7\",\"zip\": \"4711\",\"city\": \"London\"},\"billingAddress\": 
+     * {\"street\": \"Downingstreet 13\",\"zip\": \"42\",\"city\": \"London\"},\"customer\": 
+     * {\"name\": \"Johnson\",\"firstname\": \"Boris\",\"username\": \"bomc@bomc.org\"},\"orderLineDTOList\": 
+     * [{ \"orderId\": 0, \"quantity\": 42, \"item\": { \"name\": \"iPad\", \"price\": 179 }}],\"orderId\": 0}"</code>
      */
     @Override
     public Response createOrder(final OrderDTO orderDTO, String userId) {
@@ -177,8 +178,8 @@ public class OrderRestEndpointImpl implements OrderRestEndpoint {
     }
 
     /**
-     * <code>curl -X GET "http://localhost:8180/bomc-order/rest/order/find/item" -H "accept: application/vnd.order-v1+json" 
-     * -H "X-BOMC_USER_ID: admin"</code>
+     * <code>curl -X GET "http://192.168.99.119:31380/bomc-order/rest/order/find/item" 
+     * -H "accept: application/vnd.order-v1+json" -H "x-bomc-user-id: bomc"</code>
      */
     @Override
     public Response findAllItems(final String userId) {
@@ -191,8 +192,8 @@ public class OrderRestEndpointImpl implements OrderRestEndpoint {
     }
 
     /**
-     * <code>curl -X GET "http://localhost:8180/bomc-order/rest/order/find/order" -H "accept: application/vnd.order-v1+json" 
-     * -H "X-BOMC_USER_ID: admin"</code>
+     * <code>curl -X GET "http://192.168.99.119:31380/bomc-order/rest/order/find/order" 
+     * -H "accept: application/vnd.order-v1+json" -H "x-bomc-user-id: bomc"</code>
      */
     @Override
     public Response findAllOrder(final String userId) {
@@ -205,8 +206,8 @@ public class OrderRestEndpointImpl implements OrderRestEndpoint {
     }
 
     /**
-     * <code>curl -X GET "http://localhost:8180/bomc-order/rest/order/find/2/order" -H "accept: application/vnd.order-v1+json" 
-     * -H "X-BOMC_USER_ID: admin"</code>
+     * <code>curl -X GET "http://192.168.99.119:31380/bomc-order/rest/order/find/1/order" 
+     * -H "accept: application/vnd.order-v1+json" -H "x-bomc-user-id: bomc"</code>
      */
     @Override
     public Response findOrderById(final Long orderId, final String userId) {
@@ -217,16 +218,13 @@ public class OrderRestEndpointImpl implements OrderRestEndpoint {
     }
 
     /**
-     * <code>curl -X POST "http://localhost:8180/bomc-order/rest/order/add/orderline" -H "accept: application/vnd.order-v1+json" 
-     * -H "X-BOMC_USER_ID: admin" -H "Content-Type: application/vnd.order-v1+json" -d "{ \"shippingAddress\": { \"street\": \"string\", \"zip\": 
-     * \"string\", \"city\": \"string\" }, \"billingAddress\": { \"street\": \"string\", \"zip\": \"string\", \"city\": \"string\" }, 
-     * \"customer\": { \"name\": \"string\", \"firstname\": \"string\", \"username\": \"admin@admin.org\" }, \"orderLineDTOSet\": 
-     * [ { \"quantity\": 1, \"item\": { \"name\": \"iPhone\", \"price\": 0 } } ], \"orderId\": 1}"</code>
+     * <code>curl -X POST "http://192.168.99.119:31380/bomc-order/rest/order/add/orderline" -H "accept: application/vnd.order-v1+json" -H "x-bomc-user-id: bomc" 
+     * -H "Content-Type: application/vnd.order-v1+json" -d "{ \"orderId\": 1, \"quantity\": 3, \"item\": { \"name\": \"Apple Watch\", \"price\": 135.5 }}"</code>
      */
     @Override
-    public Response addLine(final OrderDTO orderDTO, final String userId) {
+    public Response addLine(final OrderLineDTO orderLineDTO, final String userId) {
 
-        this.orderControllerEJB.addLine(orderDTO, userId);
+        this.orderControllerEJB.addLine(orderLineDTO, userId);
 
         return Response.noContent().type(OrderRestEndpoint.MEDIA_TYPE_JSON_V1).build();
     }

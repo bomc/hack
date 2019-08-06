@@ -19,6 +19,7 @@ import java.util.List;
 
 import de.bomc.poc.order.application.order.dto.ItemDTO;
 import de.bomc.poc.order.application.order.dto.OrderDTO;
+import de.bomc.poc.order.application.order.dto.OrderLineDTO;
 
 /**
  * This controller handles the order domain.
@@ -77,9 +78,15 @@ public interface OrderController {
     OrderDTO findOrderById(Long orderId, String userId);
 
     /**
-     * Add a order line to the order.
+     * Adds a line to the order.
+     * 
+     * @param orderLineDTO
+     *            the new orderline to add.
+     * @param userId
+     *            the current user.
+     * @return the merged entity.
      */
-    void addLine(OrderDTO orderDTO, String userId);
+    void addLine(OrderLineDTO orderLineDTO, String userId);
 
     /**
      * Delete order by id.

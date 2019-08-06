@@ -17,7 +17,6 @@ package de.bomc.poc.order.infrastructure.persistence.customer;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -223,8 +222,8 @@ public class JpaCustomerDaoTestIT extends ArquillianBase {
         // -------------------------------------------
         //
         // There is no entity in db that is modified.
-        LocalDateTime modifiedDateTime = this.jpaCustomerDao.findLatestModifiedDateTime(userId);
-        assertThat(modifiedDateTime, nullValue());
+        final LocalDateTime modifiedDateTime = this.jpaCustomerDao.findLatestModifiedDateTime(userId);
+        assertThat(modifiedDateTime, notNullValue());
 
         // Update db entry, to create a modifyDate.
         this.utx.begin();
@@ -234,19 +233,13 @@ public class JpaCustomerDaoTestIT extends ArquillianBase {
 
         this.utx.commit();
 
-        modifiedDateTime = this.jpaCustomerDao.findLatestModifiedDateTime(userId);
+        final LocalDateTime mergedModifiedDateTime = this.jpaCustomerDao.findLatestModifiedDateTime(userId);
 
         // ___________________________________________
         // Do asserts.
         // -------------------------------------------
-        assertThat(modifiedDateTime, notNullValue());
-
-        final Long assertId = customerEntity.getId();
-        assertThat(this.jpaCustomerDao.findById(assertId).getId(), notNullValue());
-
-        final CustomerEntity modifiedCustomerEntity = this.jpaCustomerDao.findById(assertId);
-        this.logger.info(LOG_PREFIX + "test020_findLatestModifiedDate_pass [" + modifiedCustomerEntity + ", modifyDate="
-                + modifiedCustomerEntity.getModifyDateTime() + "]");
+        assertThat(mergedModifiedDateTime, notNullValue());
+        assertThat(mergedModifiedDateTime.isAfter(modifiedDateTime), equalTo(true));
     }
 
     /**

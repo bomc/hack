@@ -40,7 +40,8 @@ public interface DTOEntityOrderLineMapper {
     // Mapping for OrderLineEntity to OrderLineDTO.
     // -----------------------------------------------------------------------
     @Mappings({ 
-        @Mapping(target = "quantity", source = "quantity")
+        @Mapping(target = "quantity", source = "quantity"),
+        @Mapping(target = "orderId", source = "orderEntity.id")
      })
     OrderLineDTO mapEntityToDTO(OrderLineEntity orderLineEntity);
     

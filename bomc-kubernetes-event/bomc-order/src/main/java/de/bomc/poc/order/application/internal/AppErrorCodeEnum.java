@@ -35,6 +35,7 @@ public enum AppErrorCodeEnum implements ErrorCode {
     //
     // Indicates jpa/persistence error (10400-10499)
     JPA_PERSISTENCE_10400(10400, Category.ERROR, "Error occurs with entityManager handling."),
+    JPA_PERSISTENCE_10401(10401, Category.ERROR, "No entity available in db."),
     // Indicates connection error (10500-10599)
     //
     // Application error codes (10600-10699)

@@ -110,15 +110,22 @@ public class OrderTest extends AbstractUnitTest {
         // ___________________________________________
         // Do the test preparation.
         // -------------------------------------------
+        this.utx.begin();
+        
         final ItemEntity itemEntity1 = new ItemEntity(ITEM1_NAME, ITEM1_PRICE);
         itemEntity1.setCreateUser(CREATE_USER);
-
+        this.entityManager.persist(itemEntity1);
+        
         final ItemEntity itemEntity2 = new ItemEntity(ITEM2_NAME, ITEM2_PRICE);
         itemEntity2.setCreateUser(CREATE_USER);
-
+        this.entityManager.persist(itemEntity2);
+        
         final ItemEntity itemEntity3 = new ItemEntity(ITEM3_NAME, ITEM3_PRICE);
         itemEntity3.setCreateUser(CREATE_USER);
-
+        this.entityManager.persist(itemEntity3);
+        
+        this.utx.commit();
+        
         final CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setCreateUser(CREATE_USER);
         customerEntity.setFirstname(FIRST_NAME);
@@ -138,17 +145,32 @@ public class OrderTest extends AbstractUnitTest {
         // -------------------------------------------
         this.utx.begin();
 
-        orderEntity.addLine(COUNT_ITEM1, itemEntity1, CREATE_USER);
+        final OrderLineEntity orderLineEntity1 = new OrderLineEntity();
+        orderLineEntity1.setCreateUser(CREATE_USER);
+        orderLineEntity1.setQuantity(COUNT_ITEM1);
+        orderLineEntity1.setItem(itemEntity1);
+        
+        orderEntity.addLine(orderLineEntity1, CREATE_USER);
         this.entityManager.persist(orderEntity);
 
         this.utx.commit();
 
         this.utx.begin();
         // A new transaction set the modify date on the orderEntity.
-        orderEntity.addLine(COUNT_ITEM2, itemEntity2, CREATE_USER);
+        final OrderLineEntity orderLineEntity2 = new OrderLineEntity();
+        orderLineEntity2.setCreateUser(CREATE_USER);
+        orderLineEntity2.setQuantity(COUNT_ITEM2);
+        orderLineEntity2.setItem(itemEntity2);
+        
+        orderEntity.addLine(orderLineEntity2, CREATE_USER);
         this.entityManager.persist(orderEntity);
 
-        orderEntity.addLine(COUNT_ITEM3, itemEntity3, CREATE_USER);
+        final OrderLineEntity orderLineEntity3 = new OrderLineEntity();
+        orderLineEntity3.setCreateUser(CREATE_USER);
+        orderLineEntity3.setQuantity(COUNT_ITEM3);
+        orderLineEntity3.setItem(itemEntity3);
+        
+        orderEntity.addLine(orderLineEntity3, CREATE_USER);
         this.entityManager.persist(orderEntity);
 
         this.utx.commit();
@@ -244,8 +266,17 @@ public class OrderTest extends AbstractUnitTest {
         final AddressEntity shippingAddress = this.createAddress("shippingAddress");
         orderEntity.setShippingAddress(shippingAddress);
 
-        orderEntity.addLine(COUNT_ITEM1, itemEntity1, CREATE_USER);
-        orderEntity.addLine(COUNT_ITEM2, itemEntity2, CREATE_USER);
+        final OrderLineEntity orderLineEntity1 = new OrderLineEntity();
+        orderLineEntity1.setCreateUser(CREATE_USER);
+        orderLineEntity1.setQuantity(COUNT_ITEM1);
+        orderLineEntity1.setItem(itemEntity1);
+        orderEntity.addLine(orderLineEntity1, CREATE_USER);
+        
+        final OrderLineEntity orderLineEntity2 = new OrderLineEntity();
+        orderLineEntity2.setCreateUser(CREATE_USER);
+        orderLineEntity2.setQuantity(COUNT_ITEM2);
+        orderLineEntity2.setItem(itemEntity2);
+        orderEntity.addLine(orderLineEntity2, CREATE_USER);
 
         orderEntity.setCustomer(customerEntity);
 
@@ -456,15 +487,22 @@ public class OrderTest extends AbstractUnitTest {
         // ___________________________________________
         // Do the test preparation.
         // -------------------------------------------
+        this.utx.begin();
+        
         final ItemEntity itemEntity1 = new ItemEntity(ITEM1_NAME, ITEM1_PRICE);
         itemEntity1.setCreateUser(CREATE_USER);
-
+        this.entityManager.persist(itemEntity1);
+        
         final ItemEntity itemEntity2 = new ItemEntity(ITEM2_NAME, ITEM2_PRICE);
         itemEntity2.setCreateUser(CREATE_USER);
-
+        this.entityManager.persist(itemEntity2);
+        
         final ItemEntity itemEntity3 = new ItemEntity(ITEM3_NAME, ITEM3_PRICE);
         itemEntity3.setCreateUser(CREATE_USER);
+        this.entityManager.persist(itemEntity3);
 
+        this.utx.commit();
+        
         final CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setCreateUser(CREATE_USER);
         customerEntity.setFirstname(FIRST_NAME);
@@ -482,17 +520,29 @@ public class OrderTest extends AbstractUnitTest {
         // Persist order and the lines.
         this.utx.begin();
 
-        orderEntity.addLine(COUNT_ITEM1, itemEntity1, CREATE_USER);
+        final OrderLineEntity orderLineEntity1 = new OrderLineEntity();
+        orderLineEntity1.setCreateUser(CREATE_USER);
+        orderLineEntity1.setQuantity(COUNT_ITEM1);
+        orderLineEntity1.setItem(itemEntity1);
+        orderEntity.addLine(orderLineEntity1, CREATE_USER);
         this.entityManager.persist(orderEntity);
 
         this.utx.commit();
 
         this.utx.begin();
         // A new transaction set the modify date on the orderEntity.
-        orderEntity.addLine(COUNT_ITEM2, itemEntity2, CREATE_USER);
+        final OrderLineEntity orderLineEntity2 = new OrderLineEntity();
+        orderLineEntity2.setCreateUser(CREATE_USER);
+        orderLineEntity2.setQuantity(COUNT_ITEM2);
+        orderLineEntity2.setItem(itemEntity2);
+        orderEntity.addLine(orderLineEntity2, CREATE_USER);
         this.entityManager.persist(orderEntity);
 
-        orderEntity.addLine(COUNT_ITEM3, itemEntity3, CREATE_USER);
+        final OrderLineEntity orderLineEntity3 = new OrderLineEntity();
+        orderLineEntity3.setCreateUser(CREATE_USER);
+        orderLineEntity3.setQuantity(COUNT_ITEM3);
+        orderLineEntity3.setItem(itemEntity3);
+        orderEntity.addLine(orderLineEntity3, CREATE_USER);
         this.entityManager.persist(orderEntity);
 
         this.utx.commit();

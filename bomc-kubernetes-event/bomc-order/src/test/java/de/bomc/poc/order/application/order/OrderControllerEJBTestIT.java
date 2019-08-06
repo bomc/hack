@@ -19,8 +19,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.ejb.EJB;
@@ -54,8 +54,12 @@ import de.bomc.poc.order.application.order.dto.OrderDTO;
 import de.bomc.poc.order.application.order.dto.OrderLineDTO;
 import de.bomc.poc.order.application.order.mapping.DTOEntityItemMapper;
 import de.bomc.poc.order.application.order.mapping.DTOEntityItemMapperImpl;
+import de.bomc.poc.order.application.order.mapping.DTOEntityOrderLineMapper;
+import de.bomc.poc.order.application.order.mapping.DTOEntityOrderLineMapperImpl;
+import de.bomc.poc.order.application.order.mapping.DTOEntityOrderLineMapperImpl_;
 import de.bomc.poc.order.application.order.mapping.DTOEntityOrderMapper;
 import de.bomc.poc.order.application.order.mapping.DTOEntityOrderMapperImpl;
+import de.bomc.poc.order.application.order.mapping.OrderLineItemDecorator;
 import de.bomc.poc.order.domain.model.basis.AbstractEntity;
 import de.bomc.poc.order.domain.model.basis.AbstractMetadataEntity;
 import de.bomc.poc.order.domain.model.basis.DomainObject;
@@ -106,6 +110,8 @@ public class OrderControllerEJBTestIT extends ArquillianBase {
     private static final String CUSTOMER_USERNAME = "bomc@bomc.org";
     private static final Long ORDER_ID = 42L;
     private static final Integer ORDERLINE_QUANTITY = 42;
+    private static final String ITEM_NAME = "iPad";
+    private static final Double ITEM_PRICE = 1299.99d;
 
     // _______________________________________________
     // Membervariables
@@ -139,7 +145,8 @@ public class OrderControllerEJBTestIT extends ArquillianBase {
         webArchive.addClasses(ApplicationUserEnum.class);
         webArchive.addClasses(ItemDTO.class, OrderDTO.class, OrderLineDTO.class, AddressDTO.class, CustomerDTO.class);
         webArchive.addClasses(DTOEntityItemMapper.class, DTOEntityItemMapperImpl.class, DTOEntityOrderMapper.class,
-                DTOEntityOrderMapperImpl.class, DTOEntityCustomerMapper.class, DTOEntityCustomerMapperImpl.class);
+                DTOEntityOrderMapperImpl.class, DTOEntityCustomerMapper.class, DTOEntityCustomerMapperImpl.class,
+                DTOEntityOrderLineMapper.class, DTOEntityOrderLineMapperImpl.class, DTOEntityOrderLineMapperImpl_.class, OrderLineItemDecorator.class);
         webArchive.addClasses(OrderController.class, OrderControllerEJB.class);
         //
         // Add initial data.
@@ -206,6 +213,8 @@ public class OrderControllerEJBTestIT extends ArquillianBase {
         orderEntity.setCustomer(customerEntity);
         orderEntity.setBillingAddress(this.getAddressEntity(ADDRESS_CITY, ADDRESS_STREET, ADDRESS_ZIP));
         orderEntity.setShippingAddress(this.getAddressEntity(BILLING_CITY, BILLING_STREET, BILLING_ZIP));
+        orderEntity.setCreateUser(USER_ID);
+
         this.jpaOrderDao.persist(orderEntity, USER_ID);
 
         this.utx.commit();
@@ -214,7 +223,17 @@ public class OrderControllerEJBTestIT extends ArquillianBase {
         // Perform actual test.
         // -------------------------------------------
         orderDTO.setOrderId(orderEntity.getId());
-        this.orderController.addLine(orderDTO, USER_ID);
+
+        final ItemDTO itemDTO = new ItemDTO();
+        itemDTO.setName(ITEM_NAME);
+        itemDTO.setPrice(ITEM_PRICE);
+
+        final OrderLineDTO orderLineDTO = new OrderLineDTO();
+        orderLineDTO.setItem(itemDTO);
+        orderLineDTO.setOrderId(orderEntity.getId());
+        orderLineDTO.setQuantity(ORDERLINE_QUANTITY);
+        
+        this.orderController.addLine(orderLineDTO, USER_ID);
 
         // ___________________________________________
         // Do asserts.
@@ -228,8 +247,8 @@ public class OrderControllerEJBTestIT extends ArquillianBase {
         final OrderDTO retOrderDTO = this.orderController.findOrderById(orderEntity.getId(), USER_ID);
 
         assertThat(retOrderDTO, notNullValue());
-        assertThat(retOrderDTO.getOrderLineDTOSet().size(), equalTo(1));
-        final OrderLineDTO retOrderLine = orderDTO.getOrderLineDTOSet().iterator().next();
+        assertThat(retOrderDTO.getOrderLineDTOList().size(), equalTo(1));
+        final OrderLineDTO retOrderLine = orderDTO.getOrderLineDTOList().iterator().next();
         assertThat(retOrderLine.getQuantity(), equalTo(ORDERLINE_QUANTITY));
         assertThat(retOrderLine.getItem().getName(), equalTo(NAME));
     }
@@ -267,18 +286,27 @@ public class OrderControllerEJBTestIT extends ArquillianBase {
 
         // Read order from db, see customer_item_import.sql.
         final CustomerEntity customerEntity = this.jpaCustomerDao.findByUsername(CUSTOMER_USERNAME, USER_ID);
-        final OrderDTO orderDTO = this.getOrderDTO();
         // Create a order instance.
         final OrderEntity orderEntity = new OrderEntity();
         orderEntity.setCustomer(customerEntity);
         orderEntity.setBillingAddress(this.getAddressEntity(ADDRESS_CITY, ADDRESS_STREET, ADDRESS_ZIP));
         orderEntity.setShippingAddress(this.getAddressEntity(BILLING_CITY, BILLING_STREET, BILLING_ZIP));
+        orderEntity.setCreateUser(USER_ID);
+
         this.jpaOrderDao.persist(orderEntity, USER_ID);
 
         this.utx.commit();
 
-        orderDTO.setOrderId(orderEntity.getId());
-        this.orderController.addLine(orderDTO, USER_ID);
+        final ItemDTO itemDTO = new ItemDTO();
+        itemDTO.setName(ITEM_NAME);
+        itemDTO.setPrice(ITEM_PRICE);
+
+        final OrderLineDTO orderLineDTO = new OrderLineDTO();
+        orderLineDTO.setItem(itemDTO);
+        orderLineDTO.setOrderId(orderEntity.getId());
+        orderLineDTO.setQuantity(ORDERLINE_QUANTITY);
+        
+        this.orderController.addLine(orderLineDTO, USER_ID);
         
         // ___________________________________________
         // Perform actual test.
@@ -291,16 +319,16 @@ public class OrderControllerEJBTestIT extends ArquillianBase {
         final OrderDTO assertOrderDTO = this.orderController.findOrderById(orderEntity.getId(), USER_ID);
         assertThat(assertOrderDTO, nullValue());
     }
-    
+
     private OrderDTO getOrderDTO() {
         final OrderDTO orderDTO = new OrderDTO();
 
-        final Set<OrderLineDTO> orderLineDTOSet = new HashSet<>();
+        final List<OrderLineDTO> orderLineDTOList = new ArrayList<>();
         final OrderLineDTO orderLineDTO = new OrderLineDTO();
         orderLineDTO.setQuantity(ORDERLINE_QUANTITY);
         orderLineDTO.setItem(ItemDTO.name(NAME).price(null).build());
-        orderLineDTOSet.add(orderLineDTO);
-        orderDTO.setOrderLineDTOSet(orderLineDTOSet);
+        orderLineDTOList.add(orderLineDTO);
+        orderDTO.setOrderLineDTOList(orderLineDTOList);
         orderDTO.setOrderId(ORDER_ID);
         return orderDTO;
     }

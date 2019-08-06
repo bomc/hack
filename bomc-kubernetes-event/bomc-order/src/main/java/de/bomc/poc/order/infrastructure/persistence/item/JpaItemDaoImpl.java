@@ -56,12 +56,18 @@ public class JpaItemDaoImpl extends AbstractJpaDao<ItemEntity> implements JpaIte
     @Override
     public ItemEntity findByName(final String name, final String userId) {
         this.logger.debug(LOG_PREFIX + "findByName [name=" + name + ", userId=" + userId + "]");
-        
-        final TypedQuery<ItemEntity> queryObject = getEntityManager().createNamedQuery(ItemEntity.NQ_FIND_BY_ITEM_NAME, ItemEntity.class);
+
+        final TypedQuery<ItemEntity> queryObject = getEntityManager().createNamedQuery(ItemEntity.NQ_FIND_BY_ITEM_NAME,
+                ItemEntity.class);
         queryObject.setParameter("name", name);
         final List<ItemEntity> itemEntityList = queryObject.getResultList();
-        
-        // There is only one element, because the item name is unique.
-        return itemEntityList.get(0);
-    }    
+
+        // There is only one element, because the item name is unique. Or a
+        // empty list if given name is not available in db.
+        if(itemEntityList != null && !itemEntityList.isEmpty()) {    
+            return itemEntityList.get(0);
+        } else {
+            return null;
+        }
+    }
 }

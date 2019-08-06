@@ -19,6 +19,7 @@ import java.io.Serializable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -83,6 +84,13 @@ public class OrderLineEntity extends AbstractEntity<OrderLineEntity> implements 
     @JoinColumn(name = "C_FK_ID", referencedColumnName = "C_ID", nullable = false)
     private ItemEntity item;
 
+    /**
+     * Association to the order entity.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "orderEntity_id")
+    private OrderEntity orderEntity;
+    
     /* --------------------- constructors --------------------------- */
     /**
      * Creates a new instance <code>OrderLineEntity</code> (default#co).
@@ -115,6 +123,14 @@ public class OrderLineEntity extends AbstractEntity<OrderLineEntity> implements 
         return OrderLineEntity.class;
     }
 
+    public OrderEntity getOrderEntity() {
+        return this.orderEntity;
+    }
+    
+    public void setOrderEntity(final OrderEntity orderEntity) {
+        this.orderEntity = orderEntity;
+    }
+    
     public Integer getQuantity() {
         return this.quantity;
     }
@@ -133,7 +149,7 @@ public class OrderLineEntity extends AbstractEntity<OrderLineEntity> implements 
 
     @Override
     public String toString() {
-        return "OrderLineEntity [id=" + super.getId() + ", quantity=" + quantity + ", item=" + item + "]";
+        return "OrderLineEntity [id=" + super.getId() + ", orderEntity=" + this.orderEntity + ", quantity=" + this.quantity + ", item=" + this.item + "]";
     }
 
 }

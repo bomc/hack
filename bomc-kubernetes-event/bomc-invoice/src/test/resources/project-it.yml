@@ -1,0 +1,6 @@
+thorntail:
+  logging: INFO
+#  deployment:
+#     bomc-invoice.war:
+#      jaxrs:
+#        application-path: /rest

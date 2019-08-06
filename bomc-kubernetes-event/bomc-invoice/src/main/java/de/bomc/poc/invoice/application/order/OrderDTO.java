@@ -14,9 +14,9 @@
  */
 package de.bomc.poc.invoice.application.order;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +39,7 @@ public class OrderDTO {
     private AddressDTO shippingAddress;
     private AddressDTO billingAddress;
     private CustomerDTO customer;
-    private Set<OrderLineDTO> orderLineDTOSet = new HashSet<>();
+    private List<OrderLineDTO> orderLineDTOList = new ArrayList<>();
     private Long orderId;
 
     /**
@@ -85,22 +85,22 @@ public class OrderDTO {
         this.customer = customer;
     }
 
-    public Set<OrderLineDTO> getOrderLineDTOSet() {
-        return Collections.unmodifiableSet(orderLineDTOSet);
+    public List<OrderLineDTO> getOrderLineDTOList() {
+        return Collections.unmodifiableList(orderLineDTOList);
     }
 
-    public void setOrderLineDTOSet(final Set<OrderLineDTO> orderLineDTOSet) {
+    public void setOrderLineDTOList(final List<OrderLineDTO> orderLineDTOList) {
 
-        if (orderLineDTOSet == null) {
-            final String errMsg = LOG_PREFIX + "setOrderLineDTOSet - orderLineDTOSet is null.";
+        if (orderLineDTOList == null) {
+            final String errMsg = LOG_PREFIX + "setOrderLineDTOList - orderLineDTOList is null.";
             final AppRuntimeException appRuntimeException = new AppRuntimeException(errMsg,
                     AppErrorCodeEnum.APP_ILLEGAL_ARGUMENT_10604);
-            LOGGER.log(Level.SEVERE, LOG_PREFIX + "setOrderLineDTOSet - " + appRuntimeException.stackTraceToString() + "]");
+            LOGGER.log(Level.SEVERE, LOG_PREFIX + "orderLineDTOList - " + appRuntimeException.stackTraceToString() + "]");
 
             throw appRuntimeException;
         }
 
-        this.orderLineDTOSet.addAll(orderLineDTOSet);
+        this.orderLineDTOList.addAll(orderLineDTOList);
     }
 
     /*
@@ -116,7 +116,7 @@ public class OrderDTO {
         result = prime * result + ((orderId == null) ? 0 : orderId.hashCode());
         result = prime * result + ((billingAddress == null) ? 0 : billingAddress.hashCode());
         result = prime * result + ((customer == null) ? 0 : customer.hashCode());
-        result = prime * result + ((orderLineDTOSet == null) ? 0 : orderLineDTOSet.hashCode());
+        result = prime * result + ((orderLineDTOList == null) ? 0 : orderLineDTOList.hashCode());
         result = prime * result + ((shippingAddress == null) ? 0 : shippingAddress.hashCode());
 
         return result;
@@ -162,11 +162,11 @@ public class OrderDTO {
         } else if (!customer.equals(other.customer)) {
             return false;
         }
-        if (orderLineDTOSet == null) {
-            if (other.orderLineDTOSet != null) {
+        if (orderLineDTOList == null) {
+            if (other.orderLineDTOList != null) {
                 return false;
             }
-        } else if (!orderLineDTOSet.equals(other.orderLineDTOSet)) {
+        } else if (!orderLineDTOList.equals(other.orderLineDTOList)) {
             return false;
         }
         if (shippingAddress == null) {
@@ -188,7 +188,7 @@ public class OrderDTO {
     @Override
     public String toString() {
         return "OrderDTO [orderId=" + orderId + ", shippingAddress=" + shippingAddress + ", billingAddress=" + billingAddress + ", customer="
-                + customer + ", orderLineDTOSet.size=" + orderLineDTOSet.size() + "]";
+                + customer + ", orderLineDTOList.size=" + orderLineDTOList.size() + "]";
     }
 
     // _______________________________________________
@@ -208,11 +208,11 @@ public class OrderDTO {
     }
 
     public interface ICustomer {
-        IOrderLineSet customer(CustomerDTO customer);
+        IOrderLineList customer(CustomerDTO customer);
     }
 
-    public interface IOrderLineSet {
-        IBuild orderLineSet(Set<OrderLineDTO> orderLineDTOSet);
+    public interface IOrderLineList {
+        IBuild orderLineList(List<OrderLineDTO> orderLineDTOList);
     }
 
     public interface IBuild {
@@ -222,7 +222,7 @@ public class OrderDTO {
     /**
      * The builder implementation for OrderDTO.
      */
-    private static final class Builder implements IBuild, IShippingAddress, IBillingAddress, ICustomer, IOrderLineSet {
+    private static final class Builder implements IBuild, IShippingAddress, IBillingAddress, ICustomer, IOrderLineList {
 
         private final OrderDTO instance = new OrderDTO();
 
@@ -231,14 +231,14 @@ public class OrderDTO {
         }
 
         @Override
-        public IBuild orderLineSet(final Set<OrderLineDTO> orderLineDTOSet) {
-            this.instance.setOrderLineDTOSet(orderLineDTOSet);
+        public IBuild orderLineList(final List<OrderLineDTO> orderLineDTOList) {
+            this.instance.setOrderLineDTOList(orderLineDTOList);
 
             return this;
         }
 
         @Override
-        public IOrderLineSet customer(final CustomerDTO customer) {
+        public IOrderLineList customer(final CustomerDTO customer) {
             this.instance.customer = customer;
 
             return this;

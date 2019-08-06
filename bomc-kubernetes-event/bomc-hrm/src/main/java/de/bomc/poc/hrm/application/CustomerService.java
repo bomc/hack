@@ -30,7 +30,7 @@ import de.bomc.poc.hrm.infrastructure.CustomerRepository;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
 
 /**
- * The service for customer handling.
+ * The service handles the business logic for customers.
  * 
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 07.05.2019
@@ -133,6 +133,8 @@ public class CustomerService {
 				.findById(customerEntity.getId());
 
 		if (optionalCustomerEntity.isPresent()) {
+			LOGGER.debug(LOG_PREFIX + "updateCustomer - will be updated. [customerEntity=" + customerEntity + "]");
+			//
 			// Update entity.
 			final CustomerEntity updatableCustomerEntity = optionalCustomerEntity.get();
 
@@ -140,12 +142,17 @@ public class CustomerService {
 			this.updateEntity(customerEntity, updatableCustomerEntity);
 
 			// Save to db.
-			final CustomerEntity mergedCustomerEntity = this.customerRepository.save(updatableCustomerEntity);
+			final CustomerEntity updatedCustomerEntity = this.customerRepository.save(updatableCustomerEntity);
 
-			return mergedCustomerEntity;
+			return updatedCustomerEntity;
+		} else {
+			LOGGER.debug(LOG_PREFIX + "updateCustomer - is new. [customerEntity=" + customerEntity + "]");
+			//
+			// Write down to db.
+			final CustomerEntity newCustomerEntity = this.customerRepository.save(customerEntity);
+			
+			return newCustomerEntity;
 		}
-
-		return customerEntity;
 	}
 
 	/**
@@ -165,19 +172,19 @@ public class CustomerService {
 	// Helper methods
 	// -----------------------------------------------
 
-	private void updateEntity(final CustomerEntity customerDto, final CustomerEntity customerEntity) {
+	private void updateEntity(final CustomerEntity customerEntity, final CustomerEntity updatableCustomerEntity) {
 
-		customerEntity.setFirstName(customerDto.getFirstName());
-		customerEntity.setLastName(customerDto.getLastName());
-		customerEntity.setCountry(customerDto.getCountry());
-		customerEntity.setEmailAddress(customerDto.getEmailAddress());
-		customerEntity.setPhoneNumber(customerDto.getPhoneNumber());
-		customerEntity.setCity(customerDto.getCity());
-		customerEntity.setStreet(customerDto.getStreet());
-		customerEntity.setPostalCode(customerDto.getPostalCode());
-		customerEntity.setHouseNumber(customerDto.getHouseNumber());
-		customerEntity.setDateOfBirth(customerDto.getDateOfBirth());
-		customerEntity.setId(customerDto.getId());
+		updatableCustomerEntity.setFirstName(customerEntity.getFirstName());
+		updatableCustomerEntity.setLastName(customerEntity.getLastName());
+		updatableCustomerEntity.setCountry(customerEntity.getCountry());
+		updatableCustomerEntity.setEmailAddress(customerEntity.getEmailAddress());
+		updatableCustomerEntity.setPhoneNumber(customerEntity.getPhoneNumber());
+		updatableCustomerEntity.setCity(customerEntity.getCity());
+		updatableCustomerEntity.setStreet(customerEntity.getStreet());
+		updatableCustomerEntity.setPostalCode(customerEntity.getPostalCode());
+		updatableCustomerEntity.setHouseNumber(customerEntity.getHouseNumber());
+		updatableCustomerEntity.setDateOfBirth(customerEntity.getDateOfBirth());
+		updatableCustomerEntity.setId(customerEntity.getId());
 	}
 
 	private <T> List<T> toList(final Iterable<T> iterable) {

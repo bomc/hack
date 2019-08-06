@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
 
 import de.bomc.poc.order.domain.model.basis.AbstractEntity;
 import de.bomc.poc.order.domain.model.customer.CustomerEntity;
-import de.bomc.poc.order.domain.model.item.ItemEntity;
 
 /**
  * This entity represents a order in the shop context.
@@ -103,7 +102,7 @@ public class OrderEntity extends AbstractEntity<OrderEntity> implements Serializ
     private CustomerEntity customer;
 
     @OrderColumn(name = "quantity")
-    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE }, orphanRemoval = true)
+    @OneToMany(mappedBy = "orderEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderLineEntity> orderLineSet = new HashSet<OrderLineEntity>();
 
     /* --------------------- constructors --------------------------- */
@@ -161,10 +160,8 @@ public class OrderEntity extends AbstractEntity<OrderEntity> implements Serializ
         return this.orderLineSet;
     }
 
-    public void addLine(final int count, final ItemEntity item, final String createUser) {
-        final OrderLineEntity orderLineEntity = new OrderLineEntity(count, item);
-        orderLineEntity.setCreateUser(createUser);
-
+    public void addLine(final OrderLineEntity orderLineEntity, final String createUser) {
+        // Must be persist after this method invocation.
         this.orderLineSet.add(orderLineEntity);
     }
 

@@ -1,0 +1,20 @@
+thorntail:
+ # logging: FINE
+  context:
+    path: bomc-invoice
+  datasources:
+    data-sources:
+      BomcDS:
+        driver-name: org.postgresql
+        connection-url: jdbc:postgresql://postgres:5432/bomcdb
+        user-name: bomc
+        password: bomc
+        valid-connection-checker-class-name: org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker
+        validate-on-match: true
+        background-validation: false
+        exception-sorter-class-name: org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter
+    jdbc-drivers:
+      org.postgresql:
+        driver-class-name: org.postgresql.Driver
+        xa-datasource-class-name: org.postgresql.xa.PGXADataSource
+        driver-module-name: org.postgresql

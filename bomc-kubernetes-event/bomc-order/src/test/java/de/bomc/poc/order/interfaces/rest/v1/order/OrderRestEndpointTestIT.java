@@ -200,7 +200,7 @@ public class OrderRestEndpointTestIT extends ArquillianBase {
             // Invoke endpoint by proxy.
             final OrderRestEndpoint proxy = this.invokeProxy(restClientLastModifiedFilter);
             response = proxy.getLatestModifiedDate(ApplicationUserEnum.TEST_USER.name());
-            // Returns 304, that means noting has change on server.
+            // Returns 304, that means nothing has change on server.
             assertThat(response.getStatus(), equalTo(Response.Status.OK.getStatusCode()));
         } finally {
             if (response != null) {
@@ -220,7 +220,7 @@ public class OrderRestEndpointTestIT extends ArquillianBase {
 
             // Invoke endpoint by proxy.
             final OrderRestEndpoint proxy = this.invokeProxy(restClientLastModifiedFilter);
-            response = proxy.getLatestModifiedDate(ApplicationUserEnum.TEST_USER.name());
+            response = proxy.getLatestModifiedDate(null);
             // Returns 304, that means noting has change on server.
             assertThat(response.getStatus(), equalTo(Response.Status.NOT_MODIFIED.getStatusCode()));
         } finally {

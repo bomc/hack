@@ -107,8 +107,6 @@ public class PerformanceTrackingInterceptor implements Serializable {
                     this.logger.error(appRuntimeException.stackTraceToString());
                 }
 
-                appRuntimeException = new AppRuntimeException(errorMessage,
-                        AppErrorCodeEnum.APP_CREATE_LOG_ENTRY_FAILED_10601);
                 performanceTracking.track(invocationContext.getMethod().getDeclaringClass().getCanonicalName(),
                         invocationContext.getMethod().getName(), duration,
                         appRuntimeException.getUuid() + "_" + this.getCurrentTime());

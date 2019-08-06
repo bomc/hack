@@ -27,6 +27,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import de.bomc.poc.order.application.order.dto.OrderDTO;
+import de.bomc.poc.order.application.order.dto.OrderLineDTO;
 import de.bomc.poc.order.application.util.JaxRsActivator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,7 +53,7 @@ public interface OrderRestEndpoint {
      */
     String MEDIA_TYPE_JSON_V1 = "application/vnd.order-v1+json";
     String X_BOMC_USER_ID_HEADER = "x-bomc-user-id";
-    
+
     /**
      * <pre>
      *  TODO Get from swagger gui invocation.
@@ -78,7 +79,21 @@ public interface OrderRestEndpoint {
             @ApiResponse(code = 200, message = "Returns the technical id or null if user is not created in db.") })
     @POST
     @Path("/create")
-    Response createOrder(@ApiParam(value = "The user data.") final OrderDTO orderDTO,
+    Response createOrder(@ApiParam(value = "The user data.") OrderDTO orderDTO,
+            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam(X_BOMC_USER_ID_HEADER) String userId);
+
+    /**
+     * <pre>
+     *  TODO Get from swagger ui invocation.
+     * </pre>
+     * 
+     */
+    @ApiOperation(value = "Add a orderline to the order.")
+    @ApiResponses({ @ApiResponse(code = 404, message = "Endpoint not found."),
+            @ApiResponse(code = 204, message = "Orderline is successful created.") })
+    @POST
+    @Path("/add/orderline")
+    Response addLine(@ApiParam(value = "The ordered line.") OrderLineDTO orderLineDTO,
             @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam(X_BOMC_USER_ID_HEADER) String userId);
 
     /**
@@ -121,20 +136,6 @@ public interface OrderRestEndpoint {
     @Path("/find/{orderId}/order")
     @GET
     Response findOrderById(@ApiParam(value = "The technical order id.") @PathParam("orderId") Long orderId,
-            @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam(X_BOMC_USER_ID_HEADER) String userId);
-
-    /**
-     * <pre>
-     *  TODO Get from swagger ui invocation.
-     * </pre>
-     * 
-     */
-    @ApiOperation(value = "Add a orderline to the order.")
-    @ApiResponses({ @ApiResponse(code = 404, message = "Endpoint not found."),
-            @ApiResponse(code = 204, message = "Orderline is successful created.") })
-    @POST
-    @Path("/add/orderline")
-    Response addLine(@ApiParam(value = "The given orderline data.") OrderDTO orderDTO,
             @ApiParam(value = "The executed user (used for auditing).", required = true) @HeaderParam(X_BOMC_USER_ID_HEADER) String userId);
 
     /**

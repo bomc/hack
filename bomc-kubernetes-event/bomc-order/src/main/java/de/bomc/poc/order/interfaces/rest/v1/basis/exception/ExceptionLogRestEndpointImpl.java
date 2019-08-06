@@ -52,6 +52,11 @@ public class ExceptionLogRestEndpointImpl implements ExceptionLogRestEndpoint {
     @EJB
     private ExceptionLogController exceptionLogController;
 
+    /**
+     * curl -X GET
+     * "http://192.168.99.119:31380/bomc-order/rest/exception/stored" -H
+     * "accept: application/vnd.exception-v1+json" -H "X-BOMC_USER_ID: bomc"
+     */
     @Override
     public Response getStoredExceptions(final String userId) {
 

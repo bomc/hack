@@ -94,7 +94,7 @@ public class OrderSchedulerService {
 	//
 	// Other member variables.
 	@Inject
-	public InvoiceComposition invoiceController; 
+	public InvoiceComposition invoiceComposition; 
 	
 	@PostConstruct
 	public void init() {
@@ -117,7 +117,6 @@ public class OrderSchedulerService {
 	 * Invokes the order service and check for new orders.
 	 * 
 	 * <pre>
-	 *  
 	 * NOTE:
 	 * CircuitBreaker: 
 	 * This means if 75% requests fail in a rolling window of 4 requests , then the 
@@ -184,7 +183,7 @@ public class OrderSchedulerService {
 						+ oderDtoList.size() + "]");
 
 				if(oderDtoList.size() > 0) {
-					invoiceController.createInvoice(oderDtoList, userId);
+					invoiceComposition.createInvoice(oderDtoList, userId);
 				}
 				
 				if (retLastModifiedDate != null) {

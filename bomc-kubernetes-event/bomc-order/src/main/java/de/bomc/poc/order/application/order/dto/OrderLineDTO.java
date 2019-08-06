@@ -28,6 +28,7 @@ public class OrderLineDTO implements Serializable {
      */
     private static final long serialVersionUID = -4700914004808988939L;
 
+    private Long orderId;
     private Integer quantity;
     private ItemDTO item;
 
@@ -42,8 +43,16 @@ public class OrderLineDTO implements Serializable {
     // Getter, setter for attributes, should only be used during mapping.
     // -----------------------------------------------
 
+    public Long getOrderId() {
+        return this.orderId;
+    }
+
+    public void setOrderId(final Long orderId) {
+        this.orderId = orderId;
+    }
+    
     public Integer getQuantity() {
-        return quantity;
+        return this.quantity;
     }
 
     public void setQuantity(final Integer quantity) {
@@ -51,7 +60,7 @@ public class OrderLineDTO implements Serializable {
     }
 
     public ItemDTO getItem() {
-        return item;
+        return this.item;
     }
 
     public void setItem(final ItemDTO item) {
@@ -68,9 +77,10 @@ public class OrderLineDTO implements Serializable {
         final int prime = 31;
         int result = 1;
 
-        result = prime * result + ((item == null) ? 0 : item.hashCode());
-        result = prime * result + ((quantity == null) ? 0 : quantity.hashCode());
-
+        result = prime * result + ((this.item == null) ? 0 : this.item.hashCode());
+        result = prime * result + ((this.quantity == null) ? 0 : this.quantity.hashCode());
+        result = prime * result + ((this.orderId == null) ? 0 : this.orderId.hashCode());
+        
         return result;
     }
 
@@ -107,7 +117,14 @@ public class OrderLineDTO implements Serializable {
         } else if (!quantity.equals(other.quantity)) {
             return false;
         }
-
+        if (orderId == null) {
+            if (other.orderId != null) {
+                return false;
+            }
+        } else if (!orderId.equals(other.orderId)) {
+            return false;
+        }
+        
         return true;
     }
 
@@ -118,7 +135,7 @@ public class OrderLineDTO implements Serializable {
      */
     @Override
     public String toString() {
-        return "OrderLineDTO [quantity=" + quantity + ", item=" + item + "]";
+        return "OrderLineDTO [orderId=" + orderId + ", quantity=" + quantity + ", item=" + item + "]";
     }
 
     // _______________________________________________
@@ -128,9 +145,13 @@ public class OrderLineDTO implements Serializable {
     public static IQuantity quantity(final Integer quantity) {
         return new OrderLineDTO.Builder(quantity);
     }
-
+    
     public interface IQuantity {
-        IBuild item(ItemDTO item);
+        IOrderId item(ItemDTO item);
+    }
+    
+    public interface IOrderId {
+        IBuild orderId(Long orderId);
     }
 
     public interface IBuild {
@@ -140,21 +161,28 @@ public class OrderLineDTO implements Serializable {
     /**
      * The builder implementation for OrderLineDTO.
      */
-    private static final class Builder implements IBuild, IQuantity {
+    private static final class Builder implements IBuild, IQuantity, IOrderId {
 
         private final OrderLineDTO instance = new OrderLineDTO();
 
         public Builder(final Integer quantity) {
             this.instance.quantity = quantity;
         }
-
+        
         @Override
-        public IBuild item(final ItemDTO item) {
-            this.instance.item = item;
-
+        public IBuild orderId(Long orderId) {
+            this.instance.orderId = orderId;
+            
             return this;
         }
 
+        @Override
+        public IOrderId item(ItemDTO item) {
+            this.instance.item = item;
+            
+            return this;
+        }
+        
         @Override
         public OrderLineDTO build() {
             return this.instance;

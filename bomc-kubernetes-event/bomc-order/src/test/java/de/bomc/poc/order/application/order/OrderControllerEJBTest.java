@@ -25,9 +25,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -55,6 +53,7 @@ import de.bomc.poc.order.domain.model.item.JpaItemDao;
 import de.bomc.poc.order.domain.model.order.AddressEntity;
 import de.bomc.poc.order.domain.model.order.JpaOrderDao;
 import de.bomc.poc.order.domain.model.order.OrderEntity;
+import de.bomc.poc.order.domain.model.order.OrderLineEntity;
 
 /**
  * Test the controller {@link OrderControllerEJB}.
@@ -325,9 +324,9 @@ public class OrderControllerEJBTest {
         assertThat(orderDTO.getBillingAddress(), notNullValue());
         assertThat(orderDTO.getShippingAddress(), notNullValue());
         assertThat(orderDTO.getCustomer(), notNullValue());
-        assertThat(orderDTO.getOrderLineDTOSet(), notNullValue());
-        assertThat(orderDTO.getOrderLineDTOSet().size(), equalTo(1));
-        assertThat(orderDTO.getOrderLineDTOSet().iterator().next().getItem(), notNullValue());
+        assertThat(orderDTO.getOrderLineDTOList(), notNullValue());
+        assertThat(orderDTO.getOrderLineDTOList().size(), equalTo(1));
+        assertThat(orderDTO.getOrderLineDTOList().iterator().next().getItem(), notNullValue());
     }
 
     /**
@@ -463,7 +462,7 @@ public class OrderControllerEJBTest {
         orderEntity.setBillingAddress(this.getAddressEntity());
         orderEntity.setShippingAddress(this.getAddressEntity());
         orderEntity.setCustomer(this.getCustomerEntity());
-        orderEntity.addLine(42, this.getItemEntity(42L, NAME, PRICE), USER_ID);
+        orderEntity.addLine(this.getOrderLineEntity(this.getItemEntity(42L, NAME, PRICE), 42), USER_ID);
 
         final List<OrderEntity> orderEntityList = new ArrayList<>();
         orderEntityList.add(orderEntity);
@@ -478,6 +477,14 @@ public class OrderControllerEJBTest {
         itemEntity.setPrice(price);
 
         return itemEntity;
+    }
+    
+    private OrderLineEntity getOrderLineEntity(final ItemEntity itemEntity, final Integer quantity) {
+        final OrderLineEntity orderLineEntity = new OrderLineEntity();
+        orderLineEntity.setItem(itemEntity);
+        orderLineEntity.setQuantity(quantity);
+        
+        return orderLineEntity;
     }
 
     private AddressEntity getAddressEntity() {
@@ -505,12 +512,12 @@ public class OrderControllerEJBTest {
         orderDTO.setShippingAddress(this.getAddressDTO());
         orderDTO.setCustomer(this.getCustomerDTO());
 
-        final Set<OrderLineDTO> orderLineDTOSet = new HashSet<>();
+        final List<OrderLineDTO> orderLineDTOList = new ArrayList<>();
         final OrderLineDTO orderLineDTO = new OrderLineDTO();
         orderLineDTO.setQuantity(42);
         orderLineDTO.setItem(ItemDTO.name(NAME).price(PRICE).build());
-        orderLineDTOSet.add(orderLineDTO);
-        orderDTO.setOrderLineDTOSet(orderLineDTOSet);
+        orderLineDTOList.add(orderLineDTO);
+        orderDTO.setOrderLineDTOList(orderLineDTOList);
 
         return orderDTO;
     }

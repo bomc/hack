@@ -17,13 +17,13 @@ package de.bomc.poc.order.application.order.dto;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.FixMethodOrder;
@@ -36,10 +36,6 @@ import org.junit.runners.MethodSorters;
 import de.bomc.poc.exception.core.app.AppRuntimeException;
 import de.bomc.poc.order.CategoryFastUnitTest;
 import de.bomc.poc.order.application.customer.dto.CustomerDTO;
-import de.bomc.poc.order.application.order.dto.AddressDTO;
-import de.bomc.poc.order.application.order.dto.ItemDTO;
-import de.bomc.poc.order.application.order.dto.OrderDTO;
-import de.bomc.poc.order.application.order.dto.OrderLineDTO;
 
 /**
  * Tests the {@link OrderDTO}.
@@ -82,17 +78,17 @@ public class OrderDTOBuilderTest {
                 .build();
         final ItemDTO itemDTO1 = ItemDTO.name(ITEM_NAME).price(ITEM_PRICE).build();
         final ItemDTO itemDTO2 = ItemDTO.name(ITEM_NAME + "_2").price(ITEM_PRICE + 1).build();
-        final OrderLineDTO orderLineDTO1 = OrderLineDTO.quantity(ORDERLINE_QUANTITY).item(itemDTO1).build();
-        final OrderLineDTO orderLineDTO2 = OrderLineDTO.quantity(ORDERLINE_QUANTITY).item(itemDTO2).build();
+        final OrderLineDTO orderLineDTO1 = OrderLineDTO.quantity(ORDERLINE_QUANTITY).item(itemDTO1).orderId(ORDER_ID).build();
+        final OrderLineDTO orderLineDTO2 = OrderLineDTO.quantity(ORDERLINE_QUANTITY).item(itemDTO2).orderId(ORDER_ID).build();
         final CustomerDTO customerDTO = CustomerDTO.username(CUSTOMER_EMAIL).name(CUSTOMER_NAME)
                 .firstname(CUSTOMER_FIRST_NAME).build();
 
-        final Set<OrderLineDTO> orderLineDTOSet = new HashSet<>();
-        orderLineDTOSet.add(orderLineDTO1);
-        orderLineDTOSet.add(orderLineDTO2);
+        final List<OrderLineDTO> orderLineDTOList = new ArrayList<>();
+        orderLineDTOList.add(orderLineDTO1);
+        orderLineDTOList.add(orderLineDTO2);
 
         final OrderDTO orderDTO = OrderDTO.orderId(ORDER_ID).billingAddress(billingAddressDTO).shippingAddress(shippingAddressDTO)
-                .customer(customerDTO).orderLineSet(orderLineDTOSet).build();
+                .customer(customerDTO).orderLineList(orderLineDTOList).build();
 
         LOGGER.debug(LOG_PREFIX + "test010_build_pass " + orderDTO);
 
@@ -103,8 +99,8 @@ public class OrderDTOBuilderTest {
         assertThat(orderDTO.getBillingAddress(), equalTo(billingAddressDTO));
         assertThat(orderDTO.getShippingAddress(), equalTo(shippingAddressDTO));
         assertThat(orderDTO.getCustomer(), equalTo(customerDTO));
-        assertThat(orderDTO.getOrderLineDTOSet(), notNullValue());
-        assertThat(orderDTO.getOrderLineDTOSet().size(), equalTo(2));
+        assertThat(orderDTO.getOrderLineDTOList(), notNullValue());
+        assertThat(orderDTO.getOrderLineDTOList().size(), equalTo(2));
         assertThat(orderDTO.getOrderId(), equalTo(ORDER_ID));
     }
 
@@ -128,7 +124,7 @@ public class OrderDTOBuilderTest {
         assertThat(orderDTO.getOrderId(), equalTo(ORDER_ID));
 
         // Set 'orderLineSet' null. A AppRuntimeException will be thrown.
-        orderDTO.setOrderLineDTOSet(null);
+        orderDTO.setOrderLineDTOList(null);
 
         fail("Should no be invoked.");
     }
@@ -141,7 +137,7 @@ public class OrderDTOBuilderTest {
         final OrderDTO orderDTO1 = this.createOrderDTO("_1");
         final OrderDTO orderDTO2 = this.createOrderDTO("_1");
         final OrderDTO orderDTO3 = this.createOrderDTO("_3");
-        final OrderDTO orderDTO4 = OrderDTO.orderId(null).billingAddress(null).shippingAddress(null).customer(null).orderLineSet(Collections.emptySet()).build();
+        final OrderDTO orderDTO4 = OrderDTO.orderId(null).billingAddress(null).shippingAddress(null).customer(null).orderLineList(Collections.emptyList()).build();
         final OrderDTO orderDTO5 = null;
         
         assertThat(orderDTO1.equals(orderDTO1), equalTo(true));
