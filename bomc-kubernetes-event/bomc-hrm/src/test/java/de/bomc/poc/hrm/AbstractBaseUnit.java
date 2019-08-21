@@ -17,7 +17,7 @@ package de.bomc.poc.hrm;
 import java.time.LocalDate;
 import java.time.Month;
 
-import de.bomc.poc.hrm.domain.CustomerEntity;
+import de.bomc.poc.hrm.domain.model.CustomerEntity;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
 
 /**

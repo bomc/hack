@@ -1,5 +1,5 @@
 /**
- * Project: POC PaaS
+ * Project: hrm
  * <pre>
  *
  * Last change:
@@ -12,7 +12,7 @@
  *
  * </pre>
  */
-package de.bomc.poc.hrm.domain;
+package de.bomc.poc.hrm.domain.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -125,7 +125,7 @@ public class CustomerEntity extends AbstractEntity<CustomerEntity> implements Se
 
 	@Override
 	public String toString() {
-		return "CustomerEntity [emailAddress=" + emailAddress + ", phoneNumber=" + phoneNumber + ", firstName="
+		return "CustomerEntity [id=" + id + ", emailAddress=" + emailAddress + ", phoneNumber=" + phoneNumber + ", firstName="
 				+ firstName + ", lastName=" + lastName + ", dateOfBirth=" + dateOfBirth + ", city=" + city
 				+ ", postalCode=" + postalCode + ", street=" + street + ", houseNumber=" + houseNumber + ", country="
 				+ country + "]";

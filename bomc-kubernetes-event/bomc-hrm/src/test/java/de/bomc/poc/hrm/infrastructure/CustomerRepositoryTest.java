@@ -31,7 +31,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import de.bomc.poc.hrm.AbstractBaseUnit;
-import de.bomc.poc.hrm.domain.CustomerEntity;
+import de.bomc.poc.hrm.domain.model.CustomerEntity;
 import de.bomc.poc.hrm.infrastructure.CustomerRepository;
 
 /**

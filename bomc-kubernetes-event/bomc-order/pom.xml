@@ -72,7 +72,7 @@
 		     Properties for using swagger as webapp, TO RUN IN KUBERNETES: 
 		     - NODEPORT mode, use 'DOCKER_HOST:NODEPORT'. The Nodeport will be defined in bomc-service.yml, e.g. '192.168.99.100:30082'. 
 			 - For using ingress use: 'bomc.ingress.org'. -->
-		<swagger.ui.host>192.168.99.119:31380</swagger.ui.host>
+		<swagger.ui.host>192.168.99.100:31380</swagger.ui.host>
 		<!-- ######################################### -->
 		<application.context.root>/${project.artifactId}</application.context.root>
 

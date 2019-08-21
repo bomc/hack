@@ -1,5 +1,5 @@
 /**
- * Project: POC PaaS
+ * Project: hrm
  * <pre>
  *
  * Last change:
@@ -23,11 +23,15 @@ import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.logging.LogLevel;
 import org.springframework.stereotype.Service;
 
-import de.bomc.poc.hrm.domain.CustomerEntity;
+import de.bomc.poc.hrm.application.log.method.Loggable;
+import de.bomc.poc.hrm.domain.model.CustomerEntity;
 import de.bomc.poc.hrm.infrastructure.CustomerRepository;
+import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
+import de.bomc.poc.hrm.interfaces.mapper.CustomerMapper;
 
 /**
  * The service handles the business logic for customers.
@@ -43,7 +47,8 @@ public class CustomerService {
 
 	/* --------------------- member variables ----------------------- */
 	private final CustomerRepository customerRepository;
-
+	private final CustomerMapper customerMapper;
+	
 	/**
 	 * Creates a new instance of <code>CustomerService</code>.
 	 * 
@@ -51,9 +56,10 @@ public class CustomerService {
 	 * @param customerService    the
 	 */
 	@Autowired
-	public CustomerService(final CustomerRepository customerRepository) {
+	public CustomerService(final CustomerRepository customerRepository, final CustomerMapper customerMapper) {
 
 		this.customerRepository = customerRepository;
+		this.customerMapper = customerMapper;
 	}
 
 	/**
@@ -63,13 +69,13 @@ public class CustomerService {
 	 * @return the customer.
 	 * @throws IllegalStateException if no customer is available by the given id.
 	 */
-	public CustomerEntity findById(final Long id) {
-		LOGGER.debug(LOG_PREFIX + "findById [id=" + id + "]");
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	public CustomerDto findById(final Long id) {
 
 		final CustomerEntity customerEntity = this.customerRepository.findById(id).orElseThrow(
 				() -> new IllegalStateException("There is no customer available by the given id [id=" + id + "]"));
 
-		return customerEntity;
+		return this.customerMapper.mapEntityToDto(customerEntity);
 	}
 
 	/**
@@ -80,13 +86,15 @@ public class CustomerService {
 	 * @throws IllegalStateException if no customer is available by the given
 	 *                               emailAddress.
 	 */
-	public CustomerEntity findByEmailAddress(final CustomerEmailDto customerEmailDto) {
-		LOGGER.debug(LOG_PREFIX + "findByEmailAddress [customerEmailDto=" + customerEmailDto + "]");
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	public CustomerDto findByEmailAddress(final CustomerEmailDto customerEmailDto) {
 
-		return this.customerRepository.findByEmailAddress(customerEmailDto.getEmailAddress())
+		final CustomerEntity customerEntity =  this.customerRepository.findByEmailAddress(customerEmailDto.getEmailAddress())
 				.orElseThrow(() -> new IllegalStateException(
 						"There is no customer available by the given email address [emailAddress="
 								+ customerEmailDto.getEmailAddress() + "]"));
+		
+		return this.customerMapper.mapEntityToDto(customerEntity);
 	}
 
 	/**
@@ -95,17 +103,17 @@ public class CustomerService {
 	 * @param customerEntity the given customer to persist.
 	 * @return the created customerEntity with new technical id.
 	 */
-	public CustomerEntity createCustomer(final CustomerEntity customerEntity) {
-		LOGGER.debug(LOG_PREFIX + "createCustomer [customerEntity=" + customerEntity + "]");
-
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	public CustomerDto createCustomer(final CustomerEntity customerEntity) {
 		// Set metadata.
 		// TODO Hibernate hook PrePersist not working.
 		customerEntity.setCreateDateTime(LocalDateTime.now());
 		customerEntity.setCreateUser(customerEntity.getEmailAddress());
 		// Write down to db.
 		final CustomerEntity retCustomerEntity = this.customerRepository.save(customerEntity);
-
-		return retCustomerEntity;
+		final CustomerDto customerDto = this.customerMapper.mapEntityToDto(retCustomerEntity);
+		
+		return customerDto;
 	}
 
 	/**
@@ -113,8 +121,8 @@ public class CustomerService {
 	 * 
 	 * @param id the given user id.
 	 */
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public void deleteCustomerById(final Long id) {
-		LOGGER.debug(LOG_PREFIX + "deleteCustomerById [id=" + id + "]");
 
 		this.customerRepository.deleteById(id);
 	}
@@ -123,12 +131,14 @@ public class CustomerService {
 	 * Updates the given entity. Use the returned instance for further operations as
 	 * the save operation might have changed the entity instance completely.
 	 * 
-	 * @param customerEntity the edited entity.
-	 * @return the edited entity.
+	 * @param customerDto the edited entity.
+	 * @return the edited dto.
 	 */
-	public CustomerEntity updateCustomer(final CustomerEntity customerEntity) {
-		LOGGER.debug(LOG_PREFIX + "updateCustomer [customerEntity=" + customerEntity + "]");
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	public CustomerDto updateCustomer(final CustomerDto customerDto) {
 
+		final CustomerEntity customerEntity = this.customerMapper.mapDtoToEntity(customerDto);
+	
 		final Optional<CustomerEntity> optionalCustomerEntity = this.customerRepository
 				.findById(customerEntity.getId());
 
@@ -144,14 +154,14 @@ public class CustomerService {
 			// Save to db.
 			final CustomerEntity updatedCustomerEntity = this.customerRepository.save(updatableCustomerEntity);
 
-			return updatedCustomerEntity;
+			return this.customerMapper.mapEntityToDto(updatedCustomerEntity);
 		} else {
 			LOGGER.debug(LOG_PREFIX + "updateCustomer - is new. [customerEntity=" + customerEntity + "]");
 			//
 			// Write down to db.
 			final CustomerEntity newCustomerEntity = this.customerRepository.save(customerEntity);
 			
-			return newCustomerEntity;
+			return this.customerMapper.mapEntityToDto(newCustomerEntity);
 		}
 	}
 
@@ -160,12 +170,12 @@ public class CustomerService {
 	 * 
 	 * @return a list with all customers.
 	 */
-	public List<CustomerEntity> findAll() {
-		LOGGER.debug(LOG_PREFIX + "findAll");
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	public List<CustomerDto> findAll() {
 
 		final Iterable<CustomerEntity> iterableCustomerEntity = this.customerRepository.findAll();
 
-		return this.toList(iterableCustomerEntity);
+		return this.customerMapper.mapEntitiesToDtos(this.toList(iterableCustomerEntity));
 	}
 
 	// _______________________________________________

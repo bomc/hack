@@ -21,7 +21,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.ReportingPolicy;
 
-import de.bomc.poc.hrm.domain.CustomerEntity;
+import de.bomc.poc.hrm.domain.model.CustomerEntity;
 
 /**
  * A mapper that maps the {@link CustomerEntity} to {@link CustomerDto}.

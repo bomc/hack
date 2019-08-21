@@ -29,7 +29,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import de.bomc.poc.hrm.AbstractBaseUnit;
-import de.bomc.poc.hrm.domain.CustomerEntity;
+import de.bomc.poc.hrm.domain.model.CustomerEntity;
 
 /**
  * Tests the customer entity.

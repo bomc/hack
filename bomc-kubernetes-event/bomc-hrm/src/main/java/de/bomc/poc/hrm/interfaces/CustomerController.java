@@ -21,9 +21,10 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.logging.LogLevel;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,14 +35,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 import de.bomc.poc.hrm.application.CustomerService;
-import de.bomc.poc.hrm.domain.CustomerEntity;
+import de.bomc.poc.hrm.application.log.method.Loggable;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerMapper;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -56,7 +59,7 @@ import io.swagger.annotations.ApiResponses;
 @RestController
 @RequestMapping(value = "/customer")
 @CrossOrigin(origins = "*") // TODO: security issue
-@Api(value = "Customer Management System", description = "Operations pertaining to customer in Customer Management System")
+@Api(tags = "Customer queries", value = "Customer Management System", description = "Operations pertaining to customer in Customer Management System", produces = "application/json;charset=UTF-8")
 public class CustomerController {
 
 	private static final String LOG_PREFIX = "CustomerController#";
@@ -71,70 +74,71 @@ public class CustomerController {
 	 * @param customerService the given customer service.
 	 * @param customerMapper  the given customer mapper.
 	 */
-	@Autowired
+	// @Autowired: is here not necessary, is done by IOC container.
 	public CustomerController(final CustomerService customerService, final CustomerMapper customerMapper) {
 		this.customerService = customerService;
 		this.customerMapper = customerMapper;
 	}
 
-	
-	@ApiOperation(value = "Get customer by technical id.", response = CustomerDto.class)
+	@ApiOperation(value = "Get customer by technical id.", response = CustomerDto.class, notes = "The 'id' is the technical id.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Successfully retrieved a customer dto by the given id."),
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
-			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.")
-	})
+			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
+	@ApiImplicitParams(@ApiImplicitParam(name = "id", value = "The technical id.", dataType = "Long", dataTypeClass = java.lang.Long.class, required = true))
 	@GetMapping(value = "/{id}", produces = "application/json;charset=UTF-8")
-	public CustomerDto getCustomerById(@ApiParam(value = "Given technical id to get customer.", required = true) @PathVariable final Long id) {
-		LOGGER.debug(LOG_PREFIX + "getCustomerById [id=" + id + "]");
+	@ResponseStatus(HttpStatus.OK)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
+	public ResponseEntity<CustomerDto> getCustomerById(@PathVariable final Long id) {
 
-		return this.customerMapper.mapEntityToDto(customerService.findById(id));
+		return new ResponseEntity<CustomerDto>(customerService.findById(id), HttpStatus.OK);
 	}
 
-	
 	@ApiOperation(value = "Get customer by email address.", response = CustomerDto.class)
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Successfully retrieved a customer dto by the given email address."),
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
-			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.")
-	})
+			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
+	@ApiImplicitParams(@ApiImplicitParam(name = "customerEmailDto", value = "The identifier to search the customer.", dataType = "CustomerEmailDto", dataTypeClass = de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto.class, required = true))
 	@PostMapping(value = "/email-address", produces = "application/json;charset=UTF-8", consumes = "application/json;charset=UTF-8")
-	public CustomerDto getCustomerByEmailAddress(@ApiParam(value = "The customer email address.", required = true) @Valid @RequestBody final CustomerEmailDto customerEmailDto) {
-		LOGGER.debug(LOG_PREFIX + "getCustomerByEmailAddress [customerEmailDto=" + customerEmailDto + "]");
+	@ResponseStatus(HttpStatus.OK)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
+	public ResponseEntity<CustomerDto> getCustomerByEmailAddress(
+			@Valid @RequestBody final CustomerEmailDto customerEmailDto) {
 
 		try {
 			// Return the customer by the given email.
-			return this.customerMapper.mapEntityToDto(customerService.findByEmailAddress(customerEmailDto));
-		} catch(final IllegalStateException illegalStateException) {
+			return new ResponseEntity<CustomerDto>(customerService.findByEmailAddress(customerEmailDto), HttpStatus.OK);
+		} catch (final IllegalStateException illegalStateException) {
 			return null;
 		}
 	}
 
-	
 	@ApiOperation(value = "Creates a customer.")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Successfully create customer in db."),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully create customer in db."),
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
-			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.")
-	})
+			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
+	@ApiImplicitParams(@ApiImplicitParam(name = "customerDto", value = "The updated customer to persist.", dataType = "CustomerDto", dataTypeClass = de.bomc.poc.hrm.interfaces.mapper.CustomerDto.class, required = true))
 	@PostMapping(produces = "application/json;charset=UTF-8", consumes = "application/json;charset=UTF-8")
-	public CustomerEntity createCustomer(@ApiParam(value = "The customer data.", required = true) @Valid @RequestBody final CustomerDto customerDto) {
-		LOGGER.debug(LOG_PREFIX + "createCustomer [customerDto=" + customerDto + "]");
+	@ResponseStatus(HttpStatus.OK)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
+	public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody final CustomerDto customerDto) {
 
-		return this.customerService.createCustomer(customerMapper.mapDtoToEntity(customerDto)); 
+		return new ResponseEntity<CustomerDto>(
+				this.customerService.createCustomer(customerMapper.mapDtoToEntity(customerDto)), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Delete a customer by given id.")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Successfully delete a customer by given id in db."),
+	@ApiOperation(value = "Delete a customer by given id.", notes = "The technical id is expected.")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully delete a customer by given id in db."),
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
-			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.")
-	})
+			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
+	@ApiImplicitParams(@ApiImplicitParam(name = "id", value = "The identifier for deleting a customer.", dataType = "Long", dataTypeClass = java.lang.Long.class, required = true))
 	@DeleteMapping(value = "/{id}")
+	@Loggable(result = false, params = true, value = LogLevel.DEBUG, time = true)
 	public void deleteCustomer(@ApiParam(value = "The customer id.", required = true) @PathVariable final Long id) {
 		LOGGER.debug(LOG_PREFIX + "deleteCustomer [id=" + id + "]");
 
@@ -142,39 +146,35 @@ public class CustomerController {
 	}
 
 	@ApiOperation(value = "Update a customer.")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Successfully update a customer in db."),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully update a customer in db."),
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
-			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.")
-	})
+			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
+	@ApiImplicitParams(@ApiImplicitParam(name = "customerDto", value = "The updated customer to persist.", dataType = "CustomerDto", dataTypeClass = de.bomc.poc.hrm.interfaces.mapper.CustomerDto.class, required = true))
 	@PutMapping(produces = "application/json;charset=UTF-8", consumes = "application/json;charset=UTF-8")
-	public void updateCustomer(@ApiParam(value = "The customer data.", required = true) @Valid @RequestBody final CustomerDto customerDto) {
-		LOGGER.debug(LOG_PREFIX + "updateCustomer [customerDto=" + customerDto + "]");
+	@Loggable(result = false, params = true, value = LogLevel.DEBUG, time = true)
+	public void updateCustomer(@Valid @RequestBody final CustomerDto customerDto) {
 
-		final CustomerEntity customerEntity = this.customerMapper.mapDtoToEntity(customerDto);
-		
-		this.customerService.updateCustomer(customerEntity);
+		this.customerService.updateCustomer(customerDto);
 	}
 
-	@ApiOperation(value = "Find all customer.")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Successfully reads a list of customers from db."),
+	@ApiOperation(value = "Find all customer.", responseContainer = "List")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully reads a list of customers from db."),
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
-			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.")
-	})
+			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
 	@GetMapping(produces = "application/json;charset=UTF-8")
-	public List<CustomerDto> findAll() {
-		LOGGER.debug(LOG_PREFIX + "findAll");
+	@ResponseStatus(HttpStatus.OK)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
+	public ResponseEntity<List<CustomerDto>> findAll() {
 
-		return this.customerMapper.mapEntitiesToDtos(this.customerService.findAll());
+		return new ResponseEntity<List<CustomerDto>>(this.customerService.findAll(), HttpStatus.OK);
 	}
-	
+
 	// _______________________________________________
 	// Helper methods
 	// -----------------------------------------------
-	
+
 	/**
 	 * A fall-back handler – a catch-all type of logic that deals with all other
 	 * exceptions that don’t have specific handlers
@@ -183,8 +183,8 @@ public class CustomerController {
 	 * @return a ApiErrorResponseObject.
 	 */
 	@ExceptionHandler({ Exception.class })
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public ApiErrorResponseObject handleException(final MethodArgumentNotValidException exception) {
-		LOGGER.debug(LOG_PREFIX + "handleException [exception=" + exception + "]");
 
 		final String errorMsg = exception.getBindingResult().getFieldErrors().stream()
 				.map(DefaultMessageSourceResolvable::getDefaultMessage).findFirst().orElse(exception.getMessage());

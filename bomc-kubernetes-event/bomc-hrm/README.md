@@ -6,7 +6,11 @@ Build: mvn clean install
 
 Start app with embedded Tomcat: mvn spring-boot:run
 
-Swagger-UI: http://localhost:8080/swagger-ui.html
+Swagger-UI: http://localhost:8180/swagger-ui.html
+NOTE: see tomcat startup sequence for port:
+...
+ ProtocolHandler ["http-nio-8180"]
+...
 
 ### Reference Documentation
 

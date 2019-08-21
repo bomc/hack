@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
-import de.bomc.poc.hrm.domain.CustomerEntity;
+import de.bomc.poc.hrm.domain.model.CustomerEntity;
 
 /**
  * The repository for customer handling.

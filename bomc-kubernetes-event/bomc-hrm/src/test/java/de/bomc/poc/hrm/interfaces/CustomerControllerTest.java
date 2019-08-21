@@ -49,7 +49,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.bomc.poc.hrm.AbstractBaseUnit;
 import de.bomc.poc.hrm.application.CustomerService;
-import de.bomc.poc.hrm.domain.CustomerEntity;
+import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
 
 /**
@@ -60,7 +60,7 @@ import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
  */
 @WebMvcTest(CustomerController.class)
 @RunWith(SpringJUnit4ClassRunner.class)
-@ComponentScan("de.bomc.poc.hrm.interfaces.mapper")
+@ComponentScan("de.bomc.poc")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CustomerControllerTest extends AbstractBaseUnit {
 
@@ -75,7 +75,7 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 	private MockMvc mvc;
 	@MockBean
 	private CustomerService customerService;
-
+	
 	/* --------------------- methods -------------------------------- */
 
 	@Test
@@ -83,10 +83,10 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test010_createCustomer_pass");
 
 		// GIVEN
-		final CustomerEntity createdCustomerEntity = createCustomerEntity();
-		createdCustomerEntity.setId(CUSTOMER_ID);
+		final CustomerDto createdCustomerDto = createCustomerDto();
+		createdCustomerDto.setId(CUSTOMER_ID);
 		
-		when(this.customerService.createCustomer(createCustomerEntity())).thenReturn(createdCustomerEntity);
+		when(this.customerService.createCustomer(createCustomerEntity())).thenReturn(createdCustomerDto);
 
 		final ObjectMapper objectMapper = new ObjectMapper();
 		final String requestJson = objectMapper.writeValueAsString(createCustomerDto());
@@ -108,7 +108,7 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		final CustomerEmailDto customerEmailDto = new CustomerEmailDto();
 		customerEmailDto.setEmailAddress(CUSTOMER_E_MAIL);
 		
-		when(this.customerService.findByEmailAddress(customerEmailDto)).thenReturn(createCustomerEntity());
+		when(this.customerService.findByEmailAddress(customerEmailDto)).thenReturn(createCustomerDto());
 
 		final ObjectMapper objectMapper = new ObjectMapper();
 		final String requestJson = objectMapper.writeValueAsString(customerEmailDto);
@@ -129,7 +129,7 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test030_getCustomerById_pass");
 
 		// GIVEN
-		when(this.customerService.findById(CUSTOMER_ID)).thenReturn(createCustomerEntity());
+		when(this.customerService.findById(CUSTOMER_ID)).thenReturn(createCustomerDto());
 
 		// THEN
 		this.mvc.perform(get("/customer/{id}", Long.toString(CUSTOMER_ID)).accept(MediaType.APPLICATION_JSON)
@@ -143,17 +143,17 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test040_findAll_pass");
 		
 		// GIVEN
-		final List<CustomerEntity> customerEntityList = new ArrayList<>();  
+		final List<CustomerDto> customerDtoList = new ArrayList<>();  
 		
-		final CustomerEntity customerEntity1 = createCustomerEntity();
-		customerEntity1.setId(1L);
-		final CustomerEntity customerEntity2 = createCustomerEntity();
-		customerEntity2.setId(2L);
+		final CustomerDto customerDto1 = createCustomerDto();
+		customerDto1.setId(1L);
+		final CustomerDto customerDto2 = createCustomerDto();
+		customerDto2.setId(2L);
 		
-		customerEntityList.add(customerEntity1);
-		customerEntityList.add(customerEntity2);
+		customerDtoList.add(customerDto1);
+		customerDtoList.add(customerDto2);
 		
-		when(this.customerService.findAll()).thenReturn(customerEntityList);
+		when(this.customerService.findAll()).thenReturn(customerDtoList);
 		
 		// THEN
 		this.mvc.perform(get("/customer")).andDo(print()).andExpect(status().isOk())
@@ -168,16 +168,16 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test040_findAll_pass");
 		
 		// GIVEN
-		final CustomerEntity customerEntity = createCustomerEntity();
-		final CustomerEntity updatedCustomerEntity = createCustomerEntity();
-		updatedCustomerEntity.setCity("Honululu");
+		final CustomerDto customerDto = createCustomerDto();
+		final CustomerDto updatedCustomerDto = createCustomerDto();
+		updatedCustomerDto.setCity("Honululu");
 		
 		final ObjectMapper objectMapper = new ObjectMapper();
-		final String requestJson = objectMapper.writeValueAsString(customerEntity);
+		final String requestJson = objectMapper.writeValueAsString(customerDto);
 		
-		when(this.customerService.updateCustomer(customerEntity)).thenReturn(updatedCustomerEntity);
+		when(this.customerService.updateCustomer(customerDto)).thenReturn(updatedCustomerDto);
 		
-		// THEN
+		// THENs
 		this.mvc.perform(put("/customer")
 			.accept(MIME_TYPE_JSON_UTF8)
 			.contentType(MIME_TYPE_JSON_UTF8)

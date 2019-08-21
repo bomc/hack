@@ -30,9 +30,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * A data transfer object for customer handling.
+ * Uses JSR-303 Annotations for validation.
  * 
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
@@ -40,6 +42,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Data
 @ApiModel(description = "All details about a customer. ")
 public class CustomerDto {
@@ -59,13 +62,13 @@ public class CustomerDto {
 	
 	@NotNull
 	@NotEmpty
-	@Size(min = 5, max = 40, message = "must be between 3 and 40!")
+	@Size(min = 3, max = 40, message = "must be between 3 and 40!")
 	@ApiModelProperty(notes = "The first name of the customer.")
 	private String firstName;
 	
 	@NotNull
 	@NotEmpty
-	@Size(min = 5, max = 40, message = "must be between 3 and 40!")
+	@Size(min = 3, max = 40, message = "must be between 3 and 40!")
 	@ApiModelProperty(notes = "The last name of the customer.")
 	private String lastName;
 	
