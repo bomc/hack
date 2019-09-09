@@ -10,15 +10,14 @@ spec:
     metadata:
       labels:
         app: bomc-order
-        # version: v1.0.0
     spec:
       containers:
       - name: bomc-order
         image: bomc/bomc-order:v1.0.0
-        imagePullPolicy: IfNotPresent
         resources:
           requests:
             cpu: "200m"
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
           protocol: TCP

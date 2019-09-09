@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import de.bomc.poc.hrm.domain.model.basis.AbstractEntity;
 import de.bomc.poc.hrm.domain.model.values.CoreTypeDefinitions;
+import lombok.ToString;
 
 /**
  * A SecurityObject is the generalization of <code>Role</code>s and
@@ -40,6 +41,9 @@ import de.bomc.poc.hrm.domain.model.values.CoreTypeDefinitions;
  *
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
+//LOMBOK
+@ToString
+//JPA
 @Entity
 @Table(name = "T_ROLE")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -50,6 +54,7 @@ import de.bomc.poc.hrm.domain.model.values.CoreTypeDefinitions;
 })
 public class SecurityObject extends AbstractEntity<SecurityObject> implements Serializable {
 
+	private static final String LOG_PREFIX = "SecurityObject#"; 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SecurityObject.class.getName());
 	private static final long serialVersionUID = 7585736035228078754L;
 	/**
@@ -86,7 +91,7 @@ public class SecurityObject extends AbstractEntity<SecurityObject> implements Se
 	protected SecurityObject() {
 		// Used by JPA provider.
 
-		LOGGER.debug("SecurityObject#co");
+		LOGGER.debug(LOG_PREFIX + "co");
 	}
 
 	/**
@@ -100,7 +105,7 @@ public class SecurityObject extends AbstractEntity<SecurityObject> implements Se
 	public SecurityObject(String name) {
 		this.name = name;
 
-		LOGGER.debug("SecurityObject#co [name=" + name + "]");
+		LOGGER.debug(LOG_PREFIX + "co [name=" + name + "]");
 	}
 
 	/**
@@ -115,7 +120,7 @@ public class SecurityObject extends AbstractEntity<SecurityObject> implements Se
 	 *             a SecurityObject must not be null.
 	 */
 	public SecurityObject(@NotNull final String name, String description) {
-		LOGGER.debug("SecurityObject#co [name=" + name + ", description=" + description + "]");
+		LOGGER.debug(LOG_PREFIX + "co [name=" + name + ", description=" + description + "]");
 
 		this.name = name;
 		this.description = description;
@@ -137,7 +142,7 @@ public class SecurityObject extends AbstractEntity<SecurityObject> implements Se
 	 * @return The name of the <code>SecurityObject</code>
 	 */
 	public String getName() {
-		LOGGER.debug("SecurityObject#getName [name=" + this.name + "]");
+		LOGGER.debug(LOG_PREFIX + "getName [name=" + this.name + "]");
 
 		return this.name;
 	}
@@ -149,7 +154,7 @@ public class SecurityObject extends AbstractEntity<SecurityObject> implements Se
 	 * 			The name of the <code>SecurityObject</code>
 	 */
 	public void setName(final String name) {
-		LOGGER.debug("SecurityObject#setName [name=" + name + "]");
+		LOGGER.debug(LOG_PREFIX + "setName [name=" + name + "]");
 
 		this.name = name;
 	}
@@ -160,7 +165,7 @@ public class SecurityObject extends AbstractEntity<SecurityObject> implements Se
 	 * @return The description of the <code>SecurityObject</code> as text
 	 */
 	public String getDescription() {
-		LOGGER.debug("SecurityObject#getDescription [description=" + this.description + "]");
+		LOGGER.debug(LOG_PREFIX + "getDescription [description=" + this.description + "]");
 
 		return this.description;
 	}
@@ -172,18 +177,9 @@ public class SecurityObject extends AbstractEntity<SecurityObject> implements Se
 	 *            The description of the <code>SecurityObject</code> as text
 	 */
 	public void setDescription(String description) {
-		LOGGER.debug("SecurityObject#setDescription [description=" + description + "]");
+		LOGGER.debug(LOG_PREFIX + "setDescription [description=" + description + "]");
 
 		this.description = description;
-	}
-
-	@Override
-	public String toString() {
-		return "SecurityObject [id=" + this.getId()
-			   + ", name=" + this.name
-			   + ", description=" + this.description
-			   + ", version=" + this.getVersion()
-			   + "]";
 	}
 
 }

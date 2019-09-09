@@ -39,8 +39,8 @@ import org.slf4j.LoggerFactory;
 @DiscriminatorValue("GRANT")
 public class Grant extends SecurityObject implements Serializable {
 
+	private static final String LOG_PREFIX = "SecurityObject#"; 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Grant.class.getName());
-	
 	private static final long serialVersionUID = 3161772453074013724L;
 
 	/**
@@ -48,7 +48,7 @@ public class Grant extends SecurityObject implements Serializable {
 	 */
 	protected Grant() {
 		// Used by JPA provider.
-		LOGGER.debug("Grant#co");
+		LOGGER.debug(LOG_PREFIX + "co");
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class Grant extends SecurityObject implements Serializable {
 	public Grant(final String name) {
 		super(name);
 		
-		LOGGER.debug("Grant#co [name=" + name + "]");
+		LOGGER.debug(LOG_PREFIX + "co [name=" + name + "]");
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class Grant extends SecurityObject implements Serializable {
 	public Grant(final String name, final String description) {
 		super(name, description);
 		
-		LOGGER.debug("Grant#co [name=" + name + ", description=" + description + "]");
+		LOGGER.debug(LOG_PREFIX + "co [name=" + name + ", description=" + description + "]");
 	}
 
 }

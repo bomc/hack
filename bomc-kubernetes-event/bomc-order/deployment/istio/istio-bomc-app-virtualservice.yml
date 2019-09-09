@@ -11,10 +11,21 @@ spec:
   # This VirtualService applies to requests coming through the istio-bomc-app-gateway.
   - istio-bomc-app-gateway.istio-system.svc.cluster.local
   http:
-  - route:
+  - match:
+    - uri:
+       prefix: /bomc-order/rest
+    route:
     - destination:
-        host: bomc-order
+        host: bomc-order-service.bomc-app.svc.cluster.local
         port:
           number: 80
         # subset: v1
+  - match:
+    - uri:
+       prefix: /bomc-order/swagger-ui
+    route:
+    - destination:
+        host: bomc-order-service.bomc-app.svc.cluster.local
+        port:
+          number: 80
 ---

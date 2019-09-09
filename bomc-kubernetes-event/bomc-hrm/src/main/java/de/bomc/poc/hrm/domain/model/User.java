@@ -49,6 +49,7 @@ import de.bomc.poc.exception.core.app.AppRuntimeException;
 import de.bomc.poc.hrm.application.exception.AppErrorCodeEnum;
 import de.bomc.poc.hrm.domain.model.basis.AbstractEntity;
 import de.bomc.poc.hrm.domain.model.validation.constraint.BomcFuture;
+import lombok.ToString;
 
 /**
  * A User represents a human user of the system. Typically an User is assigned
@@ -56,6 +57,9 @@ import de.bomc.poc.hrm.domain.model.validation.constraint.BomcFuture;
  *
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
+// LOMBOK
+@ToString
+// JPA
 @Entity
 @Table(name = "T_USER")
 @NamedQueries({ @NamedQuery(name = User.NQ_FIND_ALL, query = "select u from User u left join fetch u.roles"),
@@ -64,6 +68,7 @@ import de.bomc.poc.hrm.domain.model.validation.constraint.BomcFuture;
 		@NamedQuery(name = User.NQ_FIND_BY_USERNAME_PASSWORD, query = "select u from User u left join fetch u.roles where u.username = :username and u.persistedPassword = :password") })
 public class User extends AbstractEntity<User> implements Serializable {
 
+	private static final String LOG_PREFIX = "User#";
 	private static final Logger LOGGER = LoggerFactory.getLogger(User.class.getName());
 	private static final long serialVersionUID = -6309504091081019166L;
 
@@ -197,7 +202,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 */
 	protected User() {
 		// Accessed by the jpa provider.
-		LOGGER.debug("User#co");
+		LOGGER.debug(LOG_PREFIX + "co");
 
 		this.loadLazy();
 	}
@@ -208,7 +213,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @param username The unique name of the user
 	 */
 	public User(final String username) {
-		LOGGER.debug("User#co [username=" + username + "]");
+		LOGGER.debug(LOG_PREFIX + "co [username=" + username + "]");
 
 		this.username = username;
 		this.loadLazy();
@@ -221,7 +226,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @param password The password of the user
 	 */
 	protected User(final String username, final String password) {
-		LOGGER.debug("User#co [username=" + username + ", password=" + password + "]");
+		LOGGER.debug(LOG_PREFIX + "co [username=" + username + ", password=" + password + "]");
 
 		this.username = username;
 		this.password = password;
@@ -239,7 +244,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 
 	@PreRemove
 	public void preRemove() {
-		LOGGER.debug("User#preRemove");
+		LOGGER.debug(LOG_PREFIX + "preRemove");
 
 		// Remove the referenced roles.
 		this.removeRoles();
@@ -251,13 +256,13 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 */
 	@PostLoad
 	public void postLoad() {
-		LOGGER.debug("User#postLoad");
+		LOGGER.debug(LOG_PREFIX + "postLoad");
 
 		this.loadLazy();
 	}
 
 	private void loadLazy() {
-		LOGGER.debug("User#loadLazy [persistedPassword=" + this.persistedPassword + "]");
+		LOGGER.debug(LOG_PREFIX + "loadLazy [persistedPassword=" + this.persistedPassword + "]");
 
 		this.password = this.persistedPassword;
 	}
@@ -268,7 +273,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @return The current username
 	 */
 	public String getUsername() {
-		LOGGER.debug("User#getUsername [username=" + this.username + "]");
+		LOGGER.debug(LOG_PREFIX + "getUsername [username=" + this.username + "]");
 
 		return this.username;
 	}
@@ -281,7 +286,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	public /*
 			 * protected: is set to public, because mapstruct is using getter and setter
 			 */ void setUsername(final String username) {
-		LOGGER.debug("User#setUsername [username=" + username + "]");
+		LOGGER.debug(LOG_PREFIX + "setUsername [username=" + username + "]");
 
 		this.username = username;
 	}
@@ -292,7 +297,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @return <code>true</code> if locked, otherwise <code>false</code>
 	 */
 	public boolean isLocked() {
-		LOGGER.debug("User#isLocked [locked=" + this.locked + "]");
+		LOGGER.debug(LOG_PREFIX + "isLocked [locked=" + this.locked + "]");
 
 		return this.locked;
 	}
@@ -304,7 +309,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 *               <code>false</code> to unlock
 	 */
 	public void setLocked(final boolean locked) {
-		LOGGER.debug("User#setLocked [locked=" + locked + "]");
+		LOGGER.debug(LOG_PREFIX + "setLocked [locked=" + locked + "]");
 
 		this.locked = locked;
 	}
@@ -315,7 +320,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @return <code>true</code> if so, otherwise <code>false</code>
 	 */
 	public boolean isExternalUser() {
-		LOGGER.debug("User#isExternalUser [extern=" + this.extern + "]");
+		LOGGER.debug(LOG_PREFIX + "isExternalUser [extern=" + this.extern + "]");
 
 		return this.extern;
 	}
@@ -328,7 +333,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 *                     <code>false</code>.
 	 */
 	public void setExternalUser(final boolean externalUser) {
-		LOGGER.debug("User#setExternalUser [extern=" + externalUser + "]");
+		LOGGER.debug(LOG_PREFIX + "setExternalUser [extern=" + externalUser + "]");
 
 		this.extern = externalUser;
 	}
@@ -340,7 +345,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 *         <code>false</code>
 	 */
 	public boolean isEnabled() {
-		LOGGER.debug("User#isEnabled [enabled=" + this.enabled + "]");
+		LOGGER.debug(LOG_PREFIX + "isEnabled [enabled=" + this.enabled + "]");
 
 		return this.enabled;
 	}
@@ -351,7 +356,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @param enabled <code>true</code> when enabled, otherwise <code>false</code>
 	 */
 	public void setEnabled(final boolean enabled) {
-		LOGGER.debug("User#setEnabled [enabled=" + enabled + "]");
+		LOGGER.debug(LOG_PREFIX + "setEnabled [enabled=" + enabled + "]");
 
 		this.enabled = enabled;
 	}
@@ -362,7 +367,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @return The expiration date
 	 */
 	public LocalDateTime getExpirationDate() {
-		LOGGER.debug("User#getExpirationDate [expirationDate=" + this.formatLocalDateTime(expirationDate) + "]");
+		LOGGER.debug(LOG_PREFIX + "getExpirationDate [expirationDate=" + this.formatLocalDateTime(expirationDate) + "]");
 
 		return expirationDate;
 	}
@@ -373,7 +378,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @param expDate The new expiration date to set
 	 */
 	public void setExpirationDate(@NotNull final LocalDateTime expDate) {
-		LOGGER.debug("User#setExpirationDate [expDate=" + this.formatLocalDateTime(expDate) + "]");
+		LOGGER.debug(LOG_PREFIX + "setExpirationDate [expDate=" + this.formatLocalDateTime(expDate) + "]");
 
 		this.expirationDate = expDate;
 	}
@@ -384,7 +389,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @return The list of granted {@link Role}s
 	 */
 	public Set<Role> getRoles() {
-		LOGGER.debug("User#getRoles [roles.size=" + this.roles.size() + "]");
+		LOGGER.debug(LOG_PREFIX + "getRoles [roles.size=" + this.roles.size() + "]");
 
 		return Collections.unmodifiableSet(this.roles);
 	}
@@ -396,7 +401,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @return see {@link java.util.Collection#add(Object)}
 	 */
 	public boolean addRole(@NotNull final Role role) {
-		LOGGER.debug("User#addRole [role.name=" + role.getName() + "]");
+		LOGGER.debug(LOG_PREFIX + "addRole [role.name=" + role.getName() + "]");
 
 		final boolean isAdded = this.roles.add(role);
 
@@ -414,7 +419,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @return true if this set contained the specified element.
 	 */
 	public boolean removeRole(@NotNull final Role role) {
-		LOGGER.debug("User#removeRole [" + role.toString() + "]");
+		LOGGER.debug(LOG_PREFIX + "removeRole [" + role.toString() + "]");
 
 		// This is a bidirectional relationship, so the relationship has to be
 		// removed also on the other side.
@@ -432,7 +437,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @param role The {@link Role} to add.
 	 */
 	protected boolean internalAddRole(@NotNull final Role role) {
-		LOGGER.debug("User#internalAddRole [" + role.toString() + "]");
+		LOGGER.debug(LOG_PREFIX + "internalAddRole [" + role.toString() + "]");
 
 		final boolean isAdded = this.roles.add(role);
 
@@ -456,7 +461,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * Remove all {@link Role}s from this <code>User</code>.
 	 */
 	public void removeRoles() {
-		LOGGER.debug("User#removeRoles");
+		LOGGER.debug(LOG_PREFIX + "removeRoles");
 
 		Iterator<Role> itr = this.roles.iterator();
 
@@ -464,7 +469,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 			final Role role = itr.next();
 
 			final boolean isInternalRemove = role.internalRemoveUser(this);
-			LOGGER.debug("User#removeRoles [user.id=" + role.getId() + ", internalRemove=" + isInternalRemove + "]");
+			LOGGER.debug(LOG_PREFIX + "removeRoles [user.id=" + role.getId() + ", internalRemove=" + isInternalRemove + "]");
 
 			itr.remove();
 		}
@@ -477,7 +482,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @param roles The new list of {@link Role}s
 	 */
 	public void setRoles(final Set<Role> roles) {
-		LOGGER.debug("User#setRoles [roles.size=" + roles.size() + "]");
+		LOGGER.debug(LOG_PREFIX + "setRoles [roles.size=" + roles.size() + "]");
 
 		roles.stream().forEach(role -> {
 			this.roles.add(role);
@@ -491,7 +496,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @return The current fullname
 	 */
 	public String getFullname() {
-		LOGGER.debug("User#getFullname [fullname=" + this.fullname + "]");
+		LOGGER.debug(LOG_PREFIX + "getFullname [fullname=" + this.fullname + "]");
 
 		return this.fullname;
 	}
@@ -502,7 +507,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @param fullname The new fullname to set
 	 */
 	public void setFullname(final String fullname) {
-		LOGGER.debug("User#setFullname [fullname=" + this.fullname + "]");
+		LOGGER.debug(LOG_PREFIX + "setFullname [fullname=" + this.fullname + "]");
 
 		this.fullname = fullname;
 	}
@@ -513,7 +518,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @return The userDetails
 	 */
 	public UserDetails getUserDetails() {
-		LOGGER.debug("User#getUserDetails [userDetails=" + this.userDetails.toString() + "]");
+		LOGGER.debug(LOG_PREFIX + "getUserDetails [userDetails=" + this.userDetails.toString() + "]");
 
 		return this.userDetails;
 	}
@@ -524,7 +529,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @param userDetails The userDetails to set
 	 */
 	public void setUserDetails(UserDetails userDetails) {
-		LOGGER.debug("User#setUserDetails [userDetails=" + this.userDetails.toString() + "]");
+		LOGGER.debug(LOG_PREFIX + "setUserDetails [userDetails=" + this.userDetails.toString() + "]");
 
 		this.userDetails = userDetails;
 	}
@@ -542,7 +547,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 			grants.addAll(role.getGrants());
 		}
 
-		LOGGER.debug("User#getGrants [grants.size=" + grants.size() + "]");
+		LOGGER.debug(LOG_PREFIX + "getGrants [grants.size=" + grants.size() + "]");
 
 		return Collections.unmodifiableList(grants);
 	}
@@ -553,7 +558,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @return A list of recently used passwords
 	 */
 	public List<UserPassword> getPasswords() {
-		LOGGER.debug("User#getPasswords [passwords.size=" + this.passwords.size() + "]");
+		LOGGER.debug(LOG_PREFIX + "getPasswords [passwords.size=" + this.passwords.size() + "]");
 
 		return this.passwords;
 	}
@@ -564,7 +569,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @return The current password as String
 	 */
 	public String getPassword() {
-		LOGGER.debug("User#getPassword [password=" + this.password + "]");
+		LOGGER.debug(LOG_PREFIX + "getPassword [password=" + this.password + "]");
 
 		return this.password;
 	}
@@ -575,7 +580,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 * @return The date when the password has changed recently
 	 */
 	public LocalDateTime getLastPasswordChange() {
-		LOGGER.debug("User#getLastPassworChange [lastPasswordChange=" + this.lastPasswordChange + "]");
+		LOGGER.debug(LOG_PREFIX + "getLastPassworChange [lastPasswordChange=" + this.lastPasswordChange + "]");
 
 		return this.lastPasswordChange;
 	}
@@ -591,7 +596,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 	 *             password is not valid
 	 */
 	public void setNewPassword(final String password) {
-		LOGGER.debug("User#setNewPassword [password=" + password + "]");
+		LOGGER.debug(LOG_PREFIX + "setNewPassword [password=" + password + "]");
 
 		if (this.persistedPassword != null && this.persistedPassword.equals(password)) {
 			final String errorMessage = "Trying to set the new password equals to the current password.";
@@ -628,10 +633,10 @@ public class User extends AbstractEntity<User> implements Serializable {
 
 		if (this.persistedPassword != null) {
 			hasPasswordChanged = (this.persistedPassword.equals(this.password));
-			LOGGER.debug("User#hasPasswordChanged [hasPasswordChanged=" + hasPasswordChanged + "]");
+			LOGGER.debug(LOG_PREFIX + "hasPasswordChanged [hasPasswordChanged=" + hasPasswordChanged + "]");
 		} else {
 			LOGGER.warn(
-					"User#hasPasswordChanged - persistedPassword == null, is a test running? [hasPasswordChanged=false]");
+					LOG_PREFIX + "hasPasswordChanged - persistedPassword == null, is a test running? [hasPasswordChanged=false]");
 		}
 
 		return hasPasswordChanged;
@@ -651,7 +656,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 			isPasswordValid = false;
 		}
 
-		LOGGER.debug("User#isPasswordValid [password=" + password + ", isPasswordValid=" + isPasswordValid + "]");
+		LOGGER.debug(LOG_PREFIX + "isPasswordValid [password=" + password + ", isPasswordValid=" + isPasswordValid + "]");
 
 		return isPasswordValid;
 	}
@@ -659,14 +664,14 @@ public class User extends AbstractEntity<User> implements Serializable {
 	private void storeOldPassword(final String passwordToStore) {
 		if (passwordToStore == null || passwordToStore.isEmpty()) {
 			LOGGER.debug(
-					"User#storeOldPassword - The old password is null or empty, it would not be stored in history.");
+					LOG_PREFIX + "storeOldPassword - The old password is null or empty, it would not be stored in history.");
 
 			return;
 		}
 
 		this.passwords.add(new UserPassword(this, passwordToStore));
 
-		LOGGER.debug("User#storeOldPassword [passwords.size=" + this.passwords.size() + ", passwordToStore="
+		LOGGER.debug(LOG_PREFIX + "storeOldPassword [passwords.size=" + this.passwords.size() + ", passwordToStore="
 				+ passwordToStore + "]");
 
 		if (NUMBER_STORED_PASSWORDS < this.passwords.size()) {
@@ -680,7 +685,7 @@ public class User extends AbstractEntity<User> implements Serializable {
 				oldestUserPassword.setUser(null);
 				this.passwords.remove(oldestUserPassword);
 
-				LOGGER.debug("User#storeOldPassword# - after remove password from password list. [passwordToRemove="
+				LOGGER.debug(LOG_PREFIX + "storeOldPassword# - after remove password from password list. [passwordToRemove="
 						+ oldestUserPassword.getPassword() + ", passwords.size=" + this.passwords.size() + "]");
 			} else {
 				final String errorMessage = "The oldest password could not be determined!";
@@ -693,23 +698,23 @@ public class User extends AbstractEntity<User> implements Serializable {
 		}
 	}
 
-	@Override
-	public String toString() {
-
-		return "User [id=" + super.getId() + ", businessKey-username=" + this.username + ", extern=" + this.extern
-				+ ", lastPasswordChange=" + this.lastPasswordChange + ", locked=" + this.locked + ", password="
-				+ this.password + ", persistedPassword=" + this.persistedPassword + ", enabled=" + this.enabled
-				+ ", expirationDate=" + this.expirationDate + ", fullname=" + this.fullname + ", version="
-				+ this.getVersion()
-				// May not be logged here, throws
-				// org.hibernate.LazyInitializationException
-				// + ", userDetails=" + userDetails
-				// May not be logged here, throws
-				// org.hibernate.LazyInitializationException
-				// + ", roles.size=" + this.roles.size()
-				// May not be logged here, throws
-				// org.hibernate.LazyInitializationException
-				// + ", passwords=" + this.passwords.size()
-				+ "]";
-	}
+//	@Override
+//	public String toString() {
+//
+//		return "User [id=" + super.getId() + ", businessKey-username=" + this.username + ", extern=" + this.extern
+//				+ ", lastPasswordChange=" + this.lastPasswordChange + ", locked=" + this.locked + ", password="
+//				+ this.password + ", persistedPassword=" + this.persistedPassword + ", enabled=" + this.enabled
+//				+ ", expirationDate=" + this.expirationDate + ", fullname=" + this.fullname + ", version="
+//				+ this.getVersion()
+//				// May not be logged here, throws
+//				// org.hibernate.LazyInitializationException
+//				// + ", userDetails=" + userDetails
+//				// May not be logged here, throws
+//				// org.hibernate.LazyInitializationException
+//				// + ", roles.size=" + this.roles.size()
+//				// May not be logged here, throws
+//				// org.hibernate.LazyInitializationException
+//				// + ", passwords=" + this.passwords.size()
+//				+ "]";
+//	}
 }

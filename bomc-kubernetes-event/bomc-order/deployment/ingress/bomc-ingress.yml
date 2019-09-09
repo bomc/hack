@@ -13,7 +13,7 @@ spec:
     serviceName: default-http-backend
     servicePort: 80
   rules:
-   - host: bomc.ingress.org
+   - host: bomc.ingress.org # see C:\Windows\System32\drivers\etc\hosts
      http:
       paths:
       - path: /bomc-order

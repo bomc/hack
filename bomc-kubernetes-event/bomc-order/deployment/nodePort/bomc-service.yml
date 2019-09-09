@@ -12,10 +12,9 @@ spec:
     app: bomc-order
   ports:
   - protocol: TCP
-    port: 80
+    port: 8080
     name: http
     # bomc Use this port for Browser access
     nodePort: 30082
     # To access the version endpoint, bomc-order is the context-root, given in the jboss-web.xml
-    # curl -v 192.168.99.100:30082/bomc-order/rest/version/current-version -H "accept: application/vnd.version-v1+json"
----
+    # curl -v 192.168.99.103:30082/bomc-order/rest/version/current-version -H "accept: application/vnd.version-v1+json"

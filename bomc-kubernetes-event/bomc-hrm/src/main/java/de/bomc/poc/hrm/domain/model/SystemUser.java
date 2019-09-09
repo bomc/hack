@@ -33,9 +33,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
+//JPA
 @Entity
 public class SystemUser extends User implements Serializable {
 
+	private static final String LOG_PREFIX = "SystemUser#";
 	private static final Logger LOGGER = LoggerFactory.getLogger(SystemUser.class.getName());
 	private static final long serialVersionUID = -7575215406745881912L;
 
@@ -54,7 +56,7 @@ public class SystemUser extends User implements Serializable {
 	protected SystemUser() {
 		// Used by JPA provider.
 		//
-		LOGGER.debug("SystemUser#co");
+		LOGGER.debug(LOG_PREFIX + "co");
 	}
 
 	/**
@@ -68,7 +70,7 @@ public class SystemUser extends User implements Serializable {
 	public SystemUser(final String username, @NotBlank final String password) {
 		super(username, password);
 
-		LOGGER.debug("SystemUser#co [username=" + username + ", password=" + password + ", SYSTEM_USERNAME="
+		LOGGER.debug(LOG_PREFIX + "co [username=" + username + ", password=" + password + ", SYSTEM_USERNAME="
 				+ SYSTEM_USERNAME + "]");
 
 		setFullname(SYSTEM_USERNAME);

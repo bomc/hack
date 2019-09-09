@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.bomc.poc.hrm.domain.model.basis.AbstractEntity;
+import lombok.ToString;
 
 /**
  * Is a representation of an <code>User</code> together with the password.
@@ -40,10 +41,14 @@ import de.bomc.poc.hrm.domain.model.basis.AbstractEntity;
  *
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
+// LOMBOK
+@ToString
+// JPA
 @Entity
 @Table(name = "T_USER_PASSWORD")
 public class UserPassword extends AbstractEntity<UserPassword> implements Serializable {
 
+	private static final String LOG_PREFIX = "UserPassword#";
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserPassword.class.getName());
 	private static final long serialVersionUID = 1678609250279381615L;
 
@@ -74,7 +79,7 @@ public class UserPassword extends AbstractEntity<UserPassword> implements Serial
 	protected UserPassword() {
 		// Used by JPA provider.
 		
-		LOGGER.debug("UserPassword#co");
+		LOGGER.debug(LOG_PREFIX + "co");
 	}
 
 	/**
@@ -86,7 +91,7 @@ public class UserPassword extends AbstractEntity<UserPassword> implements Serial
 	 *            The <code>password</code> as String to assign
 	 */
 	public UserPassword(@NotNull final User user, @NotEmpty final String password) {
-		LOGGER.debug("UserPassword#co [user.name=" + user.getUsername() + ", password=" + password + "]");
+		LOGGER.debug(LOG_PREFIX + "co [user.name=" + user.getUsername() + ", password=" + password + "]");
 		
 		this.user = user;
 		this.password = password;
@@ -108,7 +113,7 @@ public class UserPassword extends AbstractEntity<UserPassword> implements Serial
 	 * @return The {@link User} of this password
 	 */
 	public User getUser() {
-		LOGGER.debug("UserPassword#getUser [user=" + this.user.getUsername() + "]");
+		LOGGER.debug(LOG_PREFIX + "getUser [user=" + this.user.getUsername() + "]");
 		
 		return this.user;
 	}
@@ -120,7 +125,7 @@ public class UserPassword extends AbstractEntity<UserPassword> implements Serial
 	 *            The new {@link User}
 	 */
 	public void setUser(final User user) {
-		LOGGER.debug("UserPassword#setUser [user=" + ((user == null) ? null : user.getUsername()) + "]");
+		LOGGER.debug(LOG_PREFIX + "setUser [user=" + ((user == null) ? null : user.getUsername()) + "]");
 
 		this.user = user;
 	}
@@ -131,7 +136,7 @@ public class UserPassword extends AbstractEntity<UserPassword> implements Serial
 	 * @return The current password
 	 */
 	public String getPassword() {
-		LOGGER.debug("UserPassword#getPassword [password=" + this.password + "]");
+		LOGGER.debug(LOG_PREFIX + "getPassword [password=" + this.password + "]");
 		
 		return this.password;
 	}
@@ -147,21 +152,4 @@ public class UserPassword extends AbstractEntity<UserPassword> implements Serial
 		return passwordChanged;
 	}
 
-	/**
-	 * Returns a string describing the {@link UserDetails}.
-	 *
-	 * @return the description of the userDetails.
-	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("UserPassword [id=").append(this.getId())
-			.append(", username=").append(this.user.getUsername())
-			.append(", password=").append(password)
-			.append(", version=").append(this.getVersion())
-			.append("]");
-
-		return sb.toString();
-	}
 }

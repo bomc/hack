@@ -17,6 +17,8 @@ package de.bomc.poc.hrm.domain.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lombok.ToString;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -41,6 +43,9 @@ import java.util.Set;
  * A Role is a group of <code>User</code>s. Basically more than one <code>User</code> belong to a Role. Security access policies are assigned to <code>Role</code>s instead of <code>User</code>s.
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
+// LOMBOK
+@ToString
+// JPA
 @Entity
 @DiscriminatorValue("ROLE")
 @NamedQueries({@NamedQuery(name = Role.NQ_FIND_ALL, query = "select distinct(r) from Role r left join fetch r.users left join fetch r.grants order by r.name"),
@@ -48,6 +53,7 @@ import java.util.Set;
                @NamedQuery(name = Role.NQ_FIND_ALL_BY_USERNAME, query = "select r from Role r inner join r.users u where u.username = ?1 order by r.name")})
 public class Role extends SecurityObject implements Serializable {
 
+	private static final String LOG_PREFIX = "Role#"; 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SecurityObject.class.getName());
     private static final long serialVersionUID = 3582297273912759733L;
 
@@ -104,7 +110,7 @@ public class Role extends SecurityObject implements Serializable {
     protected Role() {
         super();
 
-        LOGGER.debug("Role#co");
+        LOGGER.debug(LOG_PREFIX + "co");
     }
 
     /**
@@ -115,7 +121,7 @@ public class Role extends SecurityObject implements Serializable {
     public Role(@NotEmpty final String name) {
         super(name);
 
-        LOGGER.debug("Role#co [name=" + name + "]");
+        LOGGER.debug(LOG_PREFIX + "co [name=" + name + "]");
     }
 
     /**
@@ -127,14 +133,14 @@ public class Role extends SecurityObject implements Serializable {
     public Role(@NotEmpty final String name, String description) {
         super(name, description);
 
-        LOGGER.debug("Role#co [name=" + name + ", description=" + description + "]");
+        LOGGER.debug(LOG_PREFIX + "co [name=" + name + ", description=" + description + "]");
     }
 
 	/* ------------------- methods -------------------------- */
 
     @PreRemove
     public void preRemove() {
-        LOGGER.debug("Role#preRemove");
+        LOGGER.debug(LOG_PREFIX + "preRemove");
 
         // Remove all referenced users.
         this.removeUsers();
@@ -145,7 +151,7 @@ public class Role extends SecurityObject implements Serializable {
      * @return the immutable.
      */
     public Boolean isImmutable() {
-        LOGGER.debug("Role#isImmutable [immutable=" + this.immutable + "]");
+        LOGGER.debug(LOG_PREFIX + "isImmutable [immutable=" + this.immutable + "]");
 
         return this.immutable;
     }
@@ -155,7 +161,7 @@ public class Role extends SecurityObject implements Serializable {
      * @return A Set of all {@link User}s assigned to the <code>Role</code>
      */
     public Set<User> getUsers() {
-        LOGGER.debug("Role#getUsers [users.size=" + this.users.size() + "]");
+        LOGGER.debug(LOG_PREFIX + "getUsers [users.size=" + this.users.size() + "]");
 
         return Collections.unmodifiableSet(this.users);
     }
@@ -165,7 +171,7 @@ public class Role extends SecurityObject implements Serializable {
      * @param users the given role Set<Role>.
      */
     public void setUsers(@NotNull final Set<User> users) {
-        LOGGER.debug("Role#setUsers [users.size=" + users.size() + "]");
+        LOGGER.debug(LOG_PREFIX + "setUsers [users.size=" + users.size() + "]");
 
         users.stream()
              .forEach(user -> {
@@ -182,7 +188,7 @@ public class Role extends SecurityObject implements Serializable {
      * @return <code>true</code> if the {@link User} was new in the collection of {@link User}s, otherwise <code>false</code>
      */
     public boolean addUser(@NotNull final User user) {
-        LOGGER.debug("Role#getUsers [user.username=" + user.getUsername() + "]");
+        LOGGER.debug(LOG_PREFIX + "getUsers [user.username=" + user.getUsername() + "]");
 
         // Add user to users.
         final boolean isAdded = this.users.add(user);
@@ -197,7 +203,7 @@ public class Role extends SecurityObject implements Serializable {
      * @param user The {@link User} to be removed
      */
     public boolean removeUser(@NotNull final User user) {
-        LOGGER.debug("Role#removeUser [user.username=" + user.getUsername() + "]");
+        LOGGER.debug(LOG_PREFIX + "removeUser [user.username=" + user.getUsername() + "]");
 
         // This is a bidirectional relationship, so the relationship has to be
         // removed also on the other side.
@@ -223,7 +229,7 @@ public class Role extends SecurityObject implements Serializable {
      * @param user The {@link User} to remove.
      */
     protected boolean internalRemoveUser(@NotNull final User user) {
-        LOGGER.debug("Role#internalRemoveUser [" + user.toString() + "]");
+        LOGGER.debug(LOG_PREFIX + "internalRemoveUser [" + user.toString() + "]");
 
         final boolean isRemoved = this.users.remove(user);
 
@@ -234,7 +240,7 @@ public class Role extends SecurityObject implements Serializable {
      * Remove all {@link Role}s from the list.
      */
     public void removeUsers() {
-        LOGGER.debug("Role#removeUsers");
+        LOGGER.debug(LOG_PREFIX + "removeUsers");
 
         Iterator<User> itr = this.users.iterator();
 
@@ -242,7 +248,7 @@ public class Role extends SecurityObject implements Serializable {
             final User user = itr.next();
 
             final boolean isInternalRemove = user.internalRemoveRole(this);
-            LOGGER.debug("Role#removeUsers [user.id=" + user.getId() + ", isInternalRemove=" + isInternalRemove + "]");
+            LOGGER.debug(LOG_PREFIX + "removeUsers [user.id=" + user.getId() + ", isInternalRemove=" + isInternalRemove + "]");
 
             itr.remove();
         }
@@ -262,7 +268,7 @@ public class Role extends SecurityObject implements Serializable {
      * @return <code>true</code> if the {@link Grant} was new to the collection of {@link Grant}s, otherwise <code>false</code>
      */
     public boolean addGrant(@NotNull Grant grant) {
-        LOGGER.debug("Role#addGrant [grant=" + grant.toString() + "]");
+        LOGGER.debug(LOG_PREFIX + "addGrant [grant=" + grant.toString() + "]");
 
         return grants.add(grant);
     }
@@ -273,7 +279,7 @@ public class Role extends SecurityObject implements Serializable {
      * @return <code>true</code> if the {@link Grant} was successfully removed from the Set of {@link Grant}s, otherwise <code>false</code>
      */
     public boolean removeGrant(Grant grant) {
-        LOGGER.debug("Role#removeGrant [grant=" + grant.toString() + "]");
+        LOGGER.debug(LOG_PREFIX + "removeGrant [grant=" + grant.toString() + "]");
 
         return grants.remove(grant);
     }
@@ -284,7 +290,7 @@ public class Role extends SecurityObject implements Serializable {
      * @return <code>true</code> if the {@link Grant} was successfully removed from the Set of {@link Grant}s, otherwise <code>false</code>
      */
     public boolean removeGrants(@NotNull Set<? extends Grant> grants) {
-        LOGGER.debug("Role#removeGrants [grants.size=" + grants.size() + "]");
+        LOGGER.debug(LOG_PREFIX + "removeGrants [grants.size=" + grants.size() + "]");
 
         return this.grants.removeAll(grants);
     }
@@ -295,7 +301,7 @@ public class Role extends SecurityObject implements Serializable {
      * @throws IllegalArgumentException if grants is <code>null</code>
      */
     public void setGrants(Set<Grant> grants) {
-        LOGGER.debug("Role#setGrants [grants.size=" + grants.size() + "]");
+        LOGGER.debug(LOG_PREFIX + "setGrants [grants.size=" + grants.size() + "]");
 
         this.grants = grants;
     }

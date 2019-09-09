@@ -108,12 +108,8 @@ public class CustomerController {
 	public ResponseEntity<CustomerDto> getCustomerByEmailAddress(
 			@Valid @RequestBody final CustomerEmailDto customerEmailDto) {
 
-		try {
-			// Return the customer by the given email.
-			return new ResponseEntity<CustomerDto>(customerService.findByEmailAddress(customerEmailDto), HttpStatus.OK);
-		} catch (final IllegalStateException illegalStateException) {
-			return null;
-		}
+		// Return the customer by the given email.
+		return new ResponseEntity<CustomerDto>(customerService.findByEmailAddress(customerEmailDto), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Creates a customer.")

@@ -32,15 +32,20 @@ import org.slf4j.LoggerFactory;
 
 import de.bomc.poc.hrm.domain.model.values.CoreTypeDefinitions;
 import de.bomc.poc.hrm.domain.model.values.ImageProvider;
+import lombok.ToString;
 
 /**
  * Detailed information about an <code>User</code>.
  *
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
+// LOMBOK
+@ToString
+// JPA
 @Embeddable
 public class UserDetails implements ImageProvider, Serializable {
 
+	private static final String LOG_PREFIX = "UserDetails#";
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserDetails.class.getName());
 	private static final long serialVersionUID = 664778075559767489L;
 	/**
@@ -98,7 +103,7 @@ public class UserDetails implements ImageProvider, Serializable {
 	public UserDetails() {
 		super();
 		
-		LOGGER.debug("UserDetails#co");
+		LOGGER.debug(LOG_PREFIX + "co");
 	}
 
 	/* ----------------------------- methods --------------------- */
@@ -109,7 +114,7 @@ public class UserDetails implements ImageProvider, Serializable {
 	 * @return The phone number
 	 */
 	public String getPhoneNo() {
-		LOGGER.debug("UserDetails#getPhoneNo [phoneNo=" + phoneNo + "]");
+		LOGGER.debug(LOG_PREFIX + "getPhoneNo [phoneNo=" + phoneNo + "]");
 		
 		return this.phoneNo;
 	}
@@ -121,7 +126,7 @@ public class UserDetails implements ImageProvider, Serializable {
 	 *            The new phone number
 	 */
 	public void setPhoneNo(final String phoneNo) {
-		LOGGER.debug("UserDetails#setPhoneNo [phoneNo=" + phoneNo + "]");
+		LOGGER.debug(LOG_PREFIX + "setPhoneNo [phoneNo=" + phoneNo + "]");
 		
 		this.phoneNo = phoneNo;
 	}
@@ -132,7 +137,7 @@ public class UserDetails implements ImageProvider, Serializable {
 	 * @return The comment text
 	 */
 	public String getComment() {
-		LOGGER.debug("UserDetails#getComment [commit=" + this.comment + "]");
+		LOGGER.debug(LOG_PREFIX + "getComment [commit=" + this.comment + "]");
 		
 		return this.comment;
 	}
@@ -144,7 +149,7 @@ public class UserDetails implements ImageProvider, Serializable {
 	 *            The new comment text
 	 */
 	public void setComment(final String comment) {
-		LOGGER.debug("UserDetails#setComment [commit=" + this.comment + "]");
+		LOGGER.debug(LOG_PREFIX + "setComment [commit=" + this.comment + "]");
 		
 		this.comment = comment;
 	}
@@ -154,7 +159,7 @@ public class UserDetails implements ImageProvider, Serializable {
 	 */
 	@Override
 	public byte[] getImage() {
-		LOGGER.debug("UserDetails#getImage");
+		LOGGER.debug(LOG_PREFIX + "getImage");
 		
 		if (this.image == null) {
 			return new byte[0];
@@ -168,7 +173,7 @@ public class UserDetails implements ImageProvider, Serializable {
 	 */
 	@Override
 	public void setImage(final byte[] img) {
-		LOGGER.debug("UserDetails#setImage");
+		LOGGER.debug(LOG_PREFIX + "setImage");
 		
 		this.image = img == null ? new byte[0] : Arrays.copyOf(img, img.length);
 	}
@@ -179,7 +184,7 @@ public class UserDetails implements ImageProvider, Serializable {
 	 * @return The <code>User</code>'s sex
 	 */
 	public SEX getSex() {
-		LOGGER.debug("UserDetails#getSex [sex=" + this.sex.name() + "]");
+		LOGGER.debug(LOG_PREFIX + "getSex [sex=" + this.sex.name() + "]");
 		
 		return this.sex;
 	}
@@ -191,23 +196,8 @@ public class UserDetails implements ImageProvider, Serializable {
 	 *            The new sex
 	 */
 	public void setSex(final SEX sex) {
-		LOGGER.debug("UserDetails#setSex [sex=" + sex.name() + "]");
+		LOGGER.debug(LOG_PREFIX + "setSex [sex=" + sex.name() + "]");
 		
 		this.sex = sex;
-	}
-
-	/**
-	 * Returns a string describing the {@link UserDetails}.
-	 *
-	 * @return the description of the userDetails.
-	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-
-		return sb.append("UserDetails [comment=").append(this.comment)
-				.append(", phoneNo=").append(this.phoneNo)
-				.append(", sex=").append(this.sex)
-				.append("]").toString();
 	}
 }
