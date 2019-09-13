@@ -14,7 +14,7 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>hrm</name>
-	<description>A demo project for a microservice app to test the BIT PaaS plattform</description>
+	<description>A demo project for a microservice app.</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
