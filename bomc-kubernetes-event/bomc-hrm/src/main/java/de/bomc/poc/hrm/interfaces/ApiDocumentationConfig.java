@@ -63,7 +63,7 @@ public class ApiDocumentationConfig {
 	}
 
 	private ApiInfo apiInfo() {
-		ApiInfo apiInfo = new ApiInfo("PoC REST API", "A simple application for testing the PaaS plattform.",
+		ApiInfo apiInfo = new ApiInfo("HRM REST API", "A simple application for testing the PaaS plattform.",
 				"1.0.0-SNAPSHOT", "Terms of service", new Contact("bomc", "www.bomc.org", "bomc@bomc.org"),
 				"License of API", "API license URL", Collections.emptyList());
 
