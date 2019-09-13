@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bomc-invoice
+  name: bomc-invoice-service
   namespace: bomc-app
   labels:
     app: bomc-invoice
@@ -10,8 +10,9 @@ spec:
   selector:
     app: bomc-invoice
   ports:
-  - protocol: TCP
-    port: 80
-    name: http
-    targetPort: 8080
+    - protocol: TCP
+      port: 80
+      name: http
+      targetPort: 8080
+#  type: NodePort
 ---

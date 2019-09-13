@@ -25,7 +25,7 @@ import org.eclipse.microprofile.openapi.annotations.servers.Server;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 /**
- * A class extending {@link Application} and annotated with @ApplicationPath is
+ * A class extending {@link Application} and annotated with -at ApplicationPath is
  * the Java EE 7 "no XML" approach to activating JAX-RS.
  * <p>
  * Resources are served relative to the servlet path specified in the
@@ -48,13 +48,12 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
                         name = "bomc",
                         url = "https://bomc.org"),
                 termsOfService = "https://foo.bar/terms"),
-        servers = @Server(
-                description = "localhost",
-                url = "/bomc-invoice"
-                ),
-        tags = @Tag(
-                name = "Type",
-                description = "API type")
+        servers = { 
+        		@Server(url = "/bomc-invoice", description = "the context root")
+        },
+        tags = {
+        		@Tag(name = "Type", description = "API type")
+        }
         )
 @ApplicationPath(JaxRsActivator.APPLICATION_PATH)
 public class JaxRsActivator extends Application {

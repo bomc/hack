@@ -12,7 +12,7 @@ spec:
     app: bomc-invoice
   ports:
   - protocol: TCP
-    port: 8180
+    port: 8080
     name: http
     # bomc Use this port for Browser access
     nodePort: 30082

@@ -2,8 +2,8 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: istio-bomc-app-virtualservice
-  namespace: bomc-app
+  name: istio-bomc-app-invoice-virtualservice
+  namespace: istio-system
 spec:
   hosts:
   - "*"
@@ -11,10 +11,30 @@ spec:
   # This VirtualService applies to requests coming through the istio-bomc-app-gateway.
   - istio-bomc-app-gateway.istio-system.svc.cluster.local
   http:
-  - route:
+  - match:
+    - uri:
+       prefix: /bomc-invoice/rest
+    route:
     - destination:
-        host: bomc-invoice
+        host: bomc-invoice-service.bomc-app.svc.cluster.local
         port:
           number: 80
         # subset: v1
+  # Swagger resources
+  - match:
+    - uri:
+       prefix: /bomc-invoice/webjar
+    route:
+    - destination:
+        host: bomc-invoice-service.bomc-app.svc.cluster.local
+        port:
+          number: 80
+  - match:
+    - uri:
+       prefix: /openapi
+    route:
+    - destination:
+        host: bomc-invoice-service.bomc-app.svc.cluster.local
+        port:
+          number: 80
 ---

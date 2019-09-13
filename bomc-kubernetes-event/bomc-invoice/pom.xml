@@ -213,80 +213,72 @@
 						</includes>
 					</resource>
 				</resources>
- 
+
 				<plugins>
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
 						<version>${version.jacoco-maven-plugin}</version>
 						<executions>
-				            <!--
-        						Prepares the property pointing to the JaCoCo runtime agent which
-        						is passed as VM argument when Maven the Surefire plugin is executed.
-        					-->
+							<!-- Prepares the property pointing to the JaCoCo runtime agent which 
+								is passed as VM argument when Maven the Surefire plugin is executed. -->
 							<execution>
 								<id>pre-unit-test</id>
 								<goals>
 									<goal>prepare-agent</goal>
 								</goals>
-              					<configuration>
-                					<!-- Sets the path to the file which contains the execution data. -->
-                					<destFile>${project.build.directory}/code-coverage/jacoco-ut.exec</destFile>
-                					<!--
-            							Sets the name of the property containing the settings
-            							for JaCoCo runtime agent.
-        							-->
-                					<propertyName>surefireArgLine</propertyName>
-              					</configuration>
+								<configuration>
+									<!-- Sets the path to the file which contains the execution data. -->
+									<destFile>${project.build.directory}/code-coverage/jacoco-ut.exec</destFile>
+									<!-- Sets the name of the property containing the settings for JaCoCo 
+										runtime agent. -->
+									<propertyName>surefireArgLine</propertyName>
+								</configuration>
 							</execution>
 							<!-- Ensures that the code coverage report for unit tests is created 
 								after unit tests have been run. -->
-            				<execution>
-              					<id>post-unit-test</id>
-              					<phase>test</phase>
-              					<goals>
-                					<goal>report</goal>
-              					</goals>
-              					<configuration>
-                					<!-- Sets the path to the file which contains the execution data. -->
-                					<dataFile>${project.build.directory}/code-coverage/jacoco-ut.exec</dataFile>
-                					<!-- Sets the output directory for the code coverage report. -->
-                					<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
-              					</configuration>
-            				</execution>
-            				<execution>
-              					<id>pre-integration-test</id>
-              					<phase>pre-integration-test</phase>
-              					<goals>
-                					<goal>prepare-agent</goal>
-              					</goals>
-              					<configuration>
-                					<!-- Sets the path to the file which contains the execution data. -->
-                					<destFile>${project.build.directory}/code-coverage/jacoco-it.exec</destFile>
-                					<!--
-            							Sets the name of the property containing the settings
-            							for JaCoCo runtime agent.
-        							-->
-                					<propertyName>failsafeArgLine</propertyName>
-              					</configuration>
-            				</execution>
-            				<!--
-        						Ensures that the code coverage report for integration tests after
-        						integration tests have been run.
-        					-->
-            				<execution>
-              					<id>post-integration-test</id>
-              					<phase>post-integration-test</phase>
-              					<goals>
-                					<goal>report</goal>
-              					</goals>
-              					<configuration>
-                					<!-- Sets the path to the file which contains the execution data. -->
-                					<dataFile>${project.build.directory}/code-coverage/jacoco-it.exec</dataFile>
-                					<!-- Sets the output directory for the code coverage report. -->
-                					<outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
-              					</configuration>
-            				</execution>
+							<execution>
+								<id>post-unit-test</id>
+								<phase>test</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+								<configuration>
+									<!-- Sets the path to the file which contains the execution data. -->
+									<dataFile>${project.build.directory}/code-coverage/jacoco-ut.exec</dataFile>
+									<!-- Sets the output directory for the code coverage report. -->
+									<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+								</configuration>
+							</execution>
+							<execution>
+								<id>pre-integration-test</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+									<!-- Sets the path to the file which contains the execution data. -->
+									<destFile>${project.build.directory}/code-coverage/jacoco-it.exec</destFile>
+									<!-- Sets the name of the property containing the settings for JaCoCo 
+										runtime agent. -->
+									<propertyName>failsafeArgLine</propertyName>
+								</configuration>
+							</execution>
+							<!-- Ensures that the code coverage report for integration tests after 
+								integration tests have been run. -->
+							<execution>
+								<id>post-integration-test</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+								<configuration>
+									<!-- Sets the path to the file which contains the execution data. -->
+									<dataFile>${project.build.directory}/code-coverage/jacoco-it.exec</dataFile>
+									<!-- Sets the output directory for the code coverage report. -->
+									<outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+								</configuration>
+							</execution>
 							<execution>
 								<id>merge-ut-it-jacoco</id>
 								<goals>
@@ -305,51 +297,51 @@
 										</fileSet>
 									</fileSets>
 									<destFile>${project.build.directory}/coverage-reports/jacoco-dev.exec</destFile>
-                					<!-- Sets the path to the file which contains the execution data. -->
-                					<dataFile>${project.build.directory}/coverage-reports/jacoco-dev.exec</dataFile>
-                					<!-- Sets the output directory for the code coverage report. -->
-                					<outputDirectory>${project.reporting.outputDirectory}/jacoco-merged</outputDirectory>
+									<!-- Sets the path to the file which contains the execution data. -->
+									<dataFile>${project.build.directory}/coverage-reports/jacoco-dev.exec</dataFile>
+									<!-- Sets the output directory for the code coverage report. -->
+									<outputDirectory>${project.reporting.outputDirectory}/jacoco-merged</outputDirectory>
 								</configuration>
 							</execution>
-                            <execution>
-                                <id>jacoco-check</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                                <configuration>
-                                	<destFile>${project.build.directory}/coverage-reports/jacoco-dev.exec</destFile>
-                                    <rules>
-                                        <rule>
-                                            <element>BUNDLE</element>
-                                            <limits>
-                                                <!-- The supported counter options are: LINE, BRANCH, INSTRUCTION,
-                                                    COMPLEXITY, METHOD, CLASS (mvn clean verify). -->
-                                                <limit>
-                                                    <counter>LINE</counter>
-                                                    <value>COVEREDRATIO</value>
-                                                    <minimum>${jacoco.line.coveredratio}</minimum>
-                                                </limit>
-                                                <limit>
-                                                    <counter>BRANCH</counter>
-                                                    <value>COVEREDRATIO</value>
-                                                    <minimum>${jacoco.branch.coveredratio}</minimum>
-                                                </limit>
-                                                <limit>
-                                                    <counter>INSTRUCTION</counter>
-                                                    <value>COVEREDRATIO</value>
-                                                    <minimum>${jacoco.instruction.coveredratio}</minimum>
-                                                </limit>
-                                                <limit>
-                                                    <counter>COMPLEXITY</counter>
-                                                    <value>COVEREDRATIO</value>
-                                                    <minimum>${jacoco.complexity.coveredratio}</minimum>
-                                                </limit>
-                                            </limits>
-                                        </rule>
-                                    </rules>
-                                </configuration>
-                            </execution>
+							<execution>
+								<id>jacoco-check</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>check</goal>
+								</goals>
+								<configuration>
+									<destFile>${project.build.directory}/coverage-reports/jacoco-dev.exec</destFile>
+									<rules>
+										<rule>
+											<element>BUNDLE</element>
+											<limits>
+												<!-- The supported counter options are: LINE, BRANCH, INSTRUCTION, 
+													COMPLEXITY, METHOD, CLASS (mvn clean verify). -->
+												<limit>
+													<counter>LINE</counter>
+													<value>COVEREDRATIO</value>
+													<minimum>${jacoco.line.coveredratio}</minimum>
+												</limit>
+												<limit>
+													<counter>BRANCH</counter>
+													<value>COVEREDRATIO</value>
+													<minimum>${jacoco.branch.coveredratio}</minimum>
+												</limit>
+												<limit>
+													<counter>INSTRUCTION</counter>
+													<value>COVEREDRATIO</value>
+													<minimum>${jacoco.instruction.coveredratio}</minimum>
+												</limit>
+												<limit>
+													<counter>COMPLEXITY</counter>
+													<value>COVEREDRATIO</value>
+													<minimum>${jacoco.complexity.coveredratio}</minimum>
+												</limit>
+											</limits>
+										</rule>
+									</rules>
+								</configuration>
+							</execution>
 						</executions>
 					</plugin>
 					<plugin>
@@ -359,8 +351,8 @@
 						<configuration>
 							<!-- Junit tests werden hier ausgeführt. -->
 							<skip>false</skip>
-<!-- 							<forkCount>1</forkCount> -->
-<!-- 							<reuseForks>true</reuseForks> -->
+							<!-- <forkCount>1</forkCount> -->
+							<!-- <reuseForks>true</reuseForks> -->
 							<includes>
 								<include>**/*Test.java</include>
 							</includes>
@@ -386,18 +378,18 @@
 									<!-- Für jeden Test wird eine VM gestartet, in dieser VM wird jeweils 
 										ein separater Wildfly gestartet, das Test-Artefakt deployed und Wildfly anschliessend 
 										gestoppt. -->
-<!-- 									<forkCount>1</forkCount> -->
-<!-- 									<reuseForks>false</reuseForks> -->
+									<!-- <forkCount>1</forkCount> -->
+									<!-- <reuseForks>false</reuseForks> -->
 									<includes>
 										<include>**/*IT.java</include>
 									</includes>
 									<!-- Sets the VM argument line used when integration tests are run. -->
 									<argLine>${failsafeArgLine}</argLine>
-									
-<!--                         			<systemPropertyVariables> -->
-<!--                             			<jacoco.test>${failsafeArgLine}</jacoco.test> -->
-<!--                         			</systemPropertyVariables> -->
-                        			
+
+									<!-- <systemPropertyVariables> -->
+									<!-- <jacoco.test>${failsafeArgLine}</jacoco.test> -->
+									<!-- </systemPropertyVariables> -->
+
 								</configuration>
 							</execution>
 						</executions>
@@ -410,6 +402,9 @@
 							<jvmArguments>
 								<jvmArgument>-Xmx256m</jvmArgument>
 							</jvmArguments>
+                            <properties>
+                                <thorntail.context.path>/${project.build.finalName}</thorntail.context.path>
+                            </properties>							
 						</configuration>
 						<executions>
 							<execution>
@@ -420,20 +415,20 @@
 							</execution>
 							<execution>
 								<id>start</id>
-<!-- 								<phase>pre-integration-test</phase> -->
-<!-- 								<goals> -->
-<!-- 									<goal>start</goal> -->
-<!-- 								</goals> -->
+								<!-- <phase>pre-integration-test</phase> -->
+								<!-- <goals> -->
+								<!-- <goal>start</goal> -->
+								<!-- </goals> -->
 								<configuration>
 									<arguments>-Slocal</arguments>
 								</configuration>
 							</execution>
 							<execution>
 								<id>stop</id>
-<!-- 								<phase>post-integration-test</phase> -->
-<!-- 								<goals> -->
-<!-- 									<goal>stop</goal> -->
-<!-- 								</goals> -->
+								<!-- <phase>post-integration-test</phase> -->
+								<!-- <goals> -->
+								<!-- <goal>stop</goal> -->
+								<!-- </goals> -->
 							</execution>
 						</executions>
 					</plugin>
@@ -489,11 +484,12 @@
 			<artifactId>arquillian</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.microprofile-ext.openapi-ext</groupId>
 			<artifactId>swagger-ui</artifactId>
 			<version>${version.swagger-ui}</version>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!-- <dependency> -->
@@ -574,26 +570,26 @@
 		</dependency>
 
 		<!-- All needs to run arquillian tests. -->
-        <dependency>
-            <groupId>org.jboss.arquillian.junit</groupId>
-            <artifactId>arquillian-junit-container</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.protocol</groupId>
-            <artifactId>arquillian-protocol-servlet</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.junit</groupId>
-            <artifactId>arquillian-junit-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.container</groupId>
-            <artifactId>arquillian-container-test-api</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-container</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.protocol</groupId>
+			<artifactId>arquillian-protocol-servlet</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.container</groupId>
+			<artifactId>arquillian-container-test-api</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 
 
@@ -603,7 +599,7 @@
 			<version>${version.arquillian-jacoco}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.jboss.shrinkwrap.resolver</groupId>
 			<artifactId>shrinkwrap-resolver-depchain</artifactId>

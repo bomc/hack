@@ -69,9 +69,9 @@ public class OrderSchedulerService {
 	private static final String ROOT_PATH_ORDER_SERVICE_KEY = "root.path.order.service";
 	private static final String DEFAULT_ROOT_PATH_ORDER_SERVICE = "rest";
 	private static final String ENV_HOST_KEY = "env.order.service.host.key";
-	private static final String DEFAULT_ENV_HOST_KEY = "BOMC_ORDER_SERVICE_HOST";
+	private static final String DEFAULT_ENV_HOST_KEY = "BOMC_ORDER_SERVICE_SERVICE_HOST";
 	private static final String ENV_PORT_KEY = "env.order.service.port.key";
-	private static final String DEFAULT_ENV_PORT_KEY = "BOMC_ORDER_SERVICE_PORT";
+	private static final String DEFAULT_ENV_PORT_KEY = "BOMC_ORDER_SERVICE_SERVICE_PORT";
 	private static final String ZONE_ID_EUROPE_BERLIN = "Europe/Berlin";
 	// _______________________________________________
 	// Member variables

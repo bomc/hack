@@ -2,3 +2,7 @@ thorntail:
 #  logging: FINE
   context:
     path: bomc-invoice
+  logging:
+    loggers:
+      org.microprofileext.openapi:
+        level: FINEST
