@@ -23,10 +23,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import de.bomc.poc.hrm.domain.model.basis.AbstractEntity;
-import de.bomc.poc.hrm.domain.model.basis.CustomLocalDateSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -87,7 +86,8 @@ public class CustomerEntity extends AbstractEntity<CustomerEntity> implements Se
 	private String lastName;
 
 	@Column(name = "C_DATE_OF_BIRTH", nullable = false)
-	@JsonSerialize(using = CustomLocalDateSerializer.class)
+//	@JsonSerialize(using = CustomLocalDateSerializer.class)
+	@JsonFormat(pattern="dd.MM.yyyy")
 	private LocalDate dateOfBirth;
 
 	@Column(name = "C_CITY", length = 40)

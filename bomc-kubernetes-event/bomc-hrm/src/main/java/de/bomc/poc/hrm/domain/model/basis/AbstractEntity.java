@@ -71,7 +71,7 @@ public abstract class AbstractEntity<T> extends AbstractMetadataEntity {
 	 */
 	@Override
 	public boolean isNew() {
-		return this.id == null;
+		return this.id == null || this.id == 0L;
 	}
 
 	/**

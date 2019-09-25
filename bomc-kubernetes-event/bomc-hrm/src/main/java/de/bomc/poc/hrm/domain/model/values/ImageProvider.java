@@ -22,14 +22,14 @@ package de.bomc.poc.hrm.domain.model.values;
 public interface ImageProvider {
 
 	/**
-	 * Return the image of the <code>User</code>.
+	 * Return the image of the <code>UserEntity</code>.
 	 * 
 	 * @return The current image
 	 */
 	byte[] getImage();
 
 	/**
-	 * Change the image of the <code>User</code>.
+	 * Change the image of the <code>UserEntity</code>.
 	 * 
 	 * @param img
 	 *            The new image to set

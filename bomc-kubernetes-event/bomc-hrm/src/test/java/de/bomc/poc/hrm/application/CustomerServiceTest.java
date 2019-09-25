@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import de.bomc.poc.hrm.AbstractBaseUnit;
+import de.bomc.poc.hrm.application.exception.AppRuntimeException;
 import de.bomc.poc.hrm.domain.model.CustomerEntity;
 import de.bomc.poc.hrm.infrastructure.CustomerRepository;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
@@ -75,7 +76,7 @@ public class CustomerServiceTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test010_findById_pass");
 
 		// GIVEN
-		final CustomerService customerService = new CustomerService(this.customerRepository, this.customerMapper);
+		final CustomerService customerService = new CustomerServiceImpl(this.customerRepository, this.customerMapper);
 
 		final Optional<CustomerEntity> optionalCustomerEntity = Optional.of(createCustomerEntity());
 		when(this.customerRepository.findById(CUSTOMER_ID)).thenReturn(optionalCustomerEntity);
@@ -92,10 +93,10 @@ public class CustomerServiceTest extends AbstractBaseUnit {
 	public void test020_findById_fail() {
 		LOGGER.info(LOG_PREFIX + "test020_findById_fail");
 
-		this.thrown.expect(IllegalStateException.class);
+		this.thrown.expect(AppRuntimeException.class);
 
 		// GIVEN
-		final CustomerService customerService = new CustomerService(this.customerRepository, this.customerMapper);
+		final CustomerService customerService = new CustomerServiceImpl(this.customerRepository, this.customerMapper);
 
 		final Optional<CustomerEntity> optionalCustomerEntity = Optional.ofNullable(null);
 		when(this.customerRepository.findById(CUSTOMER_ID)).thenReturn(optionalCustomerEntity);
@@ -115,7 +116,7 @@ public class CustomerServiceTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test030_createCustomer_pass");
 		
 		// GIVEN
-		final CustomerService customerService = new CustomerService(this.customerRepository, this.customerMapper);
+		final CustomerService customerService = new CustomerServiceImpl(this.customerRepository, this.customerMapper);
 		
 		final CustomerEntity customerEntity = createCustomerEntity();
 		final CustomerEntity retCustomerEntity = createCustomerEntity();
@@ -139,7 +140,7 @@ public class CustomerServiceTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test040_deleteCustomerById_pass");
 		
 		// GIVEN
-		final CustomerService customerService = new CustomerService(this.customerRepository, this.customerMapper);
+		final CustomerService customerService = new CustomerServiceImpl(this.customerRepository, this.customerMapper);
 		doNothing().when(this.customerRepository).deleteById(CUSTOMER_ID);
 		
 		// WHEN
@@ -155,7 +156,7 @@ public class CustomerServiceTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test050_updateCustomer_pass");
 		
 		// GIVEN
-		final CustomerService customerService = new CustomerService(this.customerRepository, this.customerMapper);
+		final CustomerService customerService = new CustomerServiceImpl(this.customerRepository, this.customerMapper);
 		
 		// The incoming dto
 		final String newCity = "Honululu";
@@ -200,7 +201,7 @@ public class CustomerServiceTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test060_findAll_pass");
 		
 		// GIVEN
-		final CustomerService customerService = new CustomerService(this.customerRepository, this.customerMapper);
+		final CustomerService customerService = new CustomerServiceImpl(this.customerRepository, this.customerMapper);
 		
 		final CustomerEntity customerEntity1 = createCustomerEntity();
 		customerEntity1.setId(1L);

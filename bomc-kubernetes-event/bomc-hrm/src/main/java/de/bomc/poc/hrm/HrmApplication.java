@@ -33,5 +33,4 @@ public class HrmApplication {
 		final ConfigurableApplicationContext configurableApplicationContext = SpringApplication
 				.run(HrmApplication.class, args);
 	}
-
 }

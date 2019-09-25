@@ -30,8 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,6 +44,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import de.bomc.poc.hrm.AbstractBaseUnit;
 import de.bomc.poc.hrm.application.CustomerService;
@@ -68,7 +68,6 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CustomerControllerTest.class.getName());
 
 	/* --------------------- constants ------------------------------ */
-	private static final String MIME_TYPE_JSON_UTF8 = "application/json;charset=UTF-8";
 	
 	/* --------------------- member variables ----------------------- */
 	@Autowired
@@ -89,14 +88,16 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		when(this.customerService.createCustomer(createCustomerEntity())).thenReturn(createdCustomerDto);
 
 		final ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new JavaTimeModule());
+		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		final String requestJson = objectMapper.writeValueAsString(createCustomerDto());
 
 		// THEN
 		this.mvc.perform(post("/customer")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
+				.accept(CustomerController.MEDIA_TYPE_JSON_V1)
+				.contentType(CustomerController.MEDIA_TYPE_JSON_V1)
 				.content(requestJson))
-			.andDo(print())
+				.andDo(print())
 				.andExpect(status().isOk());
 	}
 
@@ -114,13 +115,9 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		final String requestJson = objectMapper.writeValueAsString(customerEmailDto);
 		
 		// THEN
-		this.mvc.perform(post("/customer/email-address", CUSTOMER_E_MAIL)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(requestJson))
-			.andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MIME_TYPE_JSON_UTF8))
+		this.mvc.perform(post("/customer/email-address", CUSTOMER_E_MAIL).accept(CustomerController.MEDIA_TYPE_JSON_V1)
+				.contentType(CustomerController.MEDIA_TYPE_JSON_V1).content(requestJson)).andDo(print())
+				.andExpect(status().isOk()).andExpect(content().contentType(CustomerController.MEDIA_TYPE_JSON_V1))
 				.andExpect(jsonPath("$.emailAddress").value(CUSTOMER_E_MAIL));
 	}
 
@@ -132,9 +129,9 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		when(this.customerService.findById(CUSTOMER_ID)).thenReturn(createCustomerDto());
 
 		// THEN
-		this.mvc.perform(get("/customer/{id}", Long.toString(CUSTOMER_ID)).accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
-				.andExpect(content().contentType(MIME_TYPE_JSON_UTF8))
+		this.mvc.perform(get("/customer/{id}", Long.toString(CUSTOMER_ID)).accept(CustomerController.MEDIA_TYPE_JSON_V1)
+				.contentType(CustomerController.MEDIA_TYPE_JSON_V1)).andDo(print()).andExpect(status().isOk())
+				.andExpect(content().contentType(CustomerController.MEDIA_TYPE_JSON_V1))
 				.andExpect(jsonPath("$.emailAddress").value(CUSTOMER_E_MAIL));
 	}
 	
@@ -157,7 +154,7 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		
 		// THEN
 		this.mvc.perform(get("/customer")).andDo(print()).andExpect(status().isOk())
-			.andExpect(content().contentType(MIME_TYPE_JSON_UTF8))
+			.andExpect(content().contentType(CustomerController.MEDIA_TYPE_JSON_V1))
 			.andExpect(jsonPath("$").isArray())
 			.andExpect(jsonPath("$", hasSize(2)))
 			.andExpect(jsonPath("$.[0].emailAddress").value(equalTo("bomc1@bomc.org")));
@@ -173,14 +170,16 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		updatedCustomerDto.setCity("Honululu");
 		
 		final ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new JavaTimeModule());
+		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		final String requestJson = objectMapper.writeValueAsString(customerDto);
 		
 		when(this.customerService.updateCustomer(customerDto)).thenReturn(updatedCustomerDto);
 		
 		// THENs
 		this.mvc.perform(put("/customer")
-			.accept(MIME_TYPE_JSON_UTF8)
-			.contentType(MIME_TYPE_JSON_UTF8)
+			.accept(CustomerController.MEDIA_TYPE_JSON_V1)
+			.contentType(CustomerController.MEDIA_TYPE_JSON_V1)
 			.content(requestJson))
 		.andDo(print())
 			.andExpect(status().isOk());		
@@ -195,7 +194,7 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		
 		// THEN
 		this.mvc.perform(delete("/customer/{id}", Long.toString(CUSTOMER_ID))
-				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+				.accept(CustomerController.MEDIA_TYPE_JSON_V1).contentType(CustomerController.MEDIA_TYPE_JSON_V1))
 				.andDo(print()).andExpect(status().isOk());
 	}
 }

@@ -17,6 +17,8 @@ package de.bomc.poc.hrm.interfaces;
 import org.springframework.http.HttpStatus;
 
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -26,6 +28,8 @@ import lombok.ToString;
  * @since 06.05.2019
  */
 @Builder
+@Getter
+@Setter
 @ToString
 public class ApiErrorResponseObject {
 

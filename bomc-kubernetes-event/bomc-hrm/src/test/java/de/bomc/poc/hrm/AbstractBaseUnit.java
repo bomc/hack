@@ -55,7 +55,6 @@ public abstract class AbstractBaseUnit {
 	}
 	
 	public static CustomerDto createCustomerDto() {
-		
 		final CustomerDto customerDto = CustomerDto.builder().city(CUSTOMER_CITY).country(CUSTOMER_COUNTRY)
 				.dateOfBirth(CUSTOMER_DATE_OF_BIRTH).emailAddress(CUSTOMER_E_MAIL).firstName(CUSTOMER_FIRST_NAME)
 				.houseNumber(CUSTOMER_HOUSE_NUMBER).lastName(CUSTOMER_LAST_NAME).phoneNumber(CUSTOMER_PHONE_NUMBER)

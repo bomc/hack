@@ -21,8 +21,8 @@ package de.bomc.poc.hrm.application.exception;
  */
 public enum ApplicationUserEnum {
 
-    SYSTEM_USER("User that should be used for operation inside the application."),
-    TEST_USER("User that should be used for tests.");
+    SYSTEM_USER("UserEntity that should be used for operation inside the application."),
+    TEST_USER("UserEntity that should be used for tests.");
     //
     // Short description.
     private String shortDescription = "no description available";

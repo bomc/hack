@@ -17,8 +17,8 @@ package de.bomc.poc.hrm.application.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.bomc.poc.exception.core.BasisErrorCodeEnum;
-import de.bomc.poc.exception.core.ErrorCode;
+import de.bomc.poc.hrm.application.exception.core.BasisErrorCodeEnum;
+import de.bomc.poc.hrm.application.exception.core.ErrorCode;
 
 /**
  * This enum holds all errors with code and description.

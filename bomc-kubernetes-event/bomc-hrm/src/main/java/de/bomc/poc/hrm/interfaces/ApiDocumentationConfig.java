@@ -16,6 +16,8 @@ package de.bomc.poc.hrm.interfaces;
 
 import java.util.Collections;
 
+import javax.servlet.ServletContext;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -46,22 +48,53 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class ApiDocumentationConfig {
 
 	@Bean
-	public Docket productApi() {
+	public Docket customerApi(final ServletContext servletContext) {
+
 		return new Docket(DocumentationType.SWAGGER_2)
-				.groupName("hrm-api-1.0")
+//				.pathProvider(new RelativePathProvider(servletContext) {
+//					@Override
+//					public String getApplicationBasePath() {
+//						return super.getApplicationBasePath() + "/api-docs";
+//					}
+//				})
+				.groupName("customer-hrm-api-1.0")
 				// Specifies the title, description, etc of the Rest API.
 				.apiInfo(this.apiInfo())
+//				.produces(Collections.singleton("application/json;charset=UTF-8"))
 				// Provides a way to control the endpoints exposed by swagger.
 				.select()
 				// Specify the package where are the declared controllers. Swagger only picks up
 				// controllers declared in this package.
-				.apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm"))
+				.apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm.interfaces"))
 				// Specify only paths starting with /customer should be picked up.
-				.paths(PathSelectors.any()) // (this.path())
-//				.produces(Collections.singleton("application/json;charset=UTF-8"))
+				.paths(this.customerPath()) //PathSelectors.any() 
 				.build();
 	}
 
+	@Bean
+	public Docket userApi(final ServletContext servletContext) {
+
+		return new Docket(DocumentationType.SWAGGER_2)
+//				.pathProvider(new RelativePathProvider(servletContext) {
+//					@Override
+//					public String getApplicationBasePath() {
+//						return super.getApplicationBasePath() + "/api-docs";
+//					}
+//				})
+				.groupName("user-hrm-api-1.0")
+				// Specifies the title, description, etc of the Rest API.
+				.apiInfo(this.apiInfo())
+//				.produces(Collections.singleton("application/json;charset=UTF-8"))
+				// Provides a way to control the endpoints exposed by swagger.
+				.select()
+				// Specify the package where are the declared controllers. Swagger only picks up
+				// controllers declared in this package.
+				.apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm.interfaces"))
+				// Specify only paths starting with /customer should be picked up.
+				.paths(this.userPath()) //PathSelectors.any() 
+				.build();
+	}
+	
 	private ApiInfo apiInfo() {
 		ApiInfo apiInfo = new ApiInfo("HRM REST API", "A simple application for testing the PaaS plattform.",
 				"1.0.0-SNAPSHOT", "Terms of service", new Contact("bomc", "www.bomc.org", "bomc@bomc.org"),
@@ -75,11 +108,20 @@ public class ApiDocumentationConfig {
 	 * 
 	 * @return a predicate as string.
 	 */
-	@SuppressWarnings("unused")
-	private Predicate<String> path() {
+	private Predicate<String> customerPath() {
 		//
 		// Match all paths except /error
-		return Predicates.and(PathSelectors.regex("/customer.*/"), Predicates.not(PathSelectors.regex("/error.*")));
+		return Predicates.and(PathSelectors.regex("/customer.*"), Predicates.not(PathSelectors.regex("/error.*")));
 	}
 
+	/**
+	 * Only select apis that matches the given Predicates.
+	 * 
+	 * @return a predicate as string.
+	 */
+	private Predicate<String> userPath() {
+		//
+		// Match all paths except /error
+		return Predicates.and(PathSelectors.regex("/user.*"), Predicates.not(PathSelectors.regex("/error.*")));
+	}
 }

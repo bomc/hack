@@ -21,9 +21,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import de.bomc.poc.hrm.domain.model.basis.CustomLocalDateSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -73,7 +72,7 @@ public class CustomerDto {
 	private String lastName;
 	
 	@NotNull
-	@JsonSerialize(using = CustomLocalDateSerializer.class)
+	@JsonFormat(pattern="dd.MM.yyyy")
 	@ApiModelProperty(notes = "The day of birth of the customer.")
 	private LocalDate dateOfBirth;
 	

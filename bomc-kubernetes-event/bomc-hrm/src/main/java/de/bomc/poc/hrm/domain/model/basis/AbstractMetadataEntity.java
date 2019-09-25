@@ -14,17 +14,15 @@
  */
 package de.bomc.poc.hrm.domain.model.basis;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Version;
-import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * An AbstractMetadataEntity is as a base class for all domain classes.
@@ -52,15 +50,15 @@ public abstract class AbstractMetadataEntity implements DomainObject {
     @Version
     @Column(name = "C_VERSION")
     protected Long version;
-    @Column(name = "C_CREATEUSER", nullable = false, updatable = false)
+    @Column(name = "C_CREATEUSER"/*, nullable = false*/, updatable = false)
     protected String createUser;
     @Column(name = "C_CREATEDATETIME", nullable = false, updatable = false)
-    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+    @JsonFormat(pattern="dd.MMyyyy HH:mm:ss")
     protected LocalDateTime createDateTime;
     @Column(name = "C_MODIFYUSER", nullable = true)
     protected String modifyUser;
     @Column(name = "C_MODIFYDATETIME", nullable = true)
-    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+    @JsonFormat(pattern="dd.MMyyyy HH:mm:ss")
     protected LocalDateTime modifyDateTime;
 
     /* ----------------------------- methods ------------------------- */
@@ -162,17 +160,6 @@ public abstract class AbstractMetadataEntity implements DomainObject {
     @Override
     public void setModifyDateTime(final LocalDateTime modifyDateTime) {
         this.modifyDateTime = modifyDateTime;
-    }
-
-    /**
-     * Format the localDateTime to ISO-8601 standard.
-     * 
-     * @param localDateTime
-     *            the localDateTime to format.
-     * @return the localDateTime in ISO-8601 format.
-     */
-    public String formatLocalDateTime(@NotNull final LocalDateTime localDateTime) {
-        return localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
     @Override

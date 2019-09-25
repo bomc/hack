@@ -61,8 +61,8 @@ public class WebAppConfig implements WebMvcConfigurer {
 	@Override
 	public void addViewControllers(final ViewControllerRegistry registry) {
 
-		System.out.println("############################Angular##############################");
-		registry.addViewController("/").setViewName("forward:/index.html");
+//		System.out.println("############################Angular##############################");
+//		registry.addViewController("/").setViewName("forward:/index.html");
 	}
 
 	/**
@@ -74,8 +74,8 @@ public class WebAppConfig implements WebMvcConfigurer {
 	@Override
 	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
 		// Add swagger sources.
-		registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+//		registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+//		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
 	}
 
 }

@@ -15,20 +15,16 @@
 package de.bomc.poc.hrm.interfaces;
 
 import java.util.List;
-import java.util.UUID;
 
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.logging.LogLevel;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
 import de.bomc.poc.hrm.application.CustomerService;
 import de.bomc.poc.hrm.application.log.method.Loggable;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
@@ -65,6 +62,8 @@ public class CustomerController {
 	private static final String LOG_PREFIX = "CustomerController#";
 	private static final Logger LOGGER = LoggerFactory.getLogger(CustomerController.class.getName());
 
+	protected static final String MEDIA_TYPE_JSON_V1 = "application/vnd.hrm-v1+json;charset=UTF-8";
+	
 	private final CustomerService customerService;
 	private final CustomerMapper customerMapper;
 
@@ -87,7 +86,7 @@ public class CustomerController {
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
 			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
 	@ApiImplicitParams(@ApiImplicitParam(name = "id", value = "The technical id.", dataType = "Long", dataTypeClass = java.lang.Long.class, required = true))
-	@GetMapping(value = "/{id}", produces = "application/json;charset=UTF-8")
+	@GetMapping(value = "/{id}", produces = MEDIA_TYPE_JSON_V1)
 	@ResponseStatus(HttpStatus.OK)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public ResponseEntity<CustomerDto> getCustomerById(@PathVariable final Long id) {
@@ -102,7 +101,7 @@ public class CustomerController {
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
 			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
 	@ApiImplicitParams(@ApiImplicitParam(name = "customerEmailDto", value = "The identifier to search the customer.", dataType = "CustomerEmailDto", dataTypeClass = de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto.class, required = true))
-	@PostMapping(value = "/email-address", produces = "application/json;charset=UTF-8", consumes = "application/json;charset=UTF-8")
+	@PostMapping(value = "/email-address", produces = MEDIA_TYPE_JSON_V1, consumes = MEDIA_TYPE_JSON_V1)
 	@ResponseStatus(HttpStatus.OK)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public ResponseEntity<CustomerDto> getCustomerByEmailAddress(
@@ -117,8 +116,8 @@ public class CustomerController {
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
 			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
-	@ApiImplicitParams(@ApiImplicitParam(name = "customerDto", value = "The updated customer to persist.", dataType = "CustomerDto", dataTypeClass = de.bomc.poc.hrm.interfaces.mapper.CustomerDto.class, required = true))
-	@PostMapping(produces = "application/json;charset=UTF-8", consumes = "application/json;charset=UTF-8")
+	@ApiImplicitParams(@ApiImplicitParam(name = "customerDto", value = "The customer to persist.", dataType = "CustomerDto", dataTypeClass = de.bomc.poc.hrm.interfaces.mapper.CustomerDto.class, required = true))
+	@PostMapping(produces = MEDIA_TYPE_JSON_V1, consumes = MEDIA_TYPE_JSON_V1)
 	@ResponseStatus(HttpStatus.OK)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody final CustomerDto customerDto) {
@@ -133,7 +132,7 @@ public class CustomerController {
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
 			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
 	@ApiImplicitParams(@ApiImplicitParam(name = "id", value = "The identifier for deleting a customer.", dataType = "Long", dataTypeClass = java.lang.Long.class, required = true))
-	@DeleteMapping(value = "/{id}")
+	@DeleteMapping(value = "/{id}", consumes = MEDIA_TYPE_JSON_V1)
 	@Loggable(result = false, params = true, value = LogLevel.DEBUG, time = true)
 	public void deleteCustomer(@ApiParam(value = "The customer id.", required = true) @PathVariable final Long id) {
 		LOGGER.debug(LOG_PREFIX + "deleteCustomer [id=" + id + "]");
@@ -147,7 +146,7 @@ public class CustomerController {
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
 			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
 	@ApiImplicitParams(@ApiImplicitParam(name = "customerDto", value = "The updated customer to persist.", dataType = "CustomerDto", dataTypeClass = de.bomc.poc.hrm.interfaces.mapper.CustomerDto.class, required = true))
-	@PutMapping(produces = "application/json;charset=UTF-8", consumes = "application/json;charset=UTF-8")
+	@PutMapping(produces = MEDIA_TYPE_JSON_V1, consumes = MEDIA_TYPE_JSON_V1)
 	@Loggable(result = false, params = true, value = LogLevel.DEBUG, time = true)
 	public void updateCustomer(@Valid @RequestBody final CustomerDto customerDto) {
 
@@ -159,7 +158,7 @@ public class CustomerController {
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
 			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
-	@GetMapping(produces = "application/json;charset=UTF-8")
+	@GetMapping(produces = MEDIA_TYPE_JSON_V1)
 	@ResponseStatus(HttpStatus.OK)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public ResponseEntity<List<CustomerDto>> findAll() {
@@ -167,25 +166,4 @@ public class CustomerController {
 		return new ResponseEntity<List<CustomerDto>>(this.customerService.findAll(), HttpStatus.OK);
 	}
 
-	// _______________________________________________
-	// Helper methods
-	// -----------------------------------------------
-
-	/**
-	 * A fall-back handler – a catch-all type of logic that deals with all other
-	 * exceptions that don’t have specific handlers
-	 * 
-	 * @param exception the given exception.
-	 * @return a ApiErrorResponseObject.
-	 */
-	@ExceptionHandler({ Exception.class })
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
-	public ApiErrorResponseObject handleException(final MethodArgumentNotValidException exception) {
-
-		final String errorMsg = exception.getBindingResult().getFieldErrors().stream()
-				.map(DefaultMessageSourceResolvable::getDefaultMessage).findFirst().orElse(exception.getMessage());
-
-		return ApiErrorResponseObject.builder().shortErrorCodeDescription(errorMsg)
-				.errorCode(HttpStatus.INTERNAL_SERVER_ERROR.name()).uuid(UUID.randomUUID().toString()).build();
-	}
 }
