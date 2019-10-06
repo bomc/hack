@@ -14,8 +14,8 @@
  */
 package de.bomc.poc.hrm.infrastructure;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Optional;
 
@@ -27,12 +27,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import de.bomc.poc.hrm.AbstractBaseUnit;
 import de.bomc.poc.hrm.domain.model.CustomerEntity;
-import de.bomc.poc.hrm.infrastructure.CustomerRepository;
 
 /**
  * Tests the customer repository.
@@ -40,9 +40,11 @@ import de.bomc.poc.hrm.infrastructure.CustomerRepository;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
  */
-@DataJpaTest
+@DataJpaTest // Tests by default transactional and open transactions are automatically rolled
+				// back at the end of the test.
 @RunWith(SpringJUnit4ClassRunner.class)
-@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:data-h2.sql")
+@ActiveProfiles("dev")
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:data-customer-h2.sql")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CustomerRepositoryTest extends AbstractBaseUnit {
 
@@ -65,14 +67,14 @@ public class CustomerRepositoryTest extends AbstractBaseUnit {
 		// THEN
 		assertThat(optCustomerEntity.isPresent(), equalTo(true));
 	}
-	
+
 	@Test
 	public void test020_count_pass() {
 		LOGGER.info(LOG_PREFIX + "test020_count_pass");
-		
+
 		// WHEN
 		final long customerEntityCount = this.customerRepository.count();
-		
+
 		// THEN
 		assertThat(customerEntityCount, equalTo(2L));
 	}

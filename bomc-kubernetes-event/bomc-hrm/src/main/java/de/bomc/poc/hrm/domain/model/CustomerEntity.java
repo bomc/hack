@@ -37,7 +37,7 @@ import lombok.Setter;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
  */
-// Lombok
+// LOMBOK
 @AllArgsConstructor
 @Builder
 @Getter
