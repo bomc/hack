@@ -1,0 +1,40 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bomc-hrm
+  namespace: bomc-app
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bomc-hrm
+        # version: v1.0.0
+    spec:
+      containers:
+      - name: bomc-hrm
+        image: bomc/bomc-hrm:v1.0.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "200m"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+#        livenessProbe:
+#          exec:
+#            command:
+#            - /bin/bash
+#            - -c
+#            - curl -f localhost:8080/
+#          initialDelaySeconds: 10
+#        readinessProbe:
+#          exec:
+#            command:
+#            - /bin/bash
+#            - -c
+#            - curl -f localhost:8080/bomc-hrm/rest/version/current-version
+#          initialDelaySeconds: 20
+#      restartPolicy: Always
+---

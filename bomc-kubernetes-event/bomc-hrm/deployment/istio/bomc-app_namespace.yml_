@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bomc-app
+  labels:
+    # Or run 'kubectl label namespace bomc-app istio-injection=enabled' 
+    istio-injection: enabled
