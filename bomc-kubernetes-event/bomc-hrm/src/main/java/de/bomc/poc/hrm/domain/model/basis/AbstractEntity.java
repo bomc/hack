@@ -39,8 +39,8 @@ public abstract class AbstractEntity<T> extends AbstractMetadataEntity {
 	 * Unique technical key.
 	 */
 	@Id
-	@Column(name = "C_ID", unique = true, updatable = false)
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "c_id", unique = true, updatable = false)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	protected Long id;
 
 	/* --------------------- methods -------------------------------- */

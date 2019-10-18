@@ -44,7 +44,7 @@ import lombok.Setter;
 @Setter
 // JPA
 @Entity
-@Table(name = "T_CUSTOMER")
+@Table(name = "t_customer")
 @NamedQueries({
 		@NamedQuery(name = "Customer.NQ_FIND_CUSTOMER_BY_EMAIL_ADDRESS", query = "SELECT c FROM CustomerEntity c WHERE c.emailAddress = :emailAddress"),
 		@NamedQuery(name = "Customer.NQ_FIND_CUSTOMER_BY_ID", query = "SELECT c FROM CustomerEntity c WHERE c.id= :id") })
@@ -73,36 +73,36 @@ public class CustomerEntity extends AbstractEntity<CustomerEntity> implements Se
 	public static final String NQ_FIND_CUSTOMER_BY_EMAIL_ADDRESS = NQ_PREFIX + "findByEmailAddress";
 
 	/* --------------------- columns -------------------------------- */
-	@Column(name = "C_EMAIL_ADDRESS", unique = true)
+	@Column(name = "c_email_address", unique = true)
 	private String emailAddress;
 
-	@Column(name = "C_PHONE_NUMBER", length = 15)
+	@Column(name = "c_phone_number", length = 15)
 	private String phoneNumber;
 
-	@Column(name = "C_FIRST_NAME", length = 30)
+	@Column(name = "c_first_name", length = 30)
 	private String firstName;
 
-	@Column(name = "C_LAST_NAME", length = 30)
+	@Column(name = "c_last_name", length = 30)
 	private String lastName;
 
-	@Column(name = "C_DATE_OF_BIRTH", nullable = false)
+	@Column(name = "c_date_of_birth", nullable = false)
 //	@JsonSerialize(using = CustomLocalDateSerializer.class)
 	@JsonFormat(pattern="dd.MM.yyyy")
 	private LocalDate dateOfBirth;
 
-	@Column(name = "C_CITY", length = 40)
+	@Column(name = "c_city", length = 40)
 	private String city;
 
-	@Column(name = "C_POSTAL_CODE", length = 10)
+	@Column(name = "c_postal_code", length = 10)
 	private String postalCode;
 
-	@Column(name = "C_STREET", length = 60)
+	@Column(name = "c_street", length = 60)
 	private String street;
 
-	@Column(name = "C_HOUSE_NUMBER", length = 5)
+	@Column(name = "c_house_number", length = 5)
 	private String houseNumber;
 
-	@Column(name = "C_COUNTRY", length = 3)
+	@Column(name = "c_country", length = 3)
 	private String country;
 
 	/* --------------------- associations --------------------------- */

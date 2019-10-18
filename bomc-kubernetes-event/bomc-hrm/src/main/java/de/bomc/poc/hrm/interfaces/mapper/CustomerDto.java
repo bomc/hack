@@ -22,6 +22,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -38,12 +39,16 @@ import lombok.ToString;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
  */
+// Lombok
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @Data
+// Swagger
 @ApiModel(description = "All details about a customer. ")
+// Json: accepting all unknown fields.
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomerDto {
 
 	@ApiModelProperty(notes = "The database generated id.")

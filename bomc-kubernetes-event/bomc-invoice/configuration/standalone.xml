@@ -1,17 +1,17 @@
 <server xmlns="urn:jboss:domain:4.0">
-	<profile>
-		<subsystem xmlns="urn:jboss:domain:logging:3.0">
+    <profile>
+        <subsystem xmlns="urn:jboss:domain:logging:3.0">
             <console-handler name="BOMC_CONSOLE">
                 <formatter>
                     <named-formatter name="BOMC-PATTERN"/>
                 </formatter>
             </console-handler>
-			<root-logger>
-				<level name="INFO"/>
-				<handlers>
-					<handler name="BOMC_CONSOLE" />
-				</handlers>
-			</root-logger>
+                <root-logger>
+                <level name="INFO"/>
+                <handlers>
+                    <handler name="BOMC_CONSOLE" />
+                </handlers>
+            </root-logger>
             <logger category="de.bomc.poc" use-parent-handlers="false">
                 <level name="FINE"/>
                 <handlers>
@@ -21,6 +21,6 @@
             <formatter name="BOMC-PATTERN">
                 <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%X{x-bomc-request-id}] %-5p [%c] (%t) %s%e%n"/>
             </formatter>
-		</subsystem>
-	</profile>
+        </subsystem>
+    </profile>
 </server>

@@ -48,16 +48,16 @@ public abstract class AbstractMetadataEntity implements DomainObject {
      * Version field.
      */
     @Version
-    @Column(name = "C_VERSION")
+    @Column(name = "c_version")
     protected Long version;
-    @Column(name = "C_CREATEUSER"/*, nullable = false*/, updatable = false)
+    @Column(name = "c_createuser"/*, nullable = false*/, updatable = false)
     protected String createUser;
-    @Column(name = "C_CREATEDATETIME", nullable = false, updatable = false)
+    @Column(name = "c_createdatetime", nullable = false, updatable = false)
     @JsonFormat(pattern="dd.MMyyyy HH:mm:ss")
     protected LocalDateTime createDateTime;
-    @Column(name = "C_MODIFYUSER", nullable = true)
+    @Column(name = "c_modifyuser", nullable = true)
     protected String modifyUser;
-    @Column(name = "C_MODIFYDATETIME", nullable = true)
+    @Column(name = "c_modifydatetime", nullable = true)
     @JsonFormat(pattern="dd.MMyyyy HH:mm:ss")
     protected LocalDateTime modifyDateTime;
 

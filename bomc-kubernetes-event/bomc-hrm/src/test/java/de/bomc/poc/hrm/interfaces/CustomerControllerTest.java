@@ -1,5 +1,5 @@
 /**
- * Project: POC PaaS
+ * Project: hrm
  * <pre>
  *
  * Last change:
@@ -48,6 +48,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import brave.Tracer;
 import de.bomc.poc.hrm.AbstractBaseUnit;
 import de.bomc.poc.hrm.application.CustomerService;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
@@ -67,6 +68,17 @@ import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
  * A prime example for using mocks is using Spring Boot’s -at WebMvcTest to 
  * create an application context that contains all the beans necessary for 
  * testing a Spring web controller.
+ * 
+ * NOTE:
+ * -at WebMvcTest auto-configures the Spring MVC infrastructure and limits 
+ * scanned beans to -at Controller, -at ControllerAdvice, -at JsonComponent, 
+ * Converter, GenericConverter, Filter, WebMvcConfigurer, and 
+ * HandlerMethodArgumentResolver. 
+ * ___________________________________________________
+ * Regular -at Component beans are not scanned when using this annotation.
+ * 
+ * So in this case '{@link TraceHeaderFilter.class}' and the dependent 
+ * {@link brave.Tracer} bean has to be register manually.
  * </pre>
  * 
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
@@ -74,8 +86,8 @@ import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
  */
 @WebMvcTest(CustomerController.class)
 @RunWith(SpringJUnit4ClassRunner.class)
-@ActiveProfiles("dev")
-@ComponentScan("de.bomc.poc")
+@ActiveProfiles("local")
+@ComponentScan( value = {"de.bomc.poc"})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CustomerControllerTest extends AbstractBaseUnit {
 
@@ -89,7 +101,9 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 	private MockMvc mvc;
 	@MockBean
 	private CustomerService customerService;
-
+	@MockBean
+	private Tracer tracer;
+	
 	/* --------------------- methods -------------------------------- */
 
 	@Test
@@ -100,6 +114,7 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		final CustomerDto createdCustomerDto = createCustomerDto();
 		createdCustomerDto.setId(CUSTOMER_ID);
 
+		// WHEN
 		when(this.customerService.createCustomer(createCustomerEntity())).thenReturn(createdCustomerDto);
 
 		final ObjectMapper objectMapper = new ObjectMapper();
@@ -121,6 +136,7 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		final CustomerEmailDto customerEmailDto = new CustomerEmailDto();
 		customerEmailDto.setEmailAddress(CUSTOMER_E_MAIL);
 
+		// WHEN 
 		when(this.customerService.findByEmailAddress(customerEmailDto)).thenReturn(createCustomerDto());
 
 		final ObjectMapper objectMapper = new ObjectMapper();
@@ -205,4 +221,5 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 				.accept(CustomerController.MEDIA_TYPE_JSON_V1).contentType(CustomerController.MEDIA_TYPE_JSON_V1))
 				.andDo(print()).andExpect(status().isOk());
 	}
+
 }

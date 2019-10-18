@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import de.bomc.poc.hrm.application.log.http.RequestGetLoggingInterceptor;
-import de.bomc.poc.hrm.application.log.mdc.MdcInterceptor;
+//import de.bomc.poc.hrm.application.log.mdc.MdcInterceptor;
 
 /**
  * Defines callback methods to customize the Java-based configuration
@@ -35,8 +35,8 @@ public class WebAppConfig implements WebMvcConfigurer {
 
 	@Autowired
 	private RequestGetLoggingInterceptor requestGetLoggingInterceptor;
-	@Autowired
-	private MdcInterceptor mdcInterceptor;
+//	@Autowired
+//	private MdcInterceptor mdcInterceptor;
 
 	/**
 	 * Add Spring MVC lifecycle interceptors for pre- and post-processing of
@@ -55,7 +55,7 @@ public class WebAppConfig implements WebMvcConfigurer {
 		// Apply to all URLs.
 		interceptorRegistry.addInterceptor(this.requestGetLoggingInterceptor);
 		// Apply to bomc path.
-		interceptorRegistry.addInterceptor(this.mdcInterceptor).addPathPatterns("/**"); // .excludePathPatterns("/admin/oldLogin");
+		// interceptorRegistry.addInterceptor(this.mdcInterceptor).addPathPatterns("/**"); // .excludePathPatterns("/admin/oldLogin");
 	}
 
 	@Override
