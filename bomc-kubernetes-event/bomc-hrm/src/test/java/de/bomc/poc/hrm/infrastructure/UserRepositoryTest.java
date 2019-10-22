@@ -18,7 +18,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
@@ -82,10 +82,10 @@ public class UserRepositoryTest extends AbstractBaseUnit {
 		this.userRepository.save(userEntity);
 		
 		// WHEN
-		final List<UserEntity> userEntityList = this.userRepository.findByUsername(USER_NAME);
+		final Stream<UserEntity> userEntityStream = this.userRepository.findByUsername(USER_NAME);
 
 		// THEN
-		assertThat(userEntityList.size(), equalTo(1));
+		assertThat(userEntityStream.count(), equalTo(1L));
 	}
 
 	@Test
@@ -95,10 +95,10 @@ public class UserRepositoryTest extends AbstractBaseUnit {
 		// GIVEN
 		
 		// WHEN
-		final List<UserEntity> userEntityList = this.userRepository.findByUsername(USER_NAME);
+		final Stream<UserEntity> userEntityStream = this.userRepository.findByUsername(USER_NAME);
 
 		// THEN
-		assertThat(userEntityList.size(), equalTo(0));
+		assertThat(userEntityStream.count(), equalTo(0L));
 	}
 	
 	@Test
@@ -158,10 +158,10 @@ public class UserRepositoryTest extends AbstractBaseUnit {
 		assertThat(retUserEntity.getId(), notNullValue());
 		
 		// WHEN
-		final List<UserEntity> userEntityList = this.userRepository.findByUsernameAndPassword(USER_NAME, PASSWORD);
+		final Stream<UserEntity> userEntityStream = this.userRepository.findByUsernameAndPassword(USER_NAME, PASSWORD);
 		
 		// THEN
-		assertThat(userEntityList.size(), equalTo(1));
+		assertThat(userEntityStream.count(), equalTo(1L));
 	}
 	
 	@Test

@@ -1,5 +1,5 @@
 /**
- * Project: POC PaaS
+ * Project: hrm
  * <pre>
  *
  * Last change:
@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -89,6 +90,7 @@ public class CustomerController {
 	@GetMapping(value = "/{id}", produces = MEDIA_TYPE_JSON_V1)
 	@ResponseStatus(HttpStatus.OK)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
+	@Transactional(readOnly = true)
 	public ResponseEntity<CustomerDto> getCustomerById(@PathVariable final Long id) {
 
 		return new ResponseEntity<CustomerDto>(customerService.findById(id), HttpStatus.OK);
@@ -104,6 +106,7 @@ public class CustomerController {
 	@PostMapping(value = "/email-address", produces = MEDIA_TYPE_JSON_V1, consumes = MEDIA_TYPE_JSON_V1)
 	@ResponseStatus(HttpStatus.OK)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
+	@Transactional(readOnly = true)
 	public ResponseEntity<CustomerDto> getCustomerByEmailAddress(
 			@Valid @RequestBody final CustomerEmailDto customerEmailDto) {
 
@@ -120,6 +123,7 @@ public class CustomerController {
 	@PostMapping(produces = MEDIA_TYPE_JSON_V1, consumes = MEDIA_TYPE_JSON_V1)
 	@ResponseStatus(HttpStatus.OK)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
+	@Transactional
 	public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody final CustomerDto customerDto) {
 
 		return new ResponseEntity<CustomerDto>(
@@ -134,6 +138,7 @@ public class CustomerController {
 	@ApiImplicitParams(@ApiImplicitParam(name = "id", value = "The identifier for deleting a customer.", dataType = "Long", dataTypeClass = java.lang.Long.class, required = true))
 	@DeleteMapping(value = "/{id}", consumes = MEDIA_TYPE_JSON_V1)
 	@Loggable(result = false, params = true, value = LogLevel.DEBUG, time = true)
+	@Transactional
 	public void deleteCustomer(@ApiParam(value = "The customer id.", required = true) @PathVariable final Long id) {
 		LOGGER.debug(LOG_PREFIX + "deleteCustomer [id=" + id + "]");
 
@@ -148,6 +153,7 @@ public class CustomerController {
 	@ApiImplicitParams(@ApiImplicitParam(name = "customerDto", value = "The updated customer to persist.", dataType = "CustomerDto", dataTypeClass = de.bomc.poc.hrm.interfaces.mapper.CustomerDto.class, required = true))
 	@PutMapping(produces = MEDIA_TYPE_JSON_V1, consumes = MEDIA_TYPE_JSON_V1)
 	@Loggable(result = false, params = true, value = LogLevel.DEBUG, time = true)
+	@Transactional
 	public void updateCustomer(@Valid @RequestBody final CustomerDto customerDto) {
 
 		this.customerService.updateCustomer(customerDto);
@@ -161,6 +167,7 @@ public class CustomerController {
 	@GetMapping(produces = MEDIA_TYPE_JSON_V1)
 	@ResponseStatus(HttpStatus.OK)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
+	@Transactional(readOnly = true)
 	public ResponseEntity<List<CustomerDto>> findAll() {
 
 		return new ResponseEntity<List<CustomerDto>>(this.customerService.findAll(), HttpStatus.OK);

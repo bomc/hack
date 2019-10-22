@@ -78,14 +78,14 @@ public class UserControllerTest extends AbstractBaseUnit {
 
 		final UserDto userDto = new UserDto();
 
-		given(this.userMapper.mapDtoToEntity(userDto)).willReturn(userEntity);
-		given(this.userService.createUser(eq(userEntity))).willReturn(userDto);
+//		given(this.userMapper.mapDtoToEntity(userDto)).willReturn(userEntity);
+		given(this.userService.createUser(eq(userDto))).willReturn(userDto);
 
 		// WHEN
 		final ResponseEntity<UserDto> response = this.sut.createUser(userDto);
 
 		// THEN: check if certain methods have been called as expected.
-		then(this.userService).should().createUser(eq(userEntity));
+		then(this.userService).should().createUser(eq(userDto));
 
 		// Do the asserts.
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));

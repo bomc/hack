@@ -172,7 +172,7 @@ public class UserEntityTest extends AbstractBaseUnit {
 		this.emProvider1.tx().commit();
 
 		assertThat(userEntity.getExpirationDate(),
-				lessThan(LocalDateTime.now().plusDays(UserEntity.EXPIRATION_OFFSET_DAYS)));
+				lessThan(LocalDateTime.now().plusDays(UserEntity.EXPIRATION_OFFSET_DAYS + 1)));
 	}
 
 	@Test

@@ -14,7 +14,6 @@
  */
 package de.bomc.poc.hrm.application;
 
-import de.bomc.poc.hrm.domain.model.UserEntity;
 import de.bomc.poc.hrm.interfaces.mapper.UserDto;
 
 /**
@@ -25,5 +24,5 @@ import de.bomc.poc.hrm.interfaces.mapper.UserDto;
  */
 public interface UserService {
 
-	UserDto createUser(UserEntity userEntity);
+	UserDto createUser(UserDto userDto);
 }

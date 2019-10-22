@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -39,7 +40,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Profile("local")
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(entityManagerFactoryRef = "h2LocalEntityManagerFactory", basePackages = { "de.bomc.poc.hrm.infrastructure" })
+@EnableJpaRepositories(entityManagerFactoryRef = "h2LocalEntityManagerFactory", transactionManagerRef = "h2LocalTransactionManager", basePackages = {
+		"de.bomc.poc.hrm.infrastructure" })
 @PropertySource("classpath:persistence-h2Local.properties")
 public class PersistenceH2LocalConfig {
 
@@ -55,29 +57,29 @@ public class PersistenceH2LocalConfig {
 	// _______________________________________________
 	// Member variables
 	// -----------------------------------------------
-    @Value("${datasource.driver-class-name}")
-    private String dataSourceDriverClassName;
-    @Value("${datasource.url}")
-    private String dataSourceUrl;
-    @Value("${datasource.username}")
-    private String dataSourceUsername;
-    @Value("${datasource.password}")
-    private String dataSourcePassword;
-    @Value("${jpa.properties.hibernate.ddl-auto}")
-    private String jpaHibernateDdlAuto;
+	@Value("${datasource.driver-class-name}")
+	private String dataSourceDriverClassName;
+	@Value("${datasource.url}")
+	private String dataSourceUrl;
+	@Value("${datasource.username}")
+	private String dataSourceUsername;
+	@Value("${datasource.password}")
+	private String dataSourcePassword;
+	@Value("${jpa.properties.hibernate.ddl-auto}")
+	private String jpaHibernateDdlAuto;
 //    @Value("${jpa.properties.hibernate.show_sql}")
 //    private String jpaHibernateShowSql;
 //    @Value("${jpa.properties.hibernate.use_sql_comments}")
 //    private String jpaHibernateUseSqlComments;    
 //    @Value("${jpa.properties.hibernate.format_sql}")
 //    private String jpaHibernateFormatSql;
-    @Value("${jpa.properties.hibernate.dialect}")
-    private String jpaPropHibernateDialect;
+	@Value("${jpa.properties.hibernate.dialect}")
+	private String jpaPropHibernateDialect;
 
 	@Bean(name = "h2LocalDataSource")
 	public DataSource h2LocalDataSource() {
 		final DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
-		
+
 		driverManagerDataSource.setDriverClassName(this.dataSourceDriverClassName);
 		driverManagerDataSource.setUrl(this.dataSourceUrl);
 		driverManagerDataSource.setUsername(this.dataSourceUsername);
@@ -87,9 +89,10 @@ public class PersistenceH2LocalConfig {
 	}
 
 	@Bean(name = "h2LocalEntityManagerFactory")
-	public LocalContainerEntityManagerFactoryBean h2LocalEntityManagerFactory(@Qualifier("h2LocalDataSource") final DataSource h2LocalDataSource) {
+	public LocalContainerEntityManagerFactoryBean h2LocalEntityManagerFactory(
+			@Qualifier("h2LocalDataSource") final DataSource h2LocalDataSource) {
 		final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-		
+
 		em.setDataSource(h2LocalDataSource);
 		em.setPackagesToScan(new String[] { PACKAGE_TO_SCAN });
 		em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
@@ -98,6 +101,17 @@ public class PersistenceH2LocalConfig {
 		return em;
 	}
 
+	@Bean(name = "h2LocalTransactionManager")
+	public DataSourceTransactionManager transactionManager(@Qualifier("h2LocalDataSource") final DataSource h2LocalDataSource) {
+	    final DataSourceTransactionManager txManager = new DataSourceTransactionManager();
+	    txManager.setDataSource(h2LocalDataSource);
+
+	    return txManager;
+	}
+
+	// _______________________________________________
+	// Helper methods
+	// -----------------------------------------------
 	final Properties additionalProperties() {
 		final Properties hibernateProperties = new Properties();
 

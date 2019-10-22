@@ -16,8 +16,6 @@ package de.bomc.poc.hrm.interfaces;
 
 import javax.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 import de.bomc.poc.hrm.application.UserService;
 import de.bomc.poc.hrm.application.log.method.Loggable;
 import de.bomc.poc.hrm.interfaces.mapper.UserDto;
-import de.bomc.poc.hrm.interfaces.mapper.UserMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -51,24 +48,18 @@ import io.swagger.annotations.ApiResponses;
 @Api(tags = "User queries", value = "User Management System", description = "Operations pertaining to user in User Management System", produces = "application/vnd.hrm-v1+json;charset=UTF-8")
 public class UserController {
 
-	private static final String LOG_PREFIX = "UserController#";
-	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class.getName());
-
 	protected static final String MEDIA_TYPE_JSON_V1 = "application/vnd.hrm-v1+json;charset=UTF-8";
 	
 	private final UserService userService;
-	private final UserMapper userMapper;
 	
 	/**
 	 * Creates a new instance of <code>UserController</code>.
 	 * 
 	 * @param userService the given user service.
-	 * @param userMapper  the given user mapper.
 	 */
 	// @Autowired: is here not necessary, is done by IOC container.
-	public UserController(final UserService userService, final UserMapper userMapper) {
+	public UserController(final UserService userService) {
 		this.userService = userService;
-		this.userMapper = userMapper;
 	}
 	
 	@ApiOperation(value = "Creates a user.")
@@ -81,8 +72,8 @@ public class UserController {
 	@ResponseStatus(HttpStatus.OK)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public ResponseEntity<UserDto> createUser(@Valid @RequestBody final UserDto userDto) {
-
+	
 		return new ResponseEntity<UserDto>(
-				this.userService.createUser(userMapper.mapDtoToEntity(userDto)), HttpStatus.OK);
+				this.userService.createUser(userDto), HttpStatus.OK);
 	}
 }

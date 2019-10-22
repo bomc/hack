@@ -50,6 +50,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import brave.Tracer;
 import de.bomc.poc.hrm.AbstractBaseUnit;
+import de.bomc.poc.hrm.GitConfig;
 import de.bomc.poc.hrm.application.CustomerService;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
@@ -101,6 +102,8 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 	private MockMvc mvc;
 	@MockBean
 	private CustomerService customerService;
+	@MockBean
+	private GitConfig gitConfig;
 	@MockBean
 	private Tracer tracer;
 	

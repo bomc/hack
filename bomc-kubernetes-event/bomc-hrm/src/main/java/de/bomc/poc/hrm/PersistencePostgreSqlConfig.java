@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -39,7 +40,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Profile("prod")
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(entityManagerFactoryRef = "postgresqlEntityManagerFactory", basePackages = {
+@EnableJpaRepositories(entityManagerFactoryRef = "postgresqlEntityManagerFactory", transactionManagerRef = "postgresqlTransactionManager", basePackages = {
 		"de.bomc.poc.hrm.infrastructure" })
 @PropertySource("classpath:persistence-postgresql.properties")
 public class PersistencePostgreSqlConfig {
@@ -100,6 +101,17 @@ public class PersistencePostgreSqlConfig {
 		return em;
 	}
 
+	@Bean(name = "postgresqlTransactionManager")
+	public DataSourceTransactionManager transactionManager(@Qualifier("postgresqlDataSource") final DataSource postgresqlDataSource) {
+	    final DataSourceTransactionManager txManager = new DataSourceTransactionManager();
+	    txManager.setDataSource(postgresqlDataSource);
+
+	    return txManager;
+	}
+
+	// _______________________________________________
+	// Helper methods
+	// -----------------------------------------------
 	final Properties additionalProperties() {
 		final Properties hibernateProperties = new Properties();
 
@@ -109,7 +121,8 @@ public class PersistencePostgreSqlConfig {
 //		hibernateProperties.setProperty(HIBERNATE_USE_SQL_COMMENTS, this.jpaHibernateUseSqlComments);
 //		hibernateProperties.setProperty(HIBERNATE_FORMAT_SQL, this.jpaHibernateFormatSql);
 		hibernateProperties.setProperty("hibernate.default_schema", "public");
-		// Prevents java.sql.SQLFeatureNotSupportedException: Method org.postgresql.jdbc.PgConnection.createClob() is not yet implemented.
+		// Prevents java.sql.SQLFeatureNotSupportedException: Method
+		// org.postgresql.jdbc.PgConnection.createClob() is not yet implemented.
 		hibernateProperties.setProperty("hibernate.jdbc.lob.non_contextual_creation", "true");
 
 		return hibernateProperties;

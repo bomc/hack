@@ -14,7 +14,7 @@
  */
 package de.bomc.poc.hrm.infrastructure;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -32,8 +32,8 @@ import de.bomc.poc.hrm.domain.model.UserEntity;
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
 	@Query("FROM UserEntity u LEFT JOIN FETCH u.roles WHERE u.username = ?1")
-	List<UserEntity> findByUsername(String username);
+	Stream<UserEntity> findByUsername(String username);
 	
 	@Query("FROM UserEntity u LEFT JOIN FETCH u.roles WHERE u.username = ?1 and u.persistedPassword = ?2")
-	List<UserEntity> findByUsernameAndPassword(String username, String persistedPassword);
+	Stream<UserEntity> findByUsernameAndPassword(String username, String persistedPassword);
 }

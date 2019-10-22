@@ -14,6 +14,11 @@
  */
 package de.bomc.poc.hrm.application;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.logging.LogLevel;
@@ -61,9 +66,10 @@ public class UserServiceImpl implements UserService {
 	/* --------------------- methods -------------------------------- */
 
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
-	public UserDto createUser(final UserEntity userEntity) {
+	public UserDto createUser(final UserDto userDto) {
 
 		try {
+			final UserEntity userEntity = this.userMapper.mapDtoToEntity(userDto);
 			// Set metadata.
 			userEntity.setCreateUser(userEntity.getUsername());
 			// Write down to db.
@@ -71,12 +77,12 @@ public class UserServiceImpl implements UserService {
 
 			LOGGER.debug(LOG_PREFIX + "createUser - [id=" + retUserEntity.getId() + "]");
 
-			final UserDto userDto = this.userMapper.mapEntityToDto(retUserEntity);
+			final UserDto retUserDto = this.userMapper.mapEntityToDto(retUserEntity);
 
-			return userDto;
+			return retUserDto;
 		} catch (final DataIntegrityViolationException ex) {
 			final AppRuntimeException appRuntimeException = new AppRuntimeException(
-					"There is already a user avaible in db [username=" + userEntity.getUsername() + "]", ex,
+					"There is already a user avaible in db [username=" + userDto.getUsername() + "]", ex,
 					AppErrorCodeEnum.JPA_PERSISTENCE_10401);
 
 			LOGGER.error(LOG_PREFIX + "createUser " + appRuntimeException.stackTraceToString());
@@ -84,5 +90,44 @@ public class UserServiceImpl implements UserService {
 			throw appRuntimeException;
 		}
 	}
+
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	public UserDto findByUsername(final String username) {
+
+		List<UserEntity> mapstream = Collections.emptyList();
+
+		try (Stream<UserEntity> stream = this.userRepository.findByUsername(username)) {
+			mapstream = stream.collect(Collectors.toList());
+		}
+
+		// 'username' is unique, so only one element is returned.
+		return this.userMapper.mapEntityToDto(mapstream.get(0));
+	}
+
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	public UserDto findByUsernameAndPassword(final String username, final String persistedPassword) {
+		
+		List<UserEntity> mapstream = Collections.emptyList();
+
+		try (Stream<UserEntity> stream = this.userRepository.findByUsernameAndPassword(username, persistedPassword)) {
+			mapstream = stream.collect(Collectors.toList());
+		}
+
+		// the combination of'username' and 'persistedPassword' is unique, so only one element is returned.
+		return this.userMapper.mapEntityToDto(mapstream.get(0));		
+	}
+	
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	public List<UserDto> findAllUsers() {
+	    
+		final List<UserEntity> userEntityList = this.userRepository.findAll();
+		
+		return this.userMapper.mapEntitiesToDtos(userEntityList);
+	}
+	
+//	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+//	public boolean isUserInRole() {
+//		
+//	}
 
 }

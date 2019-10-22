@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -53,7 +53,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 @Import(BeanValidatorPluginsConfiguration.class)
-public class ApiDocumentationConfig extends WebMvcConfigurationSupport {
+public class ApiDocumentationConfig implements WebMvcConfigurer {
 
 	private static final String SWAGGER_CONTEXT_ROOT = "/bomc-api";
 
@@ -100,6 +100,24 @@ public class ApiDocumentationConfig extends WebMvcConfigurationSupport {
 				.build();
 	}
 
+	@Bean
+	public Docket versionApi(final ServletContext servletContext) {
+
+		return new Docket(DocumentationType.SWAGGER_2).host(this.swaggerHost + ":" + this.swaggerPort)
+				.groupName("user-version-api-1.0")
+				// Specifies the title, description, etc of the Rest API.
+				.apiInfo(this.apiInfo())
+//				.produces(Collections.singleton("application/json;charset=UTF-8"))
+				// Provides a way to control the endpoints exposed by swagger.
+				.select()
+				// Specify the package where are the declared controllers. Swagger only picks up
+				// controllers declared in this package.
+				.apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm.interfaces"))
+				// Specify only paths starting with /customer should be picked up.
+				.paths(this.versionPath()) // PathSelectors.any()
+				.build();
+	}
+	
 	/**
 	 * Enables the adopting of the swagger-ui path from
 	 * 'http://localhost:8080/bomc-hrm/swagger-ui.html' to
@@ -157,4 +175,14 @@ public class ApiDocumentationConfig extends WebMvcConfigurationSupport {
 		return Predicates.and(PathSelectors.regex("/user.*"), Predicates.not(PathSelectors.regex("/error.*")));
 	}
 
+	/**
+	 * Only select apis that matches the given Predicates.
+	 * 
+	 * @return a predicate as string.
+	 */
+	private Predicate<String> versionPath() {
+		//
+		// Match all paths except /error
+		return Predicates.and(PathSelectors.regex("/git.*"), Predicates.not(PathSelectors.regex("/error.*")));
+	}
 }

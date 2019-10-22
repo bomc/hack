@@ -33,6 +33,8 @@ import de.bomc.poc.hrm.application.log.http.RequestGetLoggingInterceptor;
 @Configuration
 public class WebAppConfig implements WebMvcConfigurer {
 
+	private static final String PATHS = "/**";
+	
 	@Autowired
 	private RequestGetLoggingInterceptor requestGetLoggingInterceptor;
 //	@Autowired
@@ -53,15 +55,14 @@ public class WebAppConfig implements WebMvcConfigurer {
 	public void addInterceptors(final InterceptorRegistry interceptorRegistry) {
 		//
 		// Apply to all URLs.
-		interceptorRegistry.addInterceptor(this.requestGetLoggingInterceptor);
+		interceptorRegistry.addInterceptor(this.requestGetLoggingInterceptor).addPathPatterns(PATHS);
 		// Apply to bomc path.
-		// interceptorRegistry.addInterceptor(this.mdcInterceptor).addPathPatterns("/**"); // .excludePathPatterns("/admin/oldLogin");
+		// interceptorRegistry.addInterceptor(this.mdcInterceptor).addPathPatterns(PATHS);
 	}
 
 	@Override
 	public void addViewControllers(final ViewControllerRegistry registry) {
 
-//		System.out.println("############################Angular##############################");
 //		registry.addViewController("/").setViewName("forward:/index.html");
 	}
 
@@ -73,6 +74,7 @@ public class WebAppConfig implements WebMvcConfigurer {
 	 */
 	@Override
 	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+		
 		// Add swagger sources.
 //		registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
 //		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");

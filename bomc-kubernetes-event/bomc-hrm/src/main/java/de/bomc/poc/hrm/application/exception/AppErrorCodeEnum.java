@@ -50,7 +50,8 @@ public enum AppErrorCodeEnum implements ErrorCode {
     APP_NO_RESOURCES_AVAILABLE_10605(10605, Category.ERROR, "No resources available in system!"),
 	APP_INVALID_PASSWORD_10606(10606, Category.FATAL, "Invalid password"),
 	APP_PASSWORD_CONFIRMS_NOT_RULES_10607(10607, Category.ERROR, "Password confirms not the defined rules."),
-	APP_PASSWORD_OLDEST_PASSWORD_NOT_DETERMIND_10608(10608, Category.ERROR, "The oldest password could not be determined.");
+	APP_PASSWORD_OLDEST_PASSWORD_NOT_DETERMIND_10608(10608, Category.ERROR, "The oldest password could not be determined."),
+	APP_ROLE_HANDLING_MAPPING_10609(10609, Category.ERROR, "Could not handle the role mapping.");
     //
     // Member variables.
     private static final String LOG_PREFIX = "AppErrorCodeEnum#";
