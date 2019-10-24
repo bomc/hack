@@ -44,7 +44,7 @@ import lombok.Setter;
 @Setter
 // JPA
 @Entity
-@Table(name = "t_customer")
+@Table(name = "t_customer", schema = "public")
 @NamedQueries({
 		@NamedQuery(name = "Customer.NQ_FIND_CUSTOMER_BY_EMAIL_ADDRESS", query = "SELECT c FROM CustomerEntity c WHERE c.emailAddress = :emailAddress"),
 		@NamedQuery(name = "Customer.NQ_FIND_CUSTOMER_BY_ID", query = "SELECT c FROM CustomerEntity c WHERE c.id= :id") })

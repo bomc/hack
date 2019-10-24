@@ -12,9 +12,10 @@
  *
  * </pre>
  */
-package de.bomc.poc.hrm;
+package de.bomc.poc.hrm.logging;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
 import net.ttddyy.dsproxy.listener.logging.SLF4JLogLevel;
+import net.ttddyy.dsproxy.listener.logging.SLF4JQueryLoggingListener;
 import net.ttddyy.dsproxy.support.ProxyDataSourceBuilder;
 
 /**
@@ -77,8 +79,23 @@ public class DatasourceProxyBeanPostProcessor implements BeanPostProcessor {
 		public ProxyDataSourceInterceptor(final DataSource dataSource, final String datasourceName) {
 			super();
 
-			this.dataSource = ProxyDataSourceBuilder.create(dataSource).name(datasourceName).countQuery()
-					.logQueryBySlf4j(SLF4JLogLevel.INFO).build();
+			// Use pretty formatted query with multiline enabled.
+			final PrettyQueryEntryCreator queryLogEntryCreator = new PrettyQueryEntryCreator();
+			queryLogEntryCreator.setMultiline(true);
+			
+			// Create a listener for logging out with slf4j.
+			final SLF4JQueryLoggingListener slf4JQueryLoggingListener = new SLF4JQueryLoggingListener();
+			slf4JQueryLoggingListener.setQueryLogEntryCreator(queryLogEntryCreator);
+			slf4JQueryLoggingListener.setLogLevel(SLF4JLogLevel.INFO);
+
+			this.dataSource = ProxyDataSourceBuilder
+					.create(dataSource) //
+					.name(datasourceName) //
+					.countQuery().multiline() //
+					.listener(slf4JQueryLoggingListener) //
+					.logSlowQueryToSysOut(500, TimeUnit.MILLISECONDS) //
+					.asJson() //
+					.build();
 		}
 
 		@Override
@@ -93,4 +110,5 @@ public class DatasourceProxyBeanPostProcessor implements BeanPostProcessor {
 			return invocation.proceed();
 		}
 	}
+	
 }

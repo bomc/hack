@@ -48,7 +48,7 @@ import lombok.ToString;
 @ToString
 // JPA
 @Entity
-@Table(name = "t_user_password")
+@Table(name = "t_user_password", schema = "public")
 public class UserPasswordEntity extends AbstractEntity<UserPasswordEntity> implements Serializable {
 
 	private static final String LOG_PREFIX = "UserPasswordEntity#";

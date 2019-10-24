@@ -28,13 +28,16 @@
 
     drop sequence if exists public.hibernate_sequence;
     
-    create sequence hibernate_sequence start 1 increment 1;
+    -- Start with 1001 to let the lower ones reserved for flyway init scripts.
+    create sequence hibernate_sequence
+      start with 1001
 	--  maxvalue 9999999999999999999
 	--  minvalue 0
 	--  nocycle
 	--  nocache
-	--  noorder;
-
+	--  noorder
+      ;
+      
     create table public.t_customer (
        c_id int8 not null,
         c_createdatetime timestamp not null,

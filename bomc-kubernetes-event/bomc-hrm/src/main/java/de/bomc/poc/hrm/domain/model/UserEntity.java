@@ -53,8 +53,9 @@ import de.bomc.poc.hrm.domain.model.validation.constraint.BomcFuture;
 import lombok.ToString;
 
 /**
- * A UserEntity represents a human user of the system. Typically an UserEntity is assigned
- * to one or more {@link RoleEntity}s to define security constraints.
+ * A UserEntity represents a human user of the system. Typically an UserEntity
+ * is assigned to one or more {@link RoleEntity}s to define security
+ * constraints.
  *
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
@@ -62,8 +63,9 @@ import lombok.ToString;
 @ToString
 // JPA
 @Entity
-@Table(name = "t_user")
-@NamedQueries({ @NamedQuery(name = UserEntity.NQ_FIND_ALL, query = "select u from UserEntity u left join fetch u.roles"),
+@Table(name = "t_user", schema = "public")
+@NamedQueries({
+		@NamedQuery(name = UserEntity.NQ_FIND_ALL, query = "select u from UserEntity u left join fetch u.roles"),
 		@NamedQuery(name = UserEntity.NQ_FIND_ALL_ORDERED, query = "select u from UserEntity u left join fetch u.roles order by u.username"),
 		@NamedQuery(name = UserEntity.NQ_FIND_BY_USERNAME, query = "select u from UserEntity u left join fetch u.roles where u.username = ?1"),
 		@NamedQuery(name = UserEntity.NQ_FIND_BY_USERNAME_PASSWORD, query = "select u from UserEntity u left join fetch u.roles where u.username = :username and u.persistedPassword = :password") })
@@ -83,13 +85,14 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	public static final short NUMBER_STORED_PASSWORDS = 3;
 
 	/**
-	 * The offset if expiration days to calculate the expiration. Default: {@value} .
+	 * The offset if expiration days to calculate the expiration. Default:
+	 * {@value} .
 	 */
 	public static final long EXPIRATION_OFFSET_DAYS = 365;
-	
+
 	/**
-	 * The default prefix String for each created <code>UserEntity</code>. Name is * * *
-	 * {@value} .
+	 * The default prefix String for each created <code>UserEntity</code>. Name is *
+	 * * * {@value} .
 	 */
 	public static final String USER_PREFIX = "USER.";
 
@@ -99,7 +102,8 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	public static final String NQ_FIND_ALL = USER_PREFIX + "findAll";
 
 	/**
-	 * Query to find all <code>UserEntity</code>s sorted by userName. Name is {@value} .
+	 * Query to find all <code>UserEntity</code>s sorted by userName. Name is
+	 * {@value} .
 	 */
 	public static final String NQ_FIND_ALL_ORDERED = USER_PREFIX + "findAllOrdered";
 
@@ -112,8 +116,8 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	public static final String NQ_FIND_BY_USERNAME = USER_PREFIX + "findByUsername";
 
 	/**
-	 * Query to find <strong>one</strong> <code>UserEntity</code> by his userName and
-	 * password.
+	 * Query to find <strong>one</strong> <code>UserEntity</code> by his userName
+	 * and password.
 	 * <li>Query parameter name <strong>username</strong> : The userName of the
 	 * <code>UserEntity</code> to search for.</li>
 	 * <li>Query parameter name <strong>password</strong> : The current password of
@@ -132,8 +136,8 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	@Size(min = 5)
 	private String username;
 	/**
-	 * <code>true</code> if the <code>UserEntity</code> is authenticated by an external
-	 * system, otherwise <code>false</code>.
+	 * <code>true</code> if the <code>UserEntity</code> is authenticated by an
+	 * external system, otherwise <code>false</code>.
 	 */
 	@Column(name = "c_extern")
 	private boolean extern = false;
@@ -141,7 +145,7 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	 * Date of the last password change.
 	 */
 	@Column(name = "c_last_password_change")
-	@JsonFormat(pattern="dd.MM.yyyy HH.mm.ss")
+	@JsonFormat(pattern = "dd.MM.yyyy HH.mm.ss")
 	private LocalDateTime lastPasswordChange;
 	/**
 	 * <code>true</code> if this <code>UserEntity</code> is locked and has not the
@@ -161,8 +165,8 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	@Column(name = "c_password")
 	private String persistedPassword;
 	/**
-	 * <code>true</code> if the <code>UserEntity</code> is enabled. This field can be
-	 * managed by the UI application to lock an UserEntity manually.
+	 * <code>true</code> if the <code>UserEntity</code> is enabled. This field can
+	 * be managed by the UI application to lock an UserEntity manually.
 	 */
 	@Column(name = "c_enabled")
 	private boolean enabled = true;
@@ -172,7 +176,7 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	 */
 	@BomcFuture
 	@Column(name = "c_expiration_date")
-	@JsonFormat(pattern="dd.MM.yyyy HH.mm.ss")
+	@JsonFormat(pattern = "dd.MM.yyyy HH.mm.ss")
 	private LocalDateTime expirationDate = LocalDateTime.now().plusDays(EXPIRATION_OFFSET_DAYS);
 	/**
 	 * The <code>UserEntity</code>s fullname. Doesn't have to be unique.
@@ -189,8 +193,8 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 
 	/* ------------------- collection mapping ------------------- */
 	/**
-	 * List of {@link RoleEntity}s assigned to the <code>UserEntity</code>. In a JPA context
-	 * eager loaded.
+	 * List of {@link RoleEntity}s assigned to the <code>UserEntity</code>. In a JPA
+	 * context eager loaded.
 	 * 
 	 * @see javax.persistence.FetchType#EAGER
 	 */
@@ -200,6 +204,16 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 
 	/**
 	 * Password history of the <code>UserEntity</code>.
+	 * 
+	 * <pre>
+	 * bomc-NOTE: For many-to-one and one-to-one associations, as 
+	 * well as to at most one one-to-many relationship,
+	 * JOIN FETCH directive is the best way of initializing 
+	 * the associations that are going to be needed in the 
+	 * view layer.
+	 * see https://vladmihalcea.com/the-open-session-in-view-anti-pattern/
+	 * </pre>
+	 * 
 	 */
 	@JoinColumn(name = "c_user_join")
 	@OneToMany(cascade = { CascadeType.ALL }, orphanRemoval = true)
@@ -350,8 +364,8 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	/**
 	 * Determines whether the <code>UserEntity</code> is enabled or not.
 	 * 
-	 * @return <code>true</code> if the <code>UserEntity</code> is enabled, otherwise
-	 *         <code>false</code>
+	 * @return <code>true</code> if the <code>UserEntity</code> is enabled,
+	 *         otherwise <code>false</code>
 	 */
 	public boolean isEnabled() {
 		LOGGER.debug(LOG_PREFIX + "isEnabled [enabled=" + this.enabled + "]");
@@ -376,7 +390,8 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	 * @return The expiration date
 	 */
 	public LocalDateTime getExpirationDate() {
-		LOGGER.debug(LOG_PREFIX + "getExpirationDate [expirationDate=" + this.expirationDate /*this.formatLocalDateTime(expirationDate)*/ + "]");
+		LOGGER.debug(LOG_PREFIX + "getExpirationDate [expirationDate="
+				+ this.expirationDate /* this.formatLocalDateTime(expirationDate) */ + "]");
 
 		return expirationDate;
 	}
@@ -387,7 +402,8 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	 * @param expDate The new expiration date to set
 	 */
 	public void setExpirationDate(@NotNull final LocalDateTime expDate) {
-		LOGGER.debug(LOG_PREFIX + "setExpirationDate [expDate=" + expDate /*this.formatLocalDateTime(expDate)*/ + "]");
+		LOGGER.debug(
+				LOG_PREFIX + "setExpirationDate [expDate=" + expDate /* this.formatLocalDateTime(expDate) */ + "]");
 
 		this.expirationDate = expDate;
 	}
@@ -454,7 +470,8 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	}
 
 	/**
-	 * Remove a {@link RoleEntity} from <code>UserEntity</code> for internal use package scope.
+	 * Remove a {@link RoleEntity} from <code>UserEntity</code> for internal use
+	 * package scope.
 	 * 
 	 * @param roleEntity The {@link RoleEntity} to remove.
 	 */
@@ -478,15 +495,16 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 			final RoleEntity roleEntity = itr.next();
 
 			final boolean isInternalRemove = roleEntity.internalRemoveUser(this);
-			LOGGER.debug(LOG_PREFIX + "removeRoles [user.id=" + roleEntity.getId() + ", internalRemove=" + isInternalRemove + "]");
+			LOGGER.debug(LOG_PREFIX + "removeRoles [user.id=" + roleEntity.getId() + ", internalRemove="
+					+ isInternalRemove + "]");
 
 			itr.remove();
 		}
 	}
 
 	/**
-	 * Set the {@link RoleEntity}s of this <code>UserEntity</code>. Existing {@link RoleEntity}s will
-	 * be not overridden.
+	 * Set the {@link RoleEntity}s of this <code>UserEntity</code>. Existing
+	 * {@link RoleEntity}s will be not overridden.
 	 * 
 	 * @param roles The new list of {@link RoleEntity}s
 	 */
@@ -544,8 +562,9 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	}
 
 	/**
-	 * Flatten {@link RoleEntity}s and {@link PermissionEntity}s and return an unmodifiable list of
-	 * all {@link PermissionEntity}s assigned to this <code>UserEntity</code>.
+	 * Flatten {@link RoleEntity}s and {@link PermissionEntity}s and return an
+	 * unmodifiable list of all {@link PermissionEntity}s assigned to this
+	 * <code>UserEntity</code>.
 	 * 
 	 * @return A list of all {@link PermissionEntity}s
 	 */
@@ -598,24 +617,23 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	 * Checks if the new password is a valid and change the password of this
 	 * <code>UserEntity</code>.
 	 * 
-	 * @param password
-	 *            The new password of this <code>UserEntity</code>
-	 * @throws AppInvalidPasswordException
-	 *             in case changing the password is not allowed or the new
-	 *             password is not valid
+	 * @param password The new password of this <code>UserEntity</code>
+	 * @throws AppInvalidPasswordException in case changing the password is not
+	 *                                     allowed or the new password is not valid
 	 */
 	public void setNewPassword(final String password) {
 		LOGGER.debug(LOG_PREFIX + "setNewPassword [password=" + password + "]");
 
 		if (this.persistedPassword != null && this.persistedPassword.equals(password)) {
 			final String errorMessage = "Trying to set the new password equals to the current password.";
-			
-			final AppRuntimeException appRuntimeException = new AppRuntimeException(errorMessage, AppErrorCodeEnum.APP_INVALID_PASSWORD_10606);
+
+			final AppRuntimeException appRuntimeException = new AppRuntimeException(errorMessage,
+					AppErrorCodeEnum.APP_INVALID_PASSWORD_10606);
 			LOGGER.error(appRuntimeException.stackTraceToString());
-			
+
 			throw appRuntimeException;
 		}
-		
+
 		if (this.isPasswordValid(password)) {
 			this.storeOldPassword(password);
 			this.persistedPassword = password;
@@ -623,10 +641,11 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 			this.lastPasswordChange = LocalDateTime.now();
 		} else {
 			final String errorMessage = "Password confirms not the defined rules.";
-			
-			final AppRuntimeException appRuntimeException = new AppRuntimeException(errorMessage, AppErrorCodeEnum.APP_PASSWORD_CONFIRMS_NOT_RULES_10607);
+
+			final AppRuntimeException appRuntimeException = new AppRuntimeException(errorMessage,
+					AppErrorCodeEnum.APP_PASSWORD_CONFIRMS_NOT_RULES_10607);
 			LOGGER.error(appRuntimeException.stackTraceToString());
-			
+
 			throw appRuntimeException;
 		}
 	}
@@ -644,8 +663,8 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 			hasPasswordChanged = (this.persistedPassword.equals(this.password));
 			LOGGER.debug(LOG_PREFIX + "hasPasswordChanged [hasPasswordChanged=" + hasPasswordChanged + "]");
 		} else {
-			LOGGER.warn(
-					LOG_PREFIX + "hasPasswordChanged - persistedPassword == null, is a test running? [hasPasswordChanged=false]");
+			LOGGER.warn(LOG_PREFIX
+					+ "hasPasswordChanged - persistedPassword == null, is a test running? [hasPasswordChanged=false]");
 		}
 
 		return hasPasswordChanged;
@@ -665,15 +684,16 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 			isPasswordValid = false;
 		}
 
-		LOGGER.debug(LOG_PREFIX + "isPasswordValid [password=" + password + ", isPasswordValid=" + isPasswordValid + "]");
+		LOGGER.debug(
+				LOG_PREFIX + "isPasswordValid [password=" + password + ", isPasswordValid=" + isPasswordValid + "]");
 
 		return isPasswordValid;
 	}
 
 	private void storeOldPassword(final String passwordToStore) {
 		if (passwordToStore == null || passwordToStore.isEmpty()) {
-			LOGGER.debug(
-					LOG_PREFIX + "storeOldPassword - The old password is null or empty, it would not be stored in history.");
+			LOGGER.debug(LOG_PREFIX
+					+ "storeOldPassword - The old password is null or empty, it would not be stored in history.");
 
 			return;
 		}
@@ -685,8 +705,9 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 
 		if (NUMBER_STORED_PASSWORDS < this.passwords.size()) {
 			// Get the oldest password from list.
-			final java.util.Optional<UserPasswordEntity> optionalUserPassword = passwords.stream().sorted((userPassword1,
-					userPassword2) -> userPassword1.getPasswordChanged().compareTo(userPassword2.getPasswordChanged()))
+			final java.util.Optional<UserPasswordEntity> optionalUserPassword = passwords.stream()
+					.sorted((userPassword1, userPassword2) -> userPassword1.getPasswordChanged()
+							.compareTo(userPassword2.getPasswordChanged()))
 					.findFirst();
 
 			if (optionalUserPassword.isPresent()) {
@@ -694,14 +715,16 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 				oldestUserPassword.setUser(null);
 				this.passwords.remove(oldestUserPassword);
 
-				LOGGER.debug(LOG_PREFIX + "storeOldPassword# - after remove password from password list. [passwordToRemove="
-						+ oldestUserPassword.getPassword() + ", passwords.size=" + this.passwords.size() + "]");
+				LOGGER.debug(
+						LOG_PREFIX + "storeOldPassword# - after remove password from password list. [passwordToRemove="
+								+ oldestUserPassword.getPassword() + ", passwords.size=" + this.passwords.size() + "]");
 			} else {
 				final String errorMessage = "The oldest password could not be determined!";
-				
-				final AppRuntimeException appRuntimeException = new AppRuntimeException(errorMessage, AppErrorCodeEnum.APP_PASSWORD_OLDEST_PASSWORD_NOT_DETERMIND_10608);
+
+				final AppRuntimeException appRuntimeException = new AppRuntimeException(errorMessage,
+						AppErrorCodeEnum.APP_PASSWORD_OLDEST_PASSWORD_NOT_DETERMIND_10608);
 				LOGGER.error(appRuntimeException.stackTraceToString());
-				
+
 				throw appRuntimeException;
 			}
 		}

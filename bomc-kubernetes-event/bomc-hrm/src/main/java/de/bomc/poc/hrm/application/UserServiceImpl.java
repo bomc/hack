@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import de.bomc.poc.hrm.application.exception.AppErrorCodeEnum;
 import de.bomc.poc.hrm.application.exception.AppRuntimeException;
@@ -65,6 +66,7 @@ public class UserServiceImpl implements UserService {
 
 	/* --------------------- methods -------------------------------- */
 
+	@Transactional
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public UserDto createUser(final UserDto userDto) {
 
@@ -91,6 +93,7 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	@Transactional(readOnly = true)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public UserDto findByUsername(final String username) {
 
@@ -104,6 +107,7 @@ public class UserServiceImpl implements UserService {
 		return this.userMapper.mapEntityToDto(mapstream.get(0));
 	}
 
+	@Transactional(readOnly = true)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public UserDto findByUsernameAndPassword(final String username, final String persistedPassword) {
 		
@@ -117,6 +121,7 @@ public class UserServiceImpl implements UserService {
 		return this.userMapper.mapEntityToDto(mapstream.get(0));		
 	}
 	
+	@Transactional(readOnly = true)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public List<UserDto> findAllUsers() {
 	    
@@ -124,10 +129,5 @@ public class UserServiceImpl implements UserService {
 		
 		return this.userMapper.mapEntitiesToDtos(userEntityList);
 	}
-	
-//	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
-//	public boolean isUserInRole() {
-//		
-//	}
 
 }

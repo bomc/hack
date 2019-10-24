@@ -45,7 +45,7 @@ import lombok.ToString;
 @ToString
 // JPA
 @Entity
-@Table(name = "t_security_object")
+@Table(name = "t_security_object", schema = "public")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING, length = 20)
 @NamedQueries({

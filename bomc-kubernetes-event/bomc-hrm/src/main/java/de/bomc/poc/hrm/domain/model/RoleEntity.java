@@ -76,7 +76,7 @@ public class RoleEntity extends SecurityObjectEntity implements Serializable {
 	 */
 	@OrderBy("username ASC")
 	@ManyToMany(cascade = { CascadeType.REFRESH })
-	@JoinTable(name = "t_role_user_join", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+	@JoinTable(name = "t_role_user_join", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "user_id"), schema = "public")
 	private Set<UserEntity> users = new HashSet<UserEntity>();
 	/**
 	 * All {@link PermissionEntity}s assigned to the <code>RoleEntity</code>, this
@@ -85,7 +85,7 @@ public class RoleEntity extends SecurityObjectEntity implements Serializable {
 	 * transaction.
 	 */
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH })
-	@JoinTable(name = "t_role_permission_join", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
+	@JoinTable(name = "t_role_permission_join", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"), schema = "public")
 	private Set<PermissionEntity> permissions = new HashSet<PermissionEntity>();
 
 	/* ------------------- constants ---------------------------- */

@@ -16,20 +16,23 @@ package de.bomc.poc.hrm;
 
 import java.util.Properties;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * Configuration for persistence.
@@ -43,49 +46,29 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories(entityManagerFactoryRef = "h2EntityManagerFactory", transactionManagerRef = "h2TransactionManager", basePackages = {
 		"de.bomc.poc.hrm.infrastructure" })
 @PropertySource("classpath:persistence-h2.properties")
-public class PersistenceH2Config {
-
-	// _______________________________________________
-	// Constants
-	// -----------------------------------------------
-	private static final String HIBERNATE_DDL_AUTO = "hibernate.hbm2ddl.auto";
-	private static final String HIBERNATE_DIALECT = "hibernate.dialect";
-//	private static final String HIBERNATE_SHOW_SQL = "hibernate.show_sql";
-//	private static final String HIBERNATE_USE_SQL_COMMENTS = "hibernate.use_sql_comments";
-//	private static final String HIBERNATE_FORMAT_SQL = "hibernate.format_sql";
-	private static final String PACKAGE_TO_SCAN = "de.bomc.poc.hrm.domain";
-	// _______________________________________________
-	// Member variables
-	// -----------------------------------------------
-	@Value("${datasource.driver-class-name}")
-	private String dataSourceDriverClassName;
-	@Value("${datasource.url}")
-	private String dataSourceUrl;
-	@Value("${datasource.username}")
-	private String dataSourceUsername;
-	@Value("${datasource.password}")
-	private String dataSourcePassword;
-	@Value("${jpa.properties.hibernate.ddl-auto}")
-	private String jpaHibernateDdlAuto;
-//    @Value("${jpa.properties.hibernate.show_sql}")
-//    private String jpaHibernateShowSql;
-//    @Value("${jpa.properties.hibernate.use_sql_comments}")
-//    private String jpaHibernateUseSqlComments;    
-//    @Value("${jpa.properties.hibernate.format_sql}")
-//    private String jpaHibernateFormatSql;
-	@Value("${jpa.properties.hibernate.dialect}")
-	private String jpaPropHibernateDialect;
-
+public class PersistenceH2Config extends AbstractConfig {
+	
 	@Bean(name = "h2DataSource")
 	public DataSource h2DataSource() {
-		final DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
 
-		driverManagerDataSource.setDriverClassName(this.dataSourceDriverClassName);
-		driverManagerDataSource.setUrl(this.dataSourceUrl);
-		driverManagerDataSource.setUsername(this.dataSourceUsername);
-		driverManagerDataSource.setPassword(this.dataSourcePassword);
+		// Set the driver properties.
+		final Properties driverProperties = new Properties();
+        driverProperties.setProperty(DRIVER_URL_PROPERTY_KEY, driverSourceUrl);
+        driverProperties.setProperty(DRIVER_USER_PROPERTY_KEY, driverSourceUsername);
+        driverProperties.setProperty(DRIVER_PASSWORD_PROPERTY_KEY, driverSourcePassword);
 
-		return driverManagerDataSource;
+        // Set dataSource properties.
+        final Properties properties = new Properties();
+        properties.put(DATASOURCE_CLASSNAME_PROPERTY_KEY, dataSourceClassName);
+        properties.put(DATASOURCE_PROPETIES_PROPERTY_KEY, driverProperties);
+        //properties.setProperty(DATASOURCE_MIN_POOLSIZE_PROPERTY_KEY, String.valueOf(dataSourceMinimumPoolSize));
+        properties.setProperty(DATASOURCE_MAX_POOLSIZE_PROPERTY_KEY, String.valueOf(dataSourceMaximumPoolSize));
+        properties.setProperty(DATASOURCE_CONNECTION_TIMEOUT_PROPERTY_KEY, String.valueOf(dataSourceConnectionTimeout));
+        
+        // Create dataSource and set properties.
+        final DataSource datasource = new HikariDataSource(new HikariConfig(properties));
+        
+        return datasource;
 	}
 
 	@Bean(name = "h2EntityManagerFactory")
@@ -96,31 +79,24 @@ public class PersistenceH2Config {
 		em.setDataSource(h2DataSource);
 		em.setPackagesToScan(new String[] { PACKAGE_TO_SCAN });
 		em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-		em.setJpaProperties(additionalProperties());
+		em.setJpaProperties(hibernateProperties());
 
 		return em;
 	}
 
 	@Bean(name = "h2TransactionManager")
-	public DataSourceTransactionManager transactionManager(@Qualifier("h2DataSource") final DataSource h2DataSource) {
-		final DataSourceTransactionManager txManager = new DataSourceTransactionManager();
-		txManager.setDataSource(h2DataSource);
-
-		return txManager;
+	public JpaTransactionManager transactionManager(@Qualifier("h2EntityManagerFactory") final EntityManagerFactory h2EntityManagerFactory) {
+		
+        final JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(h2EntityManagerFactory);
+        
+        return transactionManager;
 	}
 
-	// _______________________________________________
-	// Helper methods
-	// -----------------------------------------------
-	final Properties additionalProperties() {
-		final Properties hibernateProperties = new Properties();
-
-		hibernateProperties.setProperty(HIBERNATE_DDL_AUTO, this.jpaHibernateDdlAuto);
-		hibernateProperties.setProperty(HIBERNATE_DIALECT, this.jpaPropHibernateDialect);
-//		hibernateProperties.setProperty(HIBERNATE_SHOW_SQL, this.jpaHibernateShowSql);
-//		hibernateProperties.setProperty(HIBERNATE_USE_SQL_COMMENTS, this.jpaHibernateUseSqlComments);
-//		hibernateProperties.setProperty(HIBERNATE_FORMAT_SQL, this.jpaHibernateFormatSql);
-
-		return hibernateProperties;
-	}
+    @Bean(name = "h2TransactionTemplate")
+    public TransactionTemplate transactionTemplate(@Qualifier("h2EntityManagerFactory") final EntityManagerFactory h2EntityManagerFactory) {
+        
+    	return new TransactionTemplate(transactionManager(h2EntityManagerFactory));
+    }
+    
 }

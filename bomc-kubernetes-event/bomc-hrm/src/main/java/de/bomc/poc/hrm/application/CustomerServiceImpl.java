@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import de.bomc.poc.hrm.application.exception.AppErrorCodeEnum;
 import de.bomc.poc.hrm.application.exception.AppRuntimeException;
@@ -40,7 +41,6 @@ import de.bomc.poc.hrm.interfaces.mapper.CustomerMapper;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 07.05.2019
  */
-//@Transactional
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
@@ -60,7 +60,6 @@ public class CustomerServiceImpl implements CustomerService {
 	 * @param customerRepository the given customer repository.
 	 * @param customerService    the
 	 */
-//	@Autowired
 	public CustomerServiceImpl(final CustomerRepository customerRepository, final CustomerMapper customerMapper) {
 
 		this.customerRepository = customerRepository;
@@ -69,6 +68,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	/* --------------------- methods -------------------------------- */
 
+	@Transactional(readOnly = true)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public CustomerDto findById(final Long id) {
 
@@ -78,6 +78,7 @@ public class CustomerServiceImpl implements CustomerService {
 		return this.customerMapper.mapEntityToDto(customerEntity);
 	}
 
+	@Transactional(readOnly = true)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public CustomerDto findByEmailAddress(final CustomerEmailDto customerEmailDto) {
 
@@ -89,7 +90,7 @@ public class CustomerServiceImpl implements CustomerService {
 		return this.customerMapper.mapEntityToDto(customerEntity);
 	}
 
-
+	@Transactional
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public CustomerDto createCustomer(final CustomerEntity customerEntity) {
 		// Set metadata.
@@ -103,12 +104,14 @@ public class CustomerServiceImpl implements CustomerService {
 		return customerDto;
 	}
 
+	@Transactional
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public void deleteCustomerById(final Long id) {
 
 		this.customerRepository.deleteById(id);
 	}
 
+	@Transactional
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public CustomerDto updateCustomer(final CustomerDto customerDto) {
 
@@ -140,6 +143,7 @@ public class CustomerServiceImpl implements CustomerService {
 		}
 	}
 
+	@Transactional(readOnly = true)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public List<CustomerDto> findAll() {
 
