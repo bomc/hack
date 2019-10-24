@@ -19,9 +19,12 @@ import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -47,31 +50,47 @@ import com.zaxxer.hikari.HikariDataSource;
 		"de.bomc.poc.hrm.infrastructure" })
 @PropertySource("classpath:persistence-h2.properties")
 public class PersistenceH2Config extends AbstractConfig {
-	
+
+	private static final String DATASOURCE_POOL_NAME_VALUE = "bomc-h2";
+
 	@Bean(name = "h2DataSource")
 	public DataSource h2DataSource() {
 
 		// Set the driver properties.
 		final Properties driverProperties = new Properties();
-        driverProperties.setProperty(DRIVER_URL_PROPERTY_KEY, driverSourceUrl);
-        driverProperties.setProperty(DRIVER_USER_PROPERTY_KEY, driverSourceUsername);
-        driverProperties.setProperty(DRIVER_PASSWORD_PROPERTY_KEY, driverSourcePassword);
+		driverProperties.setProperty(DRIVER_URL_PROPERTY_KEY, driverSourceUrl);
+		driverProperties.setProperty(DRIVER_USER_PROPERTY_KEY, driverSourceUsername);
+		driverProperties.setProperty(DRIVER_PASSWORD_PROPERTY_KEY, driverSourcePassword);
 
-        // Set dataSource properties.
-        final Properties properties = new Properties();
-        properties.put(DATASOURCE_CLASSNAME_PROPERTY_KEY, dataSourceClassName);
-        properties.put(DATASOURCE_PROPETIES_PROPERTY_KEY, driverProperties);
-        //properties.setProperty(DATASOURCE_MIN_POOLSIZE_PROPERTY_KEY, String.valueOf(dataSourceMinimumPoolSize));
-        properties.setProperty(DATASOURCE_MAX_POOLSIZE_PROPERTY_KEY, String.valueOf(dataSourceMaximumPoolSize));
-        properties.setProperty(DATASOURCE_CONNECTION_TIMEOUT_PROPERTY_KEY, String.valueOf(dataSourceConnectionTimeout));
-        
-        // Create dataSource and set properties.
-        final DataSource datasource = new HikariDataSource(new HikariConfig(properties));
-        
-        return datasource;
+		// Set dataSource properties.
+		final Properties properties = new Properties();
+		properties.put(HIKARI_DATASOURCE_CLASSNAME_PROPERTY_KEY, dataSourceClassName);
+		properties.put(HIKARI_DATASOURCE_PROPETIES_PROPERTY_KEY, driverProperties);
+		// properties.setProperty(DATASOURCE_MIN_POOLSIZE_PROPERTY_KEY,
+		// String.valueOf(dataSourceMinimumPoolSize));
+		properties.setProperty(HIKARI_DATASOURCE_MAX_POOLSIZE_PROPERTY_KEY, String.valueOf(dataSourceMaximumPoolSize));
+		properties.setProperty(HIKARI_DATASOURCE_CONNECTION_TIMEOUT_PROPERTY_KEY,
+				String.valueOf(dataSourceConnectionTimeout));
+		properties.setProperty(HIKARI_DATASOURCE_CONNECTION_TEST_QUERY_KEY, dataSourceConnectionTestQuery);
+		properties.setProperty(HIKARI_DATASOURCE_POOL_NAME_KEY, DATASOURCE_POOL_NAME_VALUE);
+
+		// Create dataSource and set properties.
+		final HikariDataSource datasource = new HikariDataSource(new HikariConfig(properties));
+
+		return datasource;
+	}
+
+	@FlywayDataSource
+	@Bean(initMethod = "migrate")
+	public Flyway flyway(@Qualifier("h2DataSource") final HikariDataSource dataSource) {
+
+		return Flyway.configure().dataSource(dataSource)
+				.locations("classpath:db/migration", "classpath:dev/db/migration").baselineOnMigrate(true)
+				.schemas("public").load();
 	}
 
 	@Bean(name = "h2EntityManagerFactory")
+	@DependsOn("flyway")
 	public LocalContainerEntityManagerFactoryBean h2EntityManagerFactory(
 			@Qualifier("h2DataSource") final DataSource h2DataSource) {
 		final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
@@ -85,18 +104,20 @@ public class PersistenceH2Config extends AbstractConfig {
 	}
 
 	@Bean(name = "h2TransactionManager")
-	public JpaTransactionManager transactionManager(@Qualifier("h2EntityManagerFactory") final EntityManagerFactory h2EntityManagerFactory) {
-		
-        final JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(h2EntityManagerFactory);
-        
-        return transactionManager;
+	public JpaTransactionManager transactionManager(
+			@Qualifier("h2EntityManagerFactory") final EntityManagerFactory h2EntityManagerFactory) {
+
+		final JpaTransactionManager transactionManager = new JpaTransactionManager();
+		transactionManager.setEntityManagerFactory(h2EntityManagerFactory);
+
+		return transactionManager;
 	}
 
-    @Bean(name = "h2TransactionTemplate")
-    public TransactionTemplate transactionTemplate(@Qualifier("h2EntityManagerFactory") final EntityManagerFactory h2EntityManagerFactory) {
-        
-    	return new TransactionTemplate(transactionManager(h2EntityManagerFactory));
-    }
-    
+	@Bean(name = "h2TransactionTemplate")
+	public TransactionTemplate transactionTemplate(
+			@Qualifier("h2EntityManagerFactory") final EntityManagerFactory h2EntityManagerFactory) {
+
+		return new TransactionTemplate(transactionManager(h2EntityManagerFactory));
+	}
+
 }

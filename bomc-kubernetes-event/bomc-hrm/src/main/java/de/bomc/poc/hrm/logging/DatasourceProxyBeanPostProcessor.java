@@ -91,7 +91,8 @@ public class DatasourceProxyBeanPostProcessor implements BeanPostProcessor {
 			this.dataSource = ProxyDataSourceBuilder
 					.create(dataSource) //
 					.name(datasourceName) //
-					.countQuery().multiline() //
+					.countQuery() //
+					.multiline() //
 					.listener(slf4JQueryLoggingListener) //
 					.logSlowQueryToSysOut(500, TimeUnit.MILLISECONDS) //
 					.asJson() //
