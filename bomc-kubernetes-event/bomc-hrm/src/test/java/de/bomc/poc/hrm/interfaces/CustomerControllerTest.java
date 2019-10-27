@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -52,6 +52,8 @@ import brave.Tracer;
 import de.bomc.poc.hrm.AbstractBaseUnit;
 import de.bomc.poc.hrm.GitConfig;
 import de.bomc.poc.hrm.application.CustomerService;
+import de.bomc.poc.hrm.application.log.http.RequestGetLoggingInterceptor;
+import de.bomc.poc.hrm.application.log.http.RequestResponseLoggerImpl;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
 
@@ -85,10 +87,10 @@ import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
  */
-@WebMvcTest(CustomerController.class)
 @RunWith(SpringJUnit4ClassRunner.class)
-@ActiveProfiles("local")
-@ComponentScan( value = {"de.bomc.poc"})
+@WebMvcTest(CustomerController.class)
+@Import({ RequestGetLoggingInterceptor.class, RequestResponseLoggerImpl.class })
+@ComponentScan(value = { "de.bomc.poc.hrm.interfaces.mapper" })
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CustomerControllerTest extends AbstractBaseUnit {
 
@@ -106,9 +108,14 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 	private GitConfig gitConfig;
 	@MockBean
 	private Tracer tracer;
-	
+
 	/* --------------------- methods -------------------------------- */
 
+	/**
+	 * mvn clean install -Dtest=CustomerControllerTest#test010_createCustomer_pass
+	 * 
+	 * @throws Exception
+	 */
 	@Test
 	public void test010_createCustomer_pass() throws Exception {
 		LOGGER.info(LOG_PREFIX + "test010_createCustomer_pass");
@@ -139,7 +146,7 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		final CustomerEmailDto customerEmailDto = new CustomerEmailDto();
 		customerEmailDto.setEmailAddress(CUSTOMER_E_MAIL);
 
-		// WHEN 
+		// WHEN
 		when(this.customerService.findByEmailAddress(customerEmailDto)).thenReturn(createCustomerDto());
 
 		final ObjectMapper objectMapper = new ObjectMapper();

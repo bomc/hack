@@ -1,5 +1,5 @@
 /**
- * Project: POC PaaS
+ * Project: hrm
  * <pre>
  *
  * Last change:
@@ -17,19 +17,14 @@ package de.bomc.poc.hrm.domain.model;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import de.bomc.poc.hrm.AbstractBaseUnit;
-import de.bomc.poc.hrm.domain.model.CustomerEntity;
 
 /**
  * Tests the customer entity.
@@ -37,22 +32,35 @@ import de.bomc.poc.hrm.domain.model.CustomerEntity;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
  */
-@DataJpaTest
-@RunWith(SpringJUnit4ClassRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CustomerEntityTest extends AbstractBaseUnit {
 
 	private static final String LOG_PREFIX = "CustomerEntityTest#";
 	private static final Logger LOGGER = LoggerFactory.getLogger(CustomerEntityTest.class);
 
-	/* --------------------- constants ------------------------------ */
-	private static final String CUSTOMER_CREATE_USER = "myCreateUser";
+	// _______________________________________________
+	// Test constants
+	// -----------------------------------------------
 
-	/* --------------------- member variables ----------------------- */
-	@Autowired
-	private TestEntityManager entityManager;
+	// _______________________________________________
+	// Member variables
+	// -----------------------------------------------
 
-	/* --------------------- test methods --------------------------- */
+	// _______________________________________________
+	// Test preparation
+	// -----------------------------------------------
+	@Before
+	public void initialize() {
+		LOGGER.debug(LOG_PREFIX + "initialize");
+
+		this.entityManager1 = this.emProvider1.getEntityManager();
+
+		assertThat(this.entityManager1, notNullValue());
+	}
+
+	// _______________________________________________
+	// Test methods
+	// -----------------------------------------------/
 	@Test
 	public void test010_createCustomer_pass() {
 		LOGGER.info(LOG_PREFIX + "test010_createCustomer_pass");
@@ -62,7 +70,11 @@ public class CustomerEntityTest extends AbstractBaseUnit {
 		customerEntity.setCreateUser(CUSTOMER_CREATE_USER);
 
 		// WHEN
-		this.entityManager.persist(customerEntity);
+		this.emProvider1.tx().begin();
+
+		this.entityManager1.persist(customerEntity);
+
+		this.emProvider1.tx().commit();
 
 		// THEN
 		assertThat(customerEntity.getId(), notNullValue());

@@ -47,11 +47,12 @@
 		<version.commons-lang>2.6</version.commons-lang>
 		<version.datasource-proxy>1.5.1</version.datasource-proxy>
 		<version.p6spy>3.8.6</version.p6spy>
-		
+
 		<!-- Other plugins -->
 		<version.mapstruct-processor>1.3.0.Final</version.mapstruct-processor>
 		<version.jacoco-maven-plugin>0.8.4</version.jacoco-maven-plugin>
 		<version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
+		<version.jpa2ddl-maven-plugin>0.9.12</version.jpa2ddl-maven-plugin>
 	</properties>
 
 	<dependencies>
@@ -144,25 +145,12 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Start: snippets, see snippet folder -->
-<!--         <dependency> -->
-<!--             <groupId>net.ttddyy</groupId> -->
-<!--             <artifactId>datasource-proxy</artifactId> -->
-<!--             <version>${version.datasource-proxy}</version> -->
-<!--         </dependency> -->
-
-<!--         <dependency> -->
-<!--             <groupId>p6spy</groupId> -->
-<!--             <artifactId>p6spy</artifactId> -->
-<!--             <version>${version.p6spy}</version> -->
-<!--         </dependency> -->
-        <!-- End: snippets -->
-        
 		<!-- H2 Database Engine. -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 		</dependency>
+		
 		<!-- PostGreSQL Database Engine. -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -413,7 +401,7 @@
 					<plugin>
 						<groupId>com.devskiller.jpa2ddl</groupId>
 						<artifactId>jpa2ddl-maven-plugin</artifactId>
-						<version>0.9.12</version>
+						<version>${version.jpa2ddl-maven-plugin}</version>
 						<!-- Required to run automatically -->
 						<extensions>true</extensions>
 						<executions>
@@ -436,7 +424,7 @@
 								</property>
 								<property>
 									<name>hibernate.default_schema</name>
-									<value>public</value>
+									<value>bomc</value>
 								</property>
 							</jpaProperties>
 							<formatOutput>true</formatOutput>

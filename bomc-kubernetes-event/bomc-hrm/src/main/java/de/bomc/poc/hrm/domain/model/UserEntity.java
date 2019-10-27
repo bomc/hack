@@ -27,6 +27,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
@@ -63,7 +64,7 @@ import lombok.ToString;
 @ToString
 // JPA
 @Entity
-@Table(name = "t_user", schema = "public")
+@Table(name = "t_user", schema = "bomcdb")
 @NamedQueries({
 		@NamedQuery(name = UserEntity.NQ_FIND_ALL, query = "select u from UserEntity u left join fetch u.roles"),
 		@NamedQuery(name = UserEntity.NQ_FIND_ALL_ORDERED, query = "select u from UserEntity u left join fetch u.roles order by u.username"),
@@ -199,7 +200,7 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	 * @see javax.persistence.FetchType#EAGER
 	 */
 	@OrderBy("name ASC")
-	@ManyToMany(mappedBy = "users", cascade = { CascadeType.MERGE, CascadeType.REFRESH })
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = { CascadeType.MERGE, CascadeType.REFRESH })
 	private Set<RoleEntity> roles = new HashSet<RoleEntity>();
 
 	/**

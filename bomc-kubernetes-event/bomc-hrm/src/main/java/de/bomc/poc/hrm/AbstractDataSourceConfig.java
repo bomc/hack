@@ -4,7 +4,7 @@ import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Value;
 
-public abstract class AbstractConfig {
+public abstract class AbstractDataSourceConfig {
 
 	// _______________________________________________
 	// Constants
@@ -22,12 +22,15 @@ public abstract class AbstractConfig {
 
 	protected static final String HIBERNATE_DDL_AUTO = "hibernate.hbm2ddl.auto";
 	protected static final String HIBERNATE_DIALECT = "hibernate.dialect";
+	protected static final String HIBERNATE_DEFAULT_SCHEMA = "hibernate.default_schema";
 
 	protected static final String PACKAGE_TO_SCAN = "de.bomc.poc.hrm.domain";
-
+	
 	// _______________________________________________
 	// Member variables
 	// -----------------------------------------------
+    @Value("${spring.flyway.enabled:true}")
+    protected boolean isFlywayEnabled;
 	@Value("${driver.url}")
 	protected String driverSourceUrl;
 	@Value("${driver.username}")
@@ -48,7 +51,9 @@ public abstract class AbstractConfig {
 	protected String jpaHibernateDdlAuto;
 	@Value("${jpa.properties.hibernate.dialect}")
 	protected String jpaPropHibernateDialect;
-
+	@Value("${jpa.properties.hibernate.default_schema}")
+	protected String jpaPropHibernateDefaultSchema;
+	
 	// _______________________________________________
 	// Helper methods
 	// -----------------------------------------------
@@ -57,7 +62,8 @@ public abstract class AbstractConfig {
 
 		hibernateProperties.setProperty(HIBERNATE_DDL_AUTO, this.jpaHibernateDdlAuto);
 		hibernateProperties.setProperty(HIBERNATE_DIALECT, this.jpaPropHibernateDialect);
-
+		hibernateProperties.setProperty(HIBERNATE_DEFAULT_SCHEMA, jpaPropHibernateDefaultSchema);
+		
 		return hibernateProperties;
 	}
 }

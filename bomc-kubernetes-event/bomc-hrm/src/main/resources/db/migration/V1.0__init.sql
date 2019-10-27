@@ -1,35 +1,35 @@
 
-    alter table if exists public.t_role_permission_join 
+    alter table if exists bomcdb.t_role_permission_join 
        drop constraint if exists FKlhnhd7o7ryc0eugatw8cnvxq4;
 
-    alter table if exists public.t_role_permission_join 
+    alter table if exists bomcdb.t_role_permission_join 
        drop constraint if exists FK2uv274out3q80hyw2vrb00fic;
 
-    alter table if exists public.t_role_user_join 
+    alter table if exists bomcdb.t_role_user_join 
        drop constraint if exists FKt1k39e0y68vfko3ancuam40wq;
 
-    alter table if exists public.t_role_user_join 
+    alter table if exists bomcdb.t_role_user_join 
        drop constraint if exists FK2oooo5jjf95ll5psx4f8eyhku;
 
-    alter table if exists public.t_user_password 
+    alter table if exists bomcdb.t_user_password 
        drop constraint if exists FKrvx5dp2ockv3erm09bgdmxukj;
 
-    drop table if exists public.t_customer cascade;
+    drop table if exists bomcdb.t_customer cascade;
 
-    drop table if exists public.t_role_permission_join cascade;
+    drop table if exists bomcdb.t_role_permission_join cascade;
 
-    drop table if exists public.t_role_user_join cascade;
+    drop table if exists bomcdb.t_role_user_join cascade;
 
-    drop table if exists public.t_security_object cascade;
+    drop table if exists bomcdb.t_security_object cascade;
 
-    drop table if exists public.t_user cascade;
+    drop table if exists bomcdb.t_user cascade;
 
-    drop table if exists public.t_user_password cascade;
+    drop table if exists bomcdb.t_user_password cascade;
 
-    drop sequence if exists public.hibernate_sequence;
+    drop sequence if exists bomcdb.hibernate_sequence;
     
     -- Start with 1001 to let the lower ones reserved for flyway init scripts.
-    create sequence hibernate_sequence
+    create sequence bomcdb.hibernate_sequence
       start with 1001
 	--  maxvalue 9999999999999999999
 	--  minvalue 0
@@ -38,7 +38,7 @@
 	--  noorder
       ;
       
-    create table public.t_customer (
+    create table bomcdb.t_customer (
        c_id int8 not null,
         c_createdatetime timestamp not null,
         c_createuser varchar(255),
@@ -58,19 +58,19 @@
         primary key (c_id)
     );
 
-    create table public.t_role_permission_join (
+    create table bomcdb.t_role_permission_join (
        role_id int8 not null,
         permission_id int8 not null,
         primary key (role_id, permission_id)
     );
 
-    create table public.t_role_user_join (
+    create table bomcdb.t_role_user_join (
        role_id int8 not null,
         user_id int8 not null,
         primary key (role_id, user_id)
     );
 
-    create table public.t_security_object (
+    create table bomcdb.t_security_object (
        type varchar(20) not null,
         c_id int8 not null,
         c_createdatetime timestamp not null,
@@ -84,7 +84,7 @@
         primary key (c_id)
     );
 
-    create table public.t_user (
+    create table bomcdb.t_user (
        DTYPE varchar(31) not null,
         c_id int8 not null,
         c_createdatetime timestamp not null,
@@ -107,7 +107,7 @@
         primary key (c_id)
     );
 
-    create table public.t_user_password (
+    create table bomcdb.t_user_password (
        c_id int8 not null,
         c_createdatetime timestamp not null,
         c_createuser varchar(255),
@@ -120,39 +120,39 @@
         primary key (c_id)
     );
 
-    alter table public.t_customer 
+    alter table bomcdb.t_customer 
        add constraint UK_4lgnk4im8h61kkr0sv1pqyf1f unique (c_email_address);
 
-    alter table public.t_security_object 
+    alter table bomcdb.t_security_object 
        add constraint UK_7nthv2aiewy78qk03b4ine6nw unique (c_name);
 
-    alter table public.t_user 
+    alter table bomcdb.t_user 
        add constraint UK_5cje2jmi6q92umq0thq2idvyj unique (c_username);
 
-    alter table public.t_role_permission_join 
+    alter table bomcdb.t_role_permission_join 
        add constraint FKlhnhd7o7ryc0eugatw8cnvxq4 
        foreign key (permission_id) 
-       references public.t_security_object;
+       references bomcdb.t_security_object;
 
-    alter table public.t_role_permission_join 
+    alter table bomcdb.t_role_permission_join 
        add constraint FK2uv274out3q80hyw2vrb00fic 
        foreign key (role_id) 
-       references public.t_security_object;
+       references bomcdb.t_security_object;
 
-    alter table public.t_role_user_join 
+    alter table bomcdb.t_role_user_join 
        add constraint FKt1k39e0y68vfko3ancuam40wq 
        foreign key (user_id) 
-       references public.t_user;
+       references bomcdb.t_user;
 
-    alter table public.t_role_user_join 
+    alter table bomcdb.t_role_user_join 
        add constraint FK2oooo5jjf95ll5psx4f8eyhku 
        foreign key (role_id) 
-       references public.t_security_object;
+       references bomcdb.t_security_object;
 
-    alter table public.t_user_password 
+    alter table bomcdb.t_user_password 
        add constraint FKrvx5dp2ockv3erm09bgdmxukj 
        foreign key (c_user_join) 
-       references public.t_user;
+       references bomcdb.t_user;
 
 
     

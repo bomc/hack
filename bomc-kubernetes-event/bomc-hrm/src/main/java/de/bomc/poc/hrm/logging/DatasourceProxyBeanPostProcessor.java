@@ -80,7 +80,7 @@ public class DatasourceProxyBeanPostProcessor implements BeanPostProcessor {
 			super();
 
 			// Use pretty formatted query with multiline enabled.
-			final PrettyQueryEntryCreator queryLogEntryCreator = new PrettyQueryEntryCreator();
+			final PrettyQueryLogEntryCreator queryLogEntryCreator = new PrettyQueryLogEntryCreator();
 			queryLogEntryCreator.setMultiline(true);
 			
 			// Create a listener for logging out with slf4j.

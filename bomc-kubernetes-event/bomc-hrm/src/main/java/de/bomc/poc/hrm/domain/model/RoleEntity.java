@@ -75,8 +75,8 @@ public class RoleEntity extends SecurityObjectEntity implements Serializable {
 	 * relationship is bidirectional.
 	 */
 	@OrderBy("username ASC")
-	@ManyToMany(cascade = { CascadeType.REFRESH })
-	@JoinTable(name = "t_role_user_join", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "user_id"), schema = "public")
+	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH })
+	@JoinTable(name = "t_role_user_join", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "user_id"), schema = "bomcdb")
 	private Set<UserEntity> users = new HashSet<UserEntity>();
 	/**
 	 * All {@link PermissionEntity}s assigned to the <code>RoleEntity</code>, this
@@ -85,7 +85,7 @@ public class RoleEntity extends SecurityObjectEntity implements Serializable {
 	 * transaction.
 	 */
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH })
-	@JoinTable(name = "t_role_permission_join", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"), schema = "public")
+	@JoinTable(name = "t_role_permission_join", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"), schema = "bomcdb")
 	private Set<PermissionEntity> permissions = new HashSet<PermissionEntity>();
 
 	/* ------------------- constants ---------------------------- */

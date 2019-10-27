@@ -28,13 +28,14 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import brave.Tracer;
 import de.bomc.poc.hrm.GitConfig;
+import de.bomc.poc.hrm.application.log.http.RequestGetLoggingInterceptor;
+import de.bomc.poc.hrm.application.log.http.RequestResponseLoggerImpl;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -46,10 +47,9 @@ import lombok.extern.slf4j.Slf4j;
  * @since 21.10.2019
  */
 @Slf4j
-@WebMvcTest(VersionController.class)
 @RunWith(SpringJUnit4ClassRunner.class)
-@ActiveProfiles("local")
-@ComponentScan(value = { "de.bomc.poc" })
+@WebMvcTest(VersionController.class)
+@Import({ RequestGetLoggingInterceptor.class, RequestResponseLoggerImpl.class })
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class VersionControllerTest {
 

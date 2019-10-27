@@ -14,9 +14,9 @@
  */
 package de.bomc.poc.hrm.interfaces.exception;
 
+import java.util.UUID;
+
 import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -27,9 +27,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import de.bomc.poc.hrm.application.exception.AppErrorCodeEnum;
 import de.bomc.poc.hrm.application.exception.AppRuntimeException;
 import de.bomc.poc.hrm.application.exception.core.ExceptionUtil;
 import de.bomc.poc.hrm.interfaces.ApiErrorResponseObject;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class handles centralized exception handling for standardized and custom
@@ -38,18 +40,18 @@ import de.bomc.poc.hrm.interfaces.ApiErrorResponseObject;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
  */
+@Slf4j
 @ControllerAdvice
 public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
 
 	private static final String LOG_PREFIX = "ResponseEntityExceptionHandlerAdvice#";
-	private static Logger LOGGER = LoggerFactory.getLogger(ResponseEntityExceptionHandlerAdvice.class);
-	
+
 	// _______________________________________________
 	// Constants
 	// -----------------------------------------------
 	// @TODO see {@link TraceHeaderFilter.class}
 	private static final String X_B3_TraceId_HEADER = "X-B3-TraceId";
-	
+
 	public ResponseEntityExceptionHandlerAdvice() {
 		super();
 	}
@@ -57,19 +59,16 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 	// API
 
 	// 400
-
-	@ExceptionHandler({ ConstraintViolationException.class })
-	public ResponseEntity<Object> handleBadRequest(final ConstraintViolationException ex, final WebRequest request) {
-		final String bodyOfResponse = "bomc: This should be application specific";
-		return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-	}
-
-	@ExceptionHandler({ DataIntegrityViolationException.class })
-	public ResponseEntity<Object> handleBadRequest(final DataIntegrityViolationException ex, final WebRequest request) {
-		final String bodyOfResponse = "bomc: This should be application specific";
-		return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-	}
-
+	
+//	@Override
+//	protected ResponseEntity<Object> handleBadRequest(final HttpMessageNotReadableException ex,
+//			final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
+//		final String bodyOfResponse = "This should be application specific";
+//		// ex.getCause() instanceof JsonMappingException, JsonParseException // for
+//		// additional information later on
+//		return handleExceptionInternal(ex, bodyOfResponse, headers, HttpStatus.BAD_REQUEST, request);
+//	}
+	
 //	@Override
 //	protected ResponseEntity<Object> handleHttpMessageNotReadable(final HttpMessageNotReadableException ex,
 //			final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
@@ -106,19 +105,50 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 
 	// 500
 
+	@ExceptionHandler({ ConstraintViolationException.class })
+	public ResponseEntity<Object> handleInternal(final ConstraintViolationException ex, final WebRequest request) {
+		log.error(LOG_PREFIX + "handleInternal (ConstraintViolationException) [ex=" + ex + ", request=" + request
+				+ ", traceId=" + MDC.get(X_B3_TraceId_HEADER) + "]");
+
+		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
+				.shortErrorCodeDescription(
+						AppErrorCodeEnum.JPA_PERSISTENCE_CONSTRAINT_VIOLATION_10403.getShortErrorCodeDescription())
+				.errorCode(AppErrorCodeEnum.JPA_PERSISTENCE_CONSTRAINT_VIOLATION_10403.toString())
+				.uuid(UUID.randomUUID().toString()).status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+		return handleExceptionInternal(ex, apiErrorResponseObject, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}
+
+	@ExceptionHandler({ DataIntegrityViolationException.class })
+	public ResponseEntity<Object> handleInternal(final DataIntegrityViolationException ex, final WebRequest request) {
+		log.error(LOG_PREFIX + "handleInternal (DataIntegrityViolationException) [ex=" + ex + ", request=" + request
+				+ ", traceId=" + MDC.get(X_B3_TraceId_HEADER) + "]");
+
+		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
+				.shortErrorCodeDescription(
+						AppErrorCodeEnum.JPA_PERSISTENCE_DATA_INTEGRITY_VIOLATION_10404.getShortErrorCodeDescription())
+				.errorCode(AppErrorCodeEnum.JPA_PERSISTENCE_DATA_INTEGRITY_VIOLATION_10404.toString())
+				.uuid(UUID.randomUUID().toString()).status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+		return handleExceptionInternal(ex, apiErrorResponseObject, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}
+	
 	@ExceptionHandler({ AppRuntimeException.class })
 	public ResponseEntity<Object> handleInternal(final RuntimeException ex, final WebRequest request) {
-		LOGGER.error(LOG_PREFIX + "handleInternal [ex=" + ex + ", request=" + request + ", traceId=" + MDC.get(X_B3_TraceId_HEADER) + "]");
-		
+		log.error(LOG_PREFIX + "handleInternal [ex=" + ex + ", request=" + request + ", traceId="
+				+ MDC.get(X_B3_TraceId_HEADER) + "]");
+
 		final AppRuntimeException appRuntimeException = ExceptionUtil.unwrap(ex, AppRuntimeException.class);
-		
-		if(!appRuntimeException.isLogged()) {
+
+		if (!appRuntimeException.isLogged()) {
 			logger.error(LOG_PREFIX + "handleInternal" + appRuntimeException.stackTraceToString());
 		}
-		
-		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder().shortErrorCodeDescription(appRuntimeException.getMessage())
-		.errorCode(appRuntimeException.getErrorCode().toString()).uuid(appRuntimeException.getUuid()).status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		
+
+		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
+				.shortErrorCodeDescription(appRuntimeException.getMessage())
+				.errorCode(appRuntimeException.getErrorCode().toString()).uuid(appRuntimeException.getUuid())
+				.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
 		return handleExceptionInternal(ex, apiErrorResponseObject, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR,
 				request);
 	}

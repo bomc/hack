@@ -24,11 +24,9 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -37,6 +35,7 @@ import de.bomc.poc.hrm.application.UserService;
 import de.bomc.poc.hrm.domain.model.UserEntity;
 import de.bomc.poc.hrm.interfaces.mapper.UserDto;
 import de.bomc.poc.hrm.interfaces.mapper.UserMapper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Tests the user controller, in BDD context without Spring.
@@ -45,11 +44,11 @@ import de.bomc.poc.hrm.interfaces.mapper.UserMapper;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
  */
+@Slf4j
 @RunWith(MockitoJUnitRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserControllerTest extends AbstractBaseUnit {
 	private static final String LOG_PREFIX = "UserControllerTest#";
-	private static final Logger LOGGER = LoggerFactory.getLogger(UserControllerTest.class.getName());
 
 	/* --------------------- constants ------------------------------ */
 
@@ -70,7 +69,7 @@ public class UserControllerTest extends AbstractBaseUnit {
 
 	@Test
 	public void test010_createUser_pass() {
-		LOGGER.debug(LOG_PREFIX + "test010_createUser_pass");
+		log.debug(LOG_PREFIX + "test010_createUser_pass");
 
 		// GIVEN: define the behavior that should be mocked.
 		final UserEntity userEntity = new UserEntity(USER_USER_NAME);
@@ -78,7 +77,6 @@ public class UserControllerTest extends AbstractBaseUnit {
 
 		final UserDto userDto = new UserDto();
 
-//		given(this.userMapper.mapDtoToEntity(userDto)).willReturn(userEntity);
 		given(this.userService.createUser(eq(userDto))).willReturn(userDto);
 
 		// WHEN

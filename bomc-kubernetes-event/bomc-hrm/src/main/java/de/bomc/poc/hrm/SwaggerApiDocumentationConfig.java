@@ -53,7 +53,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 @Import(BeanValidatorPluginsConfiguration.class)
-public class ApiDocumentationConfig implements WebMvcConfigurer {
+public class SwaggerApiDocumentationConfig implements WebMvcConfigurer {
 
 	private static final String SWAGGER_CONTEXT_ROOT = "/bomc-api";
 
