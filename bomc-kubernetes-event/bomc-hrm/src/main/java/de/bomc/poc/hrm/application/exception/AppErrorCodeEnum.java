@@ -36,9 +36,9 @@ public enum AppErrorCodeEnum implements ErrorCode {
 	// MAJOR /general response errors (10000-10499)
 	//
 	// Indicates jpa/persistence error (10400-10499)
-	JPA_PERSISTENCE_10400(10400, Category.ERROR, "Error occurs with entityManager handling."),
-	JPA_PERSISTENCE_10401(10401, Category.ERROR, "No entity available in db."),
-	JPA_PERSISTENCE_10402(10402, Category.ERROR, "Entity is with given attribute already available in db."),
+	JPA_PERSISTENCE_ENTITY_MANAGER_ERROR_10400(10400, Category.ERROR, "Error occurs with entityManager handling."),
+	JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401(10401, Category.ERROR, "No entity available in db."),
+	JPA_PERSISTENCE_ENTITY_ALREADY_AVAILABLE_10402(10402, Category.ERROR, "Entity is with given attribute already available in db."),
 	JPA_PERSISTENCE_CONSTRAINT_VIOLATION_10403(10403, Category.ERROR,
 			"Iindicating that the requested DML operation resulted in a violation of a defined integrity constraint."),
 	JPA_PERSISTENCE_DATA_INTEGRITY_VIOLATION_10404(10404, Category.ERROR,

@@ -1,0 +1,148 @@
+= Bomc API Documentation
+bomc<bomc@bomc.org>
+${git.build.version}, ${git.build.time}
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: Index
+:toclevels: 4
+:sectlinks:
+
+[introduction]
+== Introduction
+This guide provides a detailed description how to use the RESTful hrm-service.
+
+[[overview]]
+== Overview
+
+[[overview-http-verbs]]
+=== HTTP verbs
+hrm-service tries to adhere as closely as possible to standard HTTP and REST conventions in its
+use of HTTP verbs.
+|===
+| Verb | Usage
+
+| `GET`
+| Used to retrieve a resource
+
+| `POST`
+| Used to create a new resource
+
+| `PATCH`
+| Used to update an existing resource, including partial updates
+
+| `PUT`
+| Used to update an existing resource, full updates only
+
+| `DELETE`
+| Used to delete an existing resource
+|===
+
+[[overview-http-status-codes]]
+=== HTTP status codes
+Person-service tries to adhere as closely as possible to standard HTTP and REST conventions in its
+use of HTTP status codes.
+
+|===
+| Status code | Usage
+
+| `200 OK`
+| Standard response for successful HTTP requests.
+| The actual response will depend on the request method used.
+| In a GET request, the response will contain an entity corresponding to the requested resource.
+| In a POST request, the response will contain an entity describing or containing the result of the action.
+
+| `201 Created`
+| The request has been fulfilled and resulted in a new resource being created.
+
+| `204 No Content`
+| The server successfully processed the request, but is not returning any content.
+
+| `400 Bad Request`
+| The server cannot or will not process the request due to something that is perceived to be a client error (e.g., malformed request syntax, invalid request message framing, or deceptive request routing).
+
+| `404 Not Found`
+| The requested resource could not be found but may be available again in the future. Subsequent requests by the client are permissible.
+|===
+
+[[resources]]
+== Resources
+
+[[resources-version]]
+== Version API
+Version API endpoint to show the current git version.
+
+=== Get Version
+Obtains the current api version from git.
+
+==== Example request
+include::{snippets}/version-controller-test/test010_get-git-version_pass/http-request.adoc[]
+
+==== Example response
+include::{snippets}/version-controller-test/test010_get-git-version_pass/http-response.adoc[]
+
+==== Response structure
+include::{snippets}/version-controller-test/test010_get-git-version_pass/response-fields.adoc[]
+
+==== CURL sample
+include::{snippets}/version-controller-test/test010_get-git-version_pass/curl-request.adoc[]
+
+[[resource-user-create]]
+== User API
+Collection of CRUD API endpoints used to manipulate users registered in the application.
+
+=== Create a user
+A ´POST´ request creates a new user.
+
+==== Request structure
+include::{snippets}/user-controller-test/test010_create-user_pass/request-fields.adoc[]
+
+==== Example Request
+include::{snippets}/user-controller-test/test010_create-user_pass/http-request.adoc[]
+
+==== CURL sample
+include::{snippets}/user-controller-test/test010_create-user_pass/curl-request.adoc[]
+
+==== Response structure
+include::{snippets}/user-controller-test/test010_create-user_pass/response-fields.adoc[]
+
+==== Example Response
+include::{snippets}/user-controller-test/test010_create-user_pass/http-response.adoc[]
+
+=== Create a user
+A ´POST´ request creates a new user.
+
+==== Request structure
+include::{snippets}/user-controller-test/test015_create-user_fail/request-fields.adoc[]
+
+==== Example Request
+include::{snippets}/user-controller-test/test015_create-user_fail/http-request.adoc[]
+
+==== CURL sample
+include::{snippets}/user-controller-test/test015_create-user_fail/curl-request.adoc[]
+
+==== Response structure
+include::{snippets}/user-controller-test/test015_create-user_fail/response-fields.adoc[]
+
+==== Example Response
+include::{snippets}/user-controller-test/test015_create-user_fail/http-response.adoc[]
+
+[[resource-find-by-id]]
+=== Find user by id
+A ´GET´ request to find a user by given id.
+
+==== Path Parameters
+include::{snippets}/user-controller-test/test020_find-by-id_pass/path-parameters.adoc[]
+
+==== Example Request
+include::{snippets}/user-controller-test/test020_find-by-id_pass/http-request.adoc[]
+
+==== CURL sample
+include::{snippets}/user-controller-test/test020_find-by-id_pass/curl-request.adoc[]
+
+==== Response structure
+include::{snippets}/user-controller-test/test020_find-by-id_pass/response-fields.adoc[]
+
+==== Example Response
+include::{snippets}/user-controller-test/test020_find-by-id_pass/http-response.adoc[]

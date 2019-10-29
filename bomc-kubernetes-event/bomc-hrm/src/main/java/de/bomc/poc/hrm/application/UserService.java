@@ -25,4 +25,7 @@ import de.bomc.poc.hrm.interfaces.mapper.UserDto;
 public interface UserService {
 
 	UserDto createUser(UserDto userDto);
+	
+	UserDto findById(Long id);
+	
 }

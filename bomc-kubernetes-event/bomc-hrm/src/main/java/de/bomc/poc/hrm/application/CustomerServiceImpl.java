@@ -73,7 +73,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public CustomerDto findById(final Long id) {
 
 		final CustomerEntity customerEntity = this.customerRepository.findById(id).orElseThrow(
-				() -> new AppRuntimeException("There is no customer available with the given id [id=" + id + "]", AppErrorCodeEnum.JPA_PERSISTENCE_10401));
+				() -> new AppRuntimeException("There is no customer available with the given id [id=" + id + "]", AppErrorCodeEnum.JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401));
 
 		return this.customerMapper.mapEntityToDto(customerEntity);
 	}

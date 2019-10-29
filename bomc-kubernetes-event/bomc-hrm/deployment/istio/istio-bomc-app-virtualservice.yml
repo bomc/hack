@@ -53,4 +53,18 @@ spec:
         port:
           number: 80
         # subset: v1
+  - match:
+    - uri:
+       prefix: /bomc-hrm/git
+    route:
+    - destination:
+        # The metadata.name, bomc-hrm-service, is the short form of the kubernetes name.
+        # bomc-hrm-service.bomc-app.svc.cluster.local is the Fully Qualified Domain Name.
+        # The reason for using the fully qualified name is to refer to the Gateway from different namespaces.
+        # If the service is in the same namespace the short name should work, here is the service in the
+        # namespace bomc-app and the gateway in istio-system.
+        host: bomc-hrm-service.bomc-app.svc.cluster.local
+        port:
+          number: 80
+        # subset: v1
 ---

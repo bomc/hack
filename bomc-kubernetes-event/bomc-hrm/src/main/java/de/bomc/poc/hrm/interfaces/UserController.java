@@ -20,6 +20,8 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,9 +51,9 @@ import io.swagger.annotations.ApiResponses;
 public class UserController {
 
 	protected static final String MEDIA_TYPE_JSON_V1 = "application/vnd.hrm-v1+json;charset=UTF-8";
-	
+
 	private final UserService userService;
-	
+
 	/**
 	 * Creates a new instance of <code>UserController</code>.
 	 * 
@@ -61,7 +63,7 @@ public class UserController {
 	public UserController(final UserService userService) {
 		this.userService = userService;
 	}
-	
+
 	@ApiOperation(value = "Creates a user.")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully create user in db."),
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
@@ -72,8 +74,21 @@ public class UserController {
 	@ResponseStatus(HttpStatus.OK)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public ResponseEntity<UserDto> createUser(@Valid @RequestBody final UserDto userDto) {
-	
-		return new ResponseEntity<UserDto>(
-				this.userService.createUser(userDto), HttpStatus.OK);
+
+		return new ResponseEntity<UserDto>(this.userService.createUser(userDto), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Find a user by given id.")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully find the user by given id."),
+			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
+			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
+			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
+	@ApiImplicitParams(@ApiImplicitParam(name = "id", value = "The unique user identifier.", dataType = "Long", dataTypeClass = Long.class, required = true))
+	@GetMapping(value="/{id}", produces = MEDIA_TYPE_JSON_V1)
+	@ResponseStatus(HttpStatus.OK)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
+	public ResponseEntity<UserDto> findById(@PathVariable("id") final Long id) {
+
+		return new ResponseEntity<UserDto>(this.userService.findById(id), HttpStatus.OK);
 	}
 }

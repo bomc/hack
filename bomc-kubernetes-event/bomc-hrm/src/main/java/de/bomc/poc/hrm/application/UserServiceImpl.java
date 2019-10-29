@@ -16,6 +16,7 @@ package de.bomc.poc.hrm.application;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -66,6 +67,7 @@ public class UserServiceImpl implements UserService {
 
 	/* --------------------- methods -------------------------------- */
 
+	@Override
 	@Transactional
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public UserDto createUser(final UserDto userDto) {
@@ -85,12 +87,27 @@ public class UserServiceImpl implements UserService {
 		} catch (final DataIntegrityViolationException ex) {
 			final AppRuntimeException appRuntimeException = new AppRuntimeException(
 					"There is already a user avaible in db [username=" + userDto.getUsername() + "]", ex,
-					AppErrorCodeEnum.JPA_PERSISTENCE_10401);
+					AppErrorCodeEnum.JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401);
 
 			LOGGER.error(LOG_PREFIX + "createUser " + appRuntimeException.stackTraceToString());
 
 			throw appRuntimeException;
 		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	public UserDto findById(final Long id) {
+
+		final Optional<UserEntity> userEntityOptional = this.userRepository.findById(id);
+
+		final UserEntity userEntity = userEntityOptional.orElseThrow(() -> new AppRuntimeException(
+				AppErrorCodeEnum.JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401.getShortErrorCodeDescription(),
+				AppErrorCodeEnum.JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401));
+
+		// 'id' is unique, so only one element is returned.
+		return this.userMapper.mapEntityToDto(userEntity);
 	}
 
 	@Transactional(readOnly = true)
@@ -110,23 +127,24 @@ public class UserServiceImpl implements UserService {
 	@Transactional(readOnly = true)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public UserDto findByUsernameAndPassword(final String username, final String persistedPassword) {
-		
+
 		List<UserEntity> mapstream = Collections.emptyList();
 
 		try (Stream<UserEntity> stream = this.userRepository.findByUsernameAndPassword(username, persistedPassword)) {
 			mapstream = stream.collect(Collectors.toList());
 		}
 
-		// the combination of'username' and 'persistedPassword' is unique, so only one element is returned.
-		return this.userMapper.mapEntityToDto(mapstream.get(0));		
+		// the combination of'username' and 'persistedPassword' is unique, so only one
+		// element is returned.
+		return this.userMapper.mapEntityToDto(mapstream.get(0));
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
 	public List<UserDto> findAllUsers() {
-	    
+
 		final List<UserEntity> userEntityList = this.userRepository.findAll();
-		
+
 		return this.userMapper.mapEntitiesToDtos(userEntityList);
 	}
 

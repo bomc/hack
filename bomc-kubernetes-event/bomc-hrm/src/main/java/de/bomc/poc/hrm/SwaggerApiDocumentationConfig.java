@@ -125,6 +125,7 @@ public class SwaggerApiDocumentationConfig implements WebMvcConfigurer {
 	 */
 	@Override
 	public void addViewControllers(final ViewControllerRegistry registry) {
+		
 		registry.addRedirectViewController(SWAGGER_CONTEXT_ROOT + "/v2/api-docs", "/v2/api-docs")
 				.setKeepQueryParams(true);
 		registry.addRedirectViewController(SWAGGER_CONTEXT_ROOT + "/swagger-resources/configuration/ui",
