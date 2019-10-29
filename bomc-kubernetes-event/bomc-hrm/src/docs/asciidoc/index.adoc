@@ -69,6 +69,7 @@ use of HTTP status codes.
 [[resources]]
 == Resources
 
+
 [[resources-version]]
 == Version API
 Version API endpoint to show the current git version.
@@ -87,6 +88,7 @@ include::{snippets}/version-controller-test/test010_get-git-version_pass/respons
 
 ==== CURL sample
 include::{snippets}/version-controller-test/test010_get-git-version_pass/curl-request.adoc[]
+
 
 [[resource-user-create]]
 == User API
@@ -110,23 +112,16 @@ include::{snippets}/user-controller-test/test010_create-user_pass/response-field
 ==== Example Response
 include::{snippets}/user-controller-test/test010_create-user_pass/http-response.adoc[]
 
-=== Create a user
-A ´POST´ request creates a new user.
-
-==== Request structure
-include::{snippets}/user-controller-test/test015_create-user_fail/request-fields.adoc[]
-
-==== Example Request
-include::{snippets}/user-controller-test/test015_create-user_fail/http-request.adoc[]
-
-==== CURL sample
-include::{snippets}/user-controller-test/test015_create-user_fail/curl-request.adoc[]
+=== Error structure on createUser endpoint.
+Whenever an error response (status code = 500) is returned, the body will contain a JSON object
+that describes the problem. The error object has the following structure:
 
 ==== Response structure
 include::{snippets}/user-controller-test/test015_create-user_fail/response-fields.adoc[]
 
 ==== Example Response
 include::{snippets}/user-controller-test/test015_create-user_fail/http-response.adoc[]
+
 
 [[resource-find-by-id]]
 === Find user by id

@@ -523,6 +523,7 @@
 		</profile>
 
 		<profile>
+			<!-- To run the security check: mvn validate -Powasp -->
 			<id>owasp</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>

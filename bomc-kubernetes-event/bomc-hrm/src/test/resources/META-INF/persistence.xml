@@ -20,17 +20,9 @@
 
         <exclude-unlisted-classes/>
 
-        <properties>
-            <!-- 
-            	https://docs.jboss.org/hibernate/entitymanager/3.5/reference/en/html/configuration.html
-            <property name="hibernate.show_sql" value="tue"/>
-            <property name="hibernate.format_sql" value="true"/>
-            <property name="hibernate.use_sql_comments" value="true"/>
-            <property name="hibernate.generate_statistics" value="true"/>
-			-->
-			
+        <properties>	
             <property name="hibernate.connection.driver_class" value="org.h2.Driver"/>
-            <property name="hibernate.connection.url" value="jdbc:h2:mem:bomcdb;init=create schema if not exists bomcdb"/>
+            <property name="hibernate.connection.url" value="jdbc:h2:mem:bomcdb;init=create schema if not exists bomcdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"/>
             <property name="hibernate.connection.username" value="sa"/>
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>

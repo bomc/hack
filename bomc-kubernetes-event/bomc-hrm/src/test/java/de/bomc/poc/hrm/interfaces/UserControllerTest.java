@@ -36,6 +36,7 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.mockito.stubbing.Answer;
@@ -128,20 +129,21 @@ public class UserControllerTest extends AbstractBaseUnit {
 	}
 
 	@Test
-	@Description("Handles the POST request for trying to create a user.")
+	@DisplayName("UserControllerTest#test010_createUser_pass")
+	@Description("Handles the POST request of the UserController to create a user. The test passes.")
 	public void test010_createUser_pass() throws Exception {
 		log.debug(LOG_PREFIX + "test010_createUser_pass");
 
 		// GIVEN
 		final UserDto userDto = new UserDto();
 		userDto.setId(null);
-		userDto.setUsername("test_username");
+		userDto.setUsername(USER_USER_NAME);
 
 		// WHEN
 		when(this.userService.createUser(any(UserDto.class))).then((Answer<UserDto>) invocationOnMock -> {
 			if (invocationOnMock.getArguments().length > 0 && invocationOnMock.getArguments()[0] instanceof UserDto) {
 				UserDto mockUserDto = (UserDto) invocationOnMock.getArguments()[0];
-				mockUserDto.setId(42L);
+				mockUserDto.setId(USER_ID);
 
 				return mockUserDto;
 			}
@@ -155,7 +157,7 @@ public class UserControllerTest extends AbstractBaseUnit {
 						.contentType(UserController.MEDIA_TYPE_JSON_V1).accept(UserController.MEDIA_TYPE_JSON_V1))
 				.andDo(print()).andExpect(status().isOk()) //
 				.andExpect(jsonPath(JSON_PREFIX + "id").value(42L)) //
-				.andExpect(jsonPath(JSON_PREFIX + "username").value("test_username")).andDo(
+				.andExpect(jsonPath(JSON_PREFIX + "username").value("USER_USER_NAME")).andDo(
 						this.documentationResultHandler.document( //
 								requestFields( //
 										fieldWithPath("id") //
@@ -177,19 +179,22 @@ public class UserControllerTest extends AbstractBaseUnit {
 	}
 
 	@Test
-	@Description("Handles the POST request for trying to create a user. The invocation fails, a AppRuntimeException is thrown.")
+	@DisplayName("UserControllerTest#test015_createUser_fail")
+	@Description("Handles the POST request for trying to create a user. A AppRuntimeException is expected, the test fails.")
 	public void test015_createUser_fail() throws Exception {
 		log.debug(LOG_PREFIX + "test015_createUser_fail");
 
+		final String EX_ERR_MSG = "There is already a user avaible in db [username=test]";
+		
 		// GIVEN
 		final UserDto userDto = new UserDto();
 		userDto.setId(null);
-		userDto.setUsername("test_username");
+		userDto.setUsername(USER_USER_NAME);
 
 		final DataIntegrityViolationException dataIntegrityViolationException = new DataIntegrityViolationException(
-				"test");
+				"UserControllerTest#test015_createUser_fail - errMsg");
 		final AppRuntimeException appRuntimeException = new AppRuntimeException(
-				"There is already a user avaible in db [username=test]", dataIntegrityViolationException,
+				EX_ERR_MSG, dataIntegrityViolationException,
 				AppErrorCodeEnum.JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401);
 
 		// WHEN
@@ -203,7 +208,7 @@ public class UserControllerTest extends AbstractBaseUnit {
 				.andDo(print()).andExpect(status().isInternalServerError()) //
 				.andExpect(jsonPath(JSON_PREFIX + "status").value("INTERNAL_SERVER_ERROR")) //
 				.andExpect(jsonPath(JSON_PREFIX + "shortErrorCodeDescription")
-						.value("There is already a user avaible in db [username=test]")) //
+						.value(EX_ERR_MSG)) //
 				.andExpect(jsonPath(JSON_PREFIX + "errorCode").value("JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401")) //
 				.andDo(this.documentationResultHandler.document( //
 						responseFields( //
@@ -225,14 +230,15 @@ public class UserControllerTest extends AbstractBaseUnit {
 	}
 
 	@Test
-	@Description("Handles the GET request for finding a user by the given id.")
+	@DisplayName("UserControllerTest#test020_findById_pass")
+	@Description("Handles the GET request for finding a user by the given id. The test passes.")
 	public void test020_findById_pass() throws Exception {
 		log.debug(LOG_PREFIX + "test020_findById_pass");
 
 		// GIVEN
 		final UserDto userDto = new UserDto();
-		userDto.setId(42L);
-		userDto.setUsername("test_username");
+		userDto.setId(USER_ID);
+		userDto.setUsername(USER_USER_NAME);
 
 		// WHEN
 		when(this.userService.findById((any(Long.class)))).thenReturn(userDto);
@@ -240,8 +246,8 @@ public class UserControllerTest extends AbstractBaseUnit {
 		// THEN
 		this.mockMvc.perform(RestDocumentationRequestBuilders.get("/user/{id}", 1L) //
 				.accept(UserController.MEDIA_TYPE_JSON_V1)) //
-				.andExpect(jsonPath(JSON_PREFIX + "id").value(42L)) //
-				.andExpect(jsonPath(JSON_PREFIX + "username").value("test_username")).andDo(print())
+				.andExpect(jsonPath(JSON_PREFIX + "id").value(USER_ID)) //
+				.andExpect(jsonPath(JSON_PREFIX + "username").value(USER_USER_NAME)).andDo(print())
 				.andExpect(status().isOk()) //
 				.andDo(this.documentationResultHandler.document( //
 						pathParameters(parameterWithName("id") //

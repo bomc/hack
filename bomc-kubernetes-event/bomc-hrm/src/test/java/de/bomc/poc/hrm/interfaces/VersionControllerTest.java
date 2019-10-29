@@ -31,11 +31,13 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Description;
 import org.springframework.context.annotation.Import;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -112,6 +114,8 @@ public class VersionControllerTest {
 	}
 
 	@Test
+	@DisplayName("VersionControllerTest#test010_getGitVersion_pass")
+	@Description("Handles the GET request of the VersionController to get git data. The test passes.")
 	public void test010_getGitVersion_pass() throws Exception {
 		log.debug(LOG_PREFIX + "test010_getGitVersion_pass");
 

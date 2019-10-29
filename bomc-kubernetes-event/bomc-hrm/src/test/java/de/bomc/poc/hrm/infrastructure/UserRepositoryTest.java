@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import de.bomc.poc.hrm.AbstractBaseUnit;
@@ -48,7 +47,6 @@ import de.bomc.poc.hrm.domain.model.UserEntity;
  */
 @DataJpaTest
 @RunWith(SpringJUnit4ClassRunner.class)
-@ActiveProfiles("local")
 //@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:data-h2.sql")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)

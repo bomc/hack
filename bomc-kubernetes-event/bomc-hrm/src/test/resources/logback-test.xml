@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The configuration shows how to set the log level in a Logback configuration 
+	for tests. The root log level is set to ERROR and the log level for 'de.bomc.poc.hrm' 
+	package is set to DEBUG. This configuration file prevents hibernate logging, 
+	that is in spring boot per default enabled. Set hibernate logging in 'src/test/resources/application.properties'. -->
+<configuration>
+	<include
+		resource="/org/springframework/boot/logging/logback/base.xml" />
+	<appender name="STDOUT"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+	<root level="ERROR">
+		<appender-ref ref="STDOUT" />
+	</root>
+	<logger name="de.bomc.poc.hrm" level="DEBUG" />
+</configuration>

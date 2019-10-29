@@ -69,7 +69,8 @@ public abstract class AbstractBaseUnit {
 	public static final String CUSTOMER_POSTAL_CODE = "4242";
 	public static final String CUSTOMER_STREET = "myStreet";
 	public static final String CUSTOMER_CREATE_USER = "myCreateUser";
-	
+
+	public static final Long USER_ID = 42L;
 	public static final String USER_USER_NAME = "bomc_user";
 	public static final String USER_PASSWORD = "bomc_password";
 	public static final String USER_NEW_PASSWORD = "bomc_new_password";
