@@ -73,36 +73,3 @@ curl -v -X POST "http://localhost:8080/bomc-hrm/customer/email-address" -H "acce
 {
   "emailAddress": "bomc@bomc.org"
 }
-
-# ____________________________________________________
-# Spring DATASOURCE (DataSourceAutoConfiguration & DataSourceProperties),
-# used by src/main/java/de/bomc/poc/hrm/PersistencePostgreSqlConfig.java
-datasource.driver-class-name=org.postgresql.Driver
-datasource.url=jdbc:postgresql://localhost:5432/postgres
-datasource.username=sa
-datasource.password=
-datasource.platform=postgresql
-# ____________________________________________________
-# Connection pool (see https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby)
-# ----------------------------------------------------
-datasource.hikari.poolName=${spring.application.name}
-# 10 minutes
-datasource.hikari.maxLifetime=600000
-# 5 minutes
-datasource.hikari.idleTimeout=300000
-datasource.hikari.minimumIdle=5
-datasource.hikari.maximumPoolSize=50
-# Test query for H2, PostgreSQL
-#datasource.hikari.connection-test-query=select 1
-
-# Keep the connection alive if idle for a long time (needed in production)
-datasource.testWhileIdle=true
-datasource.validationQuery=SELECT 1
-
-# Allows Hibernate to generate SQL optimized for a particular DBMS
-jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-# Hibernate ddl auto (create, create-drop, validate, update)
-jpa.hibernate.ddl-auto = create-drop
-# The SQL dialect makes Hibernate generate better SQL for the chosen database
-jpa.properties.hibernate.dialect = org.hibernate.dialect.H2Dialect
-jpa.hibernate.show_sql = true
