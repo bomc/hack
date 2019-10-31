@@ -79,8 +79,7 @@ public class UserRepositoryTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test010_findByUsername_pass");
 
 		// GIVEN
-		final UserEntity userEntity = new UserEntity(USER_NAME);
-		userEntity.setCreateUser(USER_NAME);
+		final UserEntity userEntity = createNonPersistedUserEntityWithUserDetailsEntity(USER_NAME, USER_PASSWORD);
 		
 		this.userRepository.save(userEntity);
 		
@@ -148,20 +147,13 @@ public class UserRepositoryTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test050_findByUsernameAndPassword_pass");
 		
 		// GIVEN
-		final UserEntity userEntity = new UserEntity(USER_NAME);
-		userEntity.setNewPassword(PASSWORD);
-		userEntity.setCreateUser(USER_NAME);
-		
-		final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
-		userDetailsEntity.setComment(USER_DETAIL_COMMENT);
-		userDetailsEntity.setPhoneNo(PHONE_NUMBER);
-		userDetailsEntity.setSex(SEX.MALE);
+		final UserEntity userEntity = createNonPersistedUserEntityWithUserDetailsEntity(USER_NAME, USER_PASSWORD);
 		final UserEntity retUserEntity = this.userRepository.save(userEntity);
 		
 		assertThat(retUserEntity.getId(), notNullValue());
 		
 		// WHEN
-		final Stream<UserEntity> userEntityStream = this.userRepository.findByUsernameAndPassword(USER_NAME, PASSWORD);
+		final Stream<UserEntity> userEntityStream = this.userRepository.findByUsernameAndPassword(USER_NAME, USER_PASSWORD);
 		
 		// THEN
 		assertThat(userEntityStream.count(), equalTo(1L));
@@ -172,18 +164,11 @@ public class UserRepositoryTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test060_setNewPassword_pass");
 		
 		// GIVEN
-		final UserEntity userEntity = new UserEntity(USER_NAME);
-		userEntity.setNewPassword(PASSWORD);
-		userEntity.setCreateUser(USER_NAME);
-		
-		final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
-		userDetailsEntity.setComment(USER_DETAIL_COMMENT);
-		userDetailsEntity.setPhoneNo(PHONE_NUMBER);
-		userDetailsEntity.setSex(SEX.MALE);
+		final UserEntity userEntity = createNonPersistedUserEntityWithUserDetailsEntity(USER_NAME, USER_PASSWORD);
 		final UserEntity retUserEntity = this.userRepository.save(userEntity);
 		
 		assertThat(retUserEntity.getId(), notNullValue());
-		assertThat(retUserEntity.getPassword(), equalTo(PASSWORD));
+		assertThat(retUserEntity.getPassword(), equalTo(USER_PASSWORD));
 		
 		// WHEN
 		retUserEntity.setNewPassword(NEW_PASSWORD);

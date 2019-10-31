@@ -22,6 +22,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -59,7 +60,7 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 	// API
 
 	// 400
-	
+
 //	@Override
 //	protected ResponseEntity<Object> handleBadRequest(final HttpMessageNotReadableException ex,
 //			final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
@@ -68,20 +69,13 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 //		// additional information later on
 //		return handleExceptionInternal(ex, bodyOfResponse, headers, HttpStatus.BAD_REQUEST, request);
 //	}
-	
+
 //	@Override
 //	protected ResponseEntity<Object> handleHttpMessageNotReadable(final HttpMessageNotReadableException ex,
 //			final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
 //		final String bodyOfResponse = "This should be application specific";
 //		// ex.getCause() instanceof JsonMappingException, JsonParseException // for
 //		// additional information later on
-//		return handleExceptionInternal(ex, bodyOfResponse, headers, HttpStatus.BAD_REQUEST, request);
-//	}
-//
-//	@Override
-//	protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex,
-//			final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
-//		final String bodyOfResponse = "This should be application specific";
 //		return handleExceptionInternal(ex, bodyOfResponse, headers, HttpStatus.BAD_REQUEST, request);
 //	}
 
@@ -107,32 +101,58 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 
 	@ExceptionHandler({ ConstraintViolationException.class })
 	public ResponseEntity<Object> handleInternal(final ConstraintViolationException ex, final WebRequest request) {
+		final String errorUuid = UUID.randomUUID().toString();
+
 		log.error(LOG_PREFIX + "handleInternal (ConstraintViolationException) [ex=" + ex + ", request=" + request
-				+ ", traceId=" + MDC.get(X_B3_TraceId_HEADER) + "]");
+				+ ", traceId=" + MDC.get(X_B3_TraceId_HEADER) + ", errorUuid= " + errorUuid + "]");
 
 		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
 				.shortErrorCodeDescription(
 						AppErrorCodeEnum.JPA_PERSISTENCE_CONSTRAINT_VIOLATION_10403.getShortErrorCodeDescription())
-				.errorCode(AppErrorCodeEnum.JPA_PERSISTENCE_CONSTRAINT_VIOLATION_10403.toString())
-				.uuid(UUID.randomUUID().toString()).status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+				.errorCode(AppErrorCodeEnum.JPA_PERSISTENCE_CONSTRAINT_VIOLATION_10403.toString()).uuid(errorUuid)
+				.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
 		return handleExceptionInternal(ex, apiErrorResponseObject, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
 
 	@ExceptionHandler({ DataIntegrityViolationException.class })
 	public ResponseEntity<Object> handleInternal(final DataIntegrityViolationException ex, final WebRequest request) {
+		final String errorUuid = UUID.randomUUID().toString();
+
 		log.error(LOG_PREFIX + "handleInternal (DataIntegrityViolationException) [ex=" + ex + ", request=" + request
-				+ ", traceId=" + MDC.get(X_B3_TraceId_HEADER) + "]");
+				+ ", traceId=" + MDC.get(X_B3_TraceId_HEADER) + ", errorUuid= " + errorUuid + "]");
 
 		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
 				.shortErrorCodeDescription(
 						AppErrorCodeEnum.JPA_PERSISTENCE_DATA_INTEGRITY_VIOLATION_10404.getShortErrorCodeDescription())
-				.errorCode(AppErrorCodeEnum.JPA_PERSISTENCE_DATA_INTEGRITY_VIOLATION_10404.toString())
-				.uuid(UUID.randomUUID().toString()).status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+				.errorCode(AppErrorCodeEnum.JPA_PERSISTENCE_DATA_INTEGRITY_VIOLATION_10404.toString()).uuid(errorUuid)
+				.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
 		return handleExceptionInternal(ex, apiErrorResponseObject, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
-	
+
+	/**
+	 * NOTE: A ExceptionHandler for this type of exception -
+	 * 'MethodArgumentNotValidException' already exists. So the method must be only
+	 * overwritten.
+	 */
+	@Override
+	public ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex,
+			HttpHeaders headers, HttpStatus status, final WebRequest request) {
+		final String errorUuid = UUID.randomUUID().toString();
+
+		log.error(LOG_PREFIX + "handleInternal (MethodArgumentNotValidException) [ex=" + ex + ", status=" + status
+				+ ", request=" + request + ", traceId=" + MDC.get(X_B3_TraceId_HEADER) + ", errorUuid= " + errorUuid
+				+ "]");
+
+		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
+				.shortErrorCodeDescription(AppErrorCodeEnum.APP_VALDIDATION_ERROR_10610.getShortErrorCodeDescription())
+				.errorCode(AppErrorCodeEnum.APP_VALDIDATION_ERROR_10610.toString()).uuid(errorUuid)
+				.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+		return handleExceptionInternal(ex, apiErrorResponseObject, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}
+
 	@ExceptionHandler({ AppRuntimeException.class })
 	public ResponseEntity<Object> handleInternal(final RuntimeException ex, final WebRequest request) {
 		log.error(LOG_PREFIX + "handleInternal [ex=" + ex + ", request=" + request + ", traceId="

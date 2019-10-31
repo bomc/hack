@@ -66,7 +66,7 @@ public class CustomerEntityTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test010_createCustomer_pass");
 
 		// GIVEN
-		final CustomerEntity customerEntity = createCustomerEntity();
+		final CustomerEntity customerEntity = createNonPersistedCustomerEntity();
 		customerEntity.setCreateUser(CUSTOMER_CREATE_USER);
 
 		// WHEN

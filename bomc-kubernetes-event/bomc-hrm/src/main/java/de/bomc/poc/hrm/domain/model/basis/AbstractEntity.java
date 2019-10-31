@@ -76,10 +76,11 @@ public abstract class AbstractEntity<T> extends AbstractMetadataEntity {
 
 	/**
 	 * <pre>
+	 * https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+	 * 
 	 * Two entities are considered equal if they are of the same class and have the same ID.
 	 * An entity that has no ID (i.e. it is not persistent yet) is only equal to itself.
 	 * </pre>
-	 * <p>
 	 * {@inheritDoc}
 	 * 
 	 * @see Object#equals(Object)
@@ -104,7 +105,11 @@ public abstract class AbstractEntity<T> extends AbstractMetadataEntity {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * <pre>
+	 * {@inheritDoc} 
+	 * 
+	 * https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+	 * </pre>
 	 * 
 	 * @see Object#hashCode()
 	 */

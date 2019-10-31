@@ -14,6 +14,9 @@
  */
 package de.bomc.poc.hrm.interfaces;
 
+import java.util.Collections;
+import java.util.Map;
+
 import javax.validation.Valid;
 
 import org.springframework.boot.logging.LogLevel;
@@ -64,11 +67,13 @@ public class UserController {
 		this.userService = userService;
 	}
 
-	@ApiOperation(value = "Creates a user.")
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully create user in db."),
+	@ApiOperation(value = "Creates a user.", produces = MEDIA_TYPE_JSON_V1, consumes = MEDIA_TYPE_JSON_V1)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully create user in db.", response = UserDto.class),
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
-			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
+			@ApiResponse(code = 404, message = "The resource that trying to reach is not found."),
+			@ApiResponse(code = 500, message = "A internal application error.", response = ApiErrorResponseObject.class)
+			})
 	@ApiImplicitParams(@ApiImplicitParam(name = "userDto", value = "The user to persist.", dataType = "UserDto", dataTypeClass = de.bomc.poc.hrm.interfaces.mapper.UserDto.class, required = true))
 	@PostMapping(produces = MEDIA_TYPE_JSON_V1, consumes = MEDIA_TYPE_JSON_V1)
 	@ResponseStatus(HttpStatus.OK)
@@ -78,11 +83,13 @@ public class UserController {
 		return new ResponseEntity<UserDto>(this.userService.createUser(userDto), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Find a user by given id.")
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully find the user by given id."),
+	@ApiOperation(value = "Find a user by given id.", produces = MEDIA_TYPE_JSON_V1)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully find the user by given id.", response = UserDto.class),
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
-			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
+			@ApiResponse(code = 404, message = "The resource that trying to reach is not found."),
+			@ApiResponse(code = 500, message = "A internal application error.", response = ApiErrorResponseObject.class)
+	})
 	@ApiImplicitParams(@ApiImplicitParam(name = "id", value = "The unique user identifier.", dataType = "Long", dataTypeClass = Long.class, required = true))
 	@GetMapping(value="/{id}", produces = MEDIA_TYPE_JSON_V1)
 	@ResponseStatus(HttpStatus.OK)
@@ -91,4 +98,26 @@ public class UserController {
 
 		return new ResponseEntity<UserDto>(this.userService.findById(id), HttpStatus.OK);
 	}
+	
+	@ApiOperation(value = "heck if the user has permission.", produces = MEDIA_TYPE_JSON_V1)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully perform the action.", responseContainer = "Map[String, String]", response = String.class),
+			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
+			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
+			@ApiResponse(code = 404, message = "The resource that trying to reach is not found."),
+			@ApiResponse(code = 500, message = "A internal application error.", response = ApiErrorResponseObject.class)		
+	})
+	@ApiImplicitParams( {
+			@ApiImplicitParam(name = "username", value = "The unique username.", dataType = "String", dataTypeClass = String.class, required = true),
+			@ApiImplicitParam(name = "permission", value = "The permission to check.", dataType = "String", dataTypeClass = String.class, required = true)
+	})
+	@GetMapping(value="/{permission}/{username}", produces = MEDIA_TYPE_JSON_V1)
+	@ResponseStatus(HttpStatus.OK)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
+	public ResponseEntity<Map<String, String>> hasUserPermission(@PathVariable("permission") final String permission, @PathVariable("username") final String username) {
+
+		final Boolean hasPermission = this.userService.hasUserPermission(username, permission);
+		
+		return new ResponseEntity<Map<String, String>>(Collections.singletonMap("hasPermission", hasPermission.toString()), HttpStatus.OK);
+	}
+	
 }

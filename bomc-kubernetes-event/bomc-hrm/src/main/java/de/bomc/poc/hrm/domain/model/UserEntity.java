@@ -51,6 +51,7 @@ import de.bomc.poc.hrm.application.exception.AppErrorCodeEnum;
 import de.bomc.poc.hrm.application.exception.AppRuntimeException;
 import de.bomc.poc.hrm.domain.model.basis.AbstractEntity;
 import de.bomc.poc.hrm.domain.model.validation.constraint.BomcFuture;
+import de.bomc.poc.hrm.domain.model.values.CoreTypeDefinitions;
 import lombok.ToString;
 
 /**
@@ -61,7 +62,7 @@ import lombok.ToString;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
 // LOMBOK
-@ToString
+@ToString(exclude = {"roles", "passwords"})
 // JPA
 @Entity
 @Table(name = "t_user", schema = "bomcdb")
@@ -134,7 +135,7 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	 */
 	@NotBlank
 	@Column(name = "c_username", unique = true, nullable = false)
-	@Size(min = 5)
+	@Size(min = CoreTypeDefinitions.MINIMUM_USERNAME_LENGTH, message = "must be minimum " + CoreTypeDefinitions.MINIMUM_USERNAME_LENGTH + " characters!")
 	private String username;
 	/**
 	 * <code>true</code> if the <code>UserEntity</code> is authenticated by an
@@ -182,6 +183,10 @@ public class UserEntity extends AbstractEntity<UserEntity> implements Serializab
 	/**
 	 * The <code>UserEntity</code>s fullname. Doesn't have to be unique.
 	 */
+	@NotBlank
+	@Size(min = CoreTypeDefinitions.MINIMUM_FULLNAME_LENGTH, max = CoreTypeDefinitions.MAXIMUM_FULLNAME_LENGTH, message = "must be between "
+			+ CoreTypeDefinitions.MINIMUM_FULLNAME_LENGTH + " and " + CoreTypeDefinitions.MAXIMUM_FULLNAME_LENGTH
+			+ " characters!")
 	@Column(name = "c_fullname")
 	private String fullname;
 

@@ -22,6 +22,8 @@ import javax.validation.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lombok.ToString;
+
 /**
  * A SystemUserEntity is granted with all privileges and omits all defined security
  * constraints. Whenever a SystemUserEntity logs in, the SystemUserEntity is assigned to a
@@ -33,6 +35,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
+// LOMBOK
+@ToString(callSuper = true, includeFieldNames = true)
 // JPA
 @Entity
 public class SystemUserEntity extends UserEntity implements Serializable {
@@ -90,8 +94,4 @@ public class SystemUserEntity extends UserEntity implements Serializable {
 		return (userEntity instanceof SystemUserEntity);
 	}
 
-	@Override
-	public String toString() {
-		return super.toString();
-	}
 }

@@ -18,7 +18,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.fail;
 
 import java.time.LocalDateTime;
@@ -34,7 +33,6 @@ import de.bomc.poc.hrm.AbstractBaseUnit;
 import de.bomc.poc.hrm.application.exception.AppRuntimeException;
 import de.bomc.poc.hrm.objmother.PermissionMother;
 import de.bomc.poc.hrm.objmother.RoleMother;
-import de.bomc.poc.hrm.objmother.UserDetailsMother;
 
 /**
  * Tests the customer entity.
@@ -76,7 +74,7 @@ public class UserEntityTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test010_createUser_pass");
 
 		// GIVEN
-		final UserEntity userEntity = createNewUserEntityWithUsernameAndPassword(USER_USER_NAME, USER_PASSWORD);
+		final UserEntity userEntity = createNonPersistedUserEntityWithUserDetailsEntity(USER_USER_NAME, USER_PASSWORD);
 		userEntity.setCreateUser(USER_USER_NAME);
 
 		// WHEN
@@ -95,11 +93,7 @@ public class UserEntityTest extends AbstractBaseUnit {
 		LOGGER.info(LOG_PREFIX + "test020_createUserWithUserDetails_pass");
 
 		// GIVEN
-		final UserDetailsEntity userDetailsEntity = UserDetailsMother.instance();
-
-		final UserEntity userEntity = new UserEntity(USER_USER_NAME);
-		userEntity.setNewPassword(USER_PASSWORD);
-		userEntity.setUserDetails(userDetailsEntity);
+		final UserEntity userEntity = createNonPersistedUserEntityWithUserDetailsEntity(USER_USER_NAME, USER_PASSWORD);
 
 		// WHEN
 		this.emProvider1.tx().begin();
@@ -118,24 +112,15 @@ public class UserEntityTest extends AbstractBaseUnit {
 	public void test030_registerUser_pass() {
 		LOGGER.info(LOG_PREFIX + "test030_registerUser_pass");
 
-		// 1. Create a user with username and password.
-		final UserEntity userEntity = new UserEntity(USER_USER_NAME, USER_PASSWORD);
+		// 1. Create a user and userDteails with username and password.
+		final UserEntity userEntity = createNonPersistedUserEntityWithUserDetailsEntity(USER_USER_NAME, USER_PASSWORD);
 
 		this.emProvider1.tx().begin();
 		this.entityManager1.persist(userEntity);
 		this.emProvider1.tx().commit();
 
 		assertThat(userEntity.getId(), notNullValue());
-
-		// 2. Add user details.
-		final UserDetailsEntity userDetailsEntity = UserDetailsMother.instance();
-
-		this.emProvider1.tx().begin();
-		userEntity.setUserDetails(userDetailsEntity);
-		final UserEntity retUserEntity = this.entityManager1.merge(userEntity);
-		this.emProvider1.tx().commit();
-		
-		assertThat(retUserEntity.getUserDetails(), notNullValue());
+		assertThat(userEntity.getUserDetails(), notNullValue());
 
 		// 3. Create role and permission.
 		final PermissionMother permissionMother = new PermissionMother(this.emProvider1, PERMISSION_NAME);
@@ -152,20 +137,20 @@ public class UserEntityTest extends AbstractBaseUnit {
 
 		// 4. Add role to user.
 		this.emProvider1.tx().begin();
-		retUserEntity.addRole(roleEntity);
-		this.entityManager1.persist(retUserEntity);
+		userEntity.addRole(roleEntity);
+		this.entityManager1.persist(userEntity);
 		this.entityManager1.flush();
 		this.emProvider1.tx().commit();
 
 		// Do asserts.
-		assertThat(retUserEntity.getRoles().stream().count(), equalTo(1L));
+		assertThat(userEntity.getRoles().stream().count(), equalTo(1L));
 	}
 
 	@Test
 	public void test040_isExpired_pass() {
 		LOGGER.info(LOG_PREFIX + "test040_isExpired_pass");
 
-		final UserEntity userEntity = new UserEntity(USER_USER_NAME, USER_PASSWORD);
+		final UserEntity userEntity = createNonPersistedUserEntityWithUserDetailsEntity(USER_USER_NAME, USER_PASSWORD);
 
 		this.emProvider1.tx().begin();
 		this.entityManager1.persist(userEntity);
@@ -181,14 +166,14 @@ public class UserEntityTest extends AbstractBaseUnit {
 		
 		this.thrown.expect(AppRuntimeException.class);
 		
-		final UserEntity userEntity = new UserEntity(USER_USER_NAME, USER_PASSWORD);
+		final UserEntity userEntity = createNonPersistedUserEntityWithUserDetailsEntity(USER_USER_NAME, USER_PASSWORD);
 
 		this.emProvider1.tx().begin();
 		this.entityManager1.persist(userEntity);
 		this.emProvider1.tx().commit();
 
 		// Check last password change.
-		assertThat(userEntity.getLastPasswordChange(), nullValue());
+		assertThat(userEntity.getLastPasswordChange(), notNullValue());
 		
 		// Set new password.
 		userEntity.setNewPassword(USER_NEW_PASSWORD);

@@ -713,12 +713,42 @@ Content-Length: 123
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Null</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Unique identifier of the user.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A unique identifier of the user.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>username</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The given username of the user to be obtained.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The username you enter is represented by an email address..</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given password.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fullname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The entered full name, consisting of first and last name.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>comment</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given comment.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phoneNo</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given phoneNo.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>image</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given image.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sex</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given sex.</p></td>
 </tr>
 </tbody>
 </table>
@@ -731,11 +761,17 @@ Content-Length: 123
 Content-Type: application/vnd.hrm-v1+json;charset=UTF-8
 Accept: application/vnd.hrm-v1+json;charset=UTF-8
 Host: localhost:8080
-Content-Length: 52
+Content-Length: 235
 
 {
   "id" : null,
-  "username" : "test_username"
+  "username" : "bomc_user",
+  "password" : "bomc_password",
+  "fullname" : "bomc fullname",
+  "comment" : "userDetailsComment",
+  "phoneNo" : "+49 89 123456",
+  "image" : "Ym9tYy1pbWFnZQ==",
+  "sex" : "MALE"
 }</code></pre>
 </div>
 </div>
@@ -749,7 +785,13 @@ Content-Length: 52
     -H 'Accept: application/vnd.hrm-v1+json;charset=UTF-8' \
     -d '{
   "id" : null,
-  "username" : "test_username"
+  "username" : "bomc_user",
+  "password" : "bomc_password",
+  "fullname" : "bomc fullname",
+  "comment" : "userDetailsComment",
+  "phoneNo" : "+49 89 123456",
+  "image" : "Ym9tYy1pbWFnZQ==",
+  "sex" : "MALE"
 }'</code></pre>
 </div>
 </div>
@@ -773,12 +815,42 @@ Content-Length: 52
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Unique identifier of the user.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A unique identifier of the user.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>username</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The given username of the user to be obtained.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The username you enter is represented by an email address..</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given password.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fullname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The entered full name, consisting of first and last name.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>comment</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given comment.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phoneNo</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given phoneNo.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>image</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given image.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sex</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given sex.</p></td>
 </tr>
 </tbody>
 </table>
@@ -792,11 +864,17 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/vnd.hrm-v1+json;charset=UTF-8
-Content-Length: 50
+Content-Length: 233
 
 {
   "id" : 42,
-  "username" : "test_username"
+  "username" : "bomc_user",
+  "password" : "bomc_password",
+  "fullname" : "bomc fullname",
+  "comment" : "userDetailsComment",
+  "phoneNo" : "+49 89 123456",
+  "image" : "Ym9tYy1pbWFnZQ==",
+  "sex" : "MALE"
 }</code></pre>
 </div>
 </div>
@@ -862,7 +940,7 @@ Content-Length: 247
   "status" : "INTERNAL_SERVER_ERROR",
   "shortErrorCodeDescription" : "There is already a user avaible in db [username=test]",
   "errorCode" : "JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401",
-  "uuid" : "f6257509-5cc2-4900-ab29-81a8633bac07"
+  "uuid" : "f8d37613-d2cd-4fca-a74f-f3f8a28a14fa"
 }</code></pre>
 </div>
 </div>
@@ -933,12 +1011,42 @@ Host: localhost:8080</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Unique identifier of the user.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A unique identifier of the user.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>username</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The given username of the user to be obtained.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The username you enter is represented by an email address..</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given password.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fullname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The entered full name, consisting of first and last name.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>comment</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given comment.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>phoneNo</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given phoneNo.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>image</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given image.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sex</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The given sex.</p></td>
 </tr>
 </tbody>
 </table>
@@ -952,11 +1060,17 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/vnd.hrm-v1+json;charset=UTF-8
-Content-Length: 50
+Content-Length: 233
 
 {
   "id" : 42,
-  "username" : "test_username"
+  "username" : "bomc_user",
+  "password" : "bomc_password",
+  "fullname" : "bomc fullname",
+  "comment" : "userDetailsComment",
+  "phoneNo" : "+49 89 123456",
+  "image" : "Ym9tYy1pbWFnZQ==",
+  "sex" : "MALE"
 }</code></pre>
 </div>
 </div>

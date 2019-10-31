@@ -125,7 +125,7 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 		createdCustomerDto.setId(CUSTOMER_ID);
 
 		// WHEN
-		when(this.customerService.createCustomer(createCustomerEntity())).thenReturn(createdCustomerDto);
+		when(this.customerService.createCustomer(createNonPersistedCustomerEntity())).thenReturn(createdCustomerDto);
 
 		final ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.registerModule(new JavaTimeModule());

@@ -5,11 +5,11 @@
 	that is in spring boot per default enabled. Set hibernate logging in 'src/test/resources/application.properties'. -->
 <configuration>
 	<include
-		resource="/org/springframework/boot/logging/logback/base.xml" />
+		resource="org/springframework/boot/logging/logback/defaults.xml" />
 	<appender name="STDOUT"
 		class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			<pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level) %logger{36}.%M - %msg%n
 			</pattern>
 		</encoder>
 	</appender>

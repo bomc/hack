@@ -38,7 +38,7 @@ import lombok.ToString;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
 // LOMBOK
-@ToString
+@ToString(callSuper = true, includeFieldNames = true)
 // JPA
 @Entity
 @DiscriminatorValue("permission")

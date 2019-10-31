@@ -78,7 +78,7 @@ public class CustomerServiceTest extends AbstractBaseUnit {
 		// GIVEN
 		final CustomerService customerService = new CustomerServiceImpl(this.customerRepository, this.customerMapper);
 
-		final Optional<CustomerEntity> optionalCustomerEntity = Optional.of(createCustomerEntity());
+		final Optional<CustomerEntity> optionalCustomerEntity = Optional.of(createNonPersistedCustomerEntity());
 		when(this.customerRepository.findById(CUSTOMER_ID)).thenReturn(optionalCustomerEntity);
 
 		// WHEN
@@ -118,8 +118,8 @@ public class CustomerServiceTest extends AbstractBaseUnit {
 		// GIVEN
 		final CustomerService customerService = new CustomerServiceImpl(this.customerRepository, this.customerMapper);
 		
-		final CustomerEntity customerEntity = createCustomerEntity();
-		final CustomerEntity retCustomerEntity = createCustomerEntity();
+		final CustomerEntity customerEntity = createNonPersistedCustomerEntity();
+		final CustomerEntity retCustomerEntity = createNonPersistedCustomerEntity();
 		retCustomerEntity.setId(CUSTOMER_ID);
 		
 		final CustomerDto retCustomerDto = createCustomerDto();
@@ -163,17 +163,17 @@ public class CustomerServiceTest extends AbstractBaseUnit {
 		final CustomerDto customerDto = createCustomerDto();
 		customerDto.setId(CUSTOMER_ID);
 		// The dto mapped from incoming dto.
-		final CustomerEntity customerEntity = createCustomerEntity();
+		final CustomerEntity customerEntity = createNonPersistedCustomerEntity();
 		customerEntity.setCity(newCity);
 		customerEntity.setId(CUSTOMER_ID);
 		when(this.customerMapper.mapDtoToEntity(customerDto)).thenReturn(customerEntity);
 		
 		
-		final CustomerEntity mergedCustomerEntity = createCustomerEntity();
+		final CustomerEntity mergedCustomerEntity = createNonPersistedCustomerEntity();
 		mergedCustomerEntity.setId(CUSTOMER_ID);
 		mergedCustomerEntity.setCity(newCity);
 		
-		final CustomerEntity dbCustomerEntity = createCustomerEntity();
+		final CustomerEntity dbCustomerEntity = createNonPersistedCustomerEntity();
 		dbCustomerEntity.setId(CUSTOMER_ID);
 
 		final Optional<CustomerEntity> optionalCustomerEntity = Optional.of(dbCustomerEntity);
@@ -203,9 +203,9 @@ public class CustomerServiceTest extends AbstractBaseUnit {
 		// GIVEN
 		final CustomerService customerService = new CustomerServiceImpl(this.customerRepository, this.customerMapper);
 		
-		final CustomerEntity customerEntity1 = createCustomerEntity();
+		final CustomerEntity customerEntity1 = createNonPersistedCustomerEntity();
 		customerEntity1.setId(1L);
-		final CustomerEntity customerEntity2 = createCustomerEntity();
+		final CustomerEntity customerEntity2 = createNonPersistedCustomerEntity();
 		customerEntity1.setId(2L);
 		
 		when(this.customerRepository.findAll()).thenReturn(Arrays.asList(customerEntity1, customerEntity2));

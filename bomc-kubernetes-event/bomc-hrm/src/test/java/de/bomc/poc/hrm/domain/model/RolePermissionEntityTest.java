@@ -69,7 +69,7 @@ public class RolePermissionEntityTest extends AbstractBaseUnit {
 		LOGGER.debug(LOG_PREFIX + "test010_createPermission_pass");
 
 		// GIVEN
-		final PermissionEntity permissionEntity = AbstractBaseUnit.createPermissionEntity();
+		final PermissionEntity permissionEntity = AbstractBaseUnit.createNonPersistedPermissionEntity();
 
 		// WHEN
 		this.emProvider1.tx().begin();
@@ -93,7 +93,7 @@ public class RolePermissionEntityTest extends AbstractBaseUnit {
 		LOGGER.debug(LOG_PREFIX + "test020_createRole_pass");
 
 		// GIVEN
-		final RoleEntity roleEntity = AbstractBaseUnit.createRoleEntity();
+		final RoleEntity roleEntity = AbstractBaseUnit.createNonPersistedRoleEntity();
 
 		// THEN
 		this.emProvider1.tx().begin();

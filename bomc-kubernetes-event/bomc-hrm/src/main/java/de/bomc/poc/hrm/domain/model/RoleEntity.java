@@ -47,13 +47,13 @@ import java.util.Set;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  */
 // LOMBOK
-@ToString
+@ToString(callSuper = true, includeFieldNames = true, exclude = {"users", "permissions"})
 // JPA
 @Entity
 @DiscriminatorValue("role")
 @NamedQueries({
 		@NamedQuery(name = RoleEntity.NQ_FIND_ALL, query = "select distinct(r) from RoleEntity r left join fetch r.users left join fetch r.permissions order by r.name"),
-		@NamedQuery(name = RoleEntity.NQ_FIND_BY_UNIQUE_QUERY, query = "select r from RoleEntity r where r.name = ?1"),
+		@NamedQuery(name = RoleEntity.NQ_FIND_BY_ROLE_NAME, query = "select r from RoleEntity r where r.name = ?1"),
 		@NamedQuery(name = RoleEntity.NQ_FIND_ALL_BY_USERNAME, query = "select r from RoleEntity r inner join r.users u where u.username = ?1 order by r.name") })
 public class RoleEntity extends SecurityObjectEntity implements Serializable {
 
@@ -108,7 +108,7 @@ public class RoleEntity extends SecurityObjectEntity implements Serializable {
 	 * Name is {@value} .
 	 * </p>
 	 */
-	public static final String NQ_FIND_BY_UNIQUE_QUERY = "RoleEntity.findByRolename";
+	public static final String NQ_FIND_BY_ROLE_NAME = "RoleEntity.findByRolename";
 	/**
 	 * Query to find <strong>all</strong> <code>RoleEntity</code>s by the given
 	 * username.

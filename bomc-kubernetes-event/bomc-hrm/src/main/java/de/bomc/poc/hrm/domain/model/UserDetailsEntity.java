@@ -54,8 +54,8 @@ public class UserDetailsEntity implements ImageProvider, Serializable {
 	/**
 	 * Some comment text of the <code>UserEntity</code>.
 	 */
-	@Size(max = CoreTypeDefinitions.DESCRIPTION_LENGTH)
 	@Column(name = "c_comment")
+	@Size(min = CoreTypeDefinitions.DESCRIPTION_LENGTH, message = "must not be longer than " + CoreTypeDefinitions.DESCRIPTION_LENGTH +  " characters!")
 	private String comment;
 	/**
 	 * Phone number assigned to the <code>UserEntity</code>. Matches german phone
@@ -85,8 +85,6 @@ public class UserDetailsEntity implements ImageProvider, Serializable {
 
 	/**
 	 * The <code>UserEntity</code>s sex.
-	 * 
-	 * @author <a href="mailto:bomc@bomc.org">bomc</a>
 	 */
 	public enum SEX {
 		/**

@@ -65,12 +65,13 @@ public class VersionController {
 	// _______________________________________________
 	// API
 	// -----------------------------------------------
-	@ApiOperation(value = "Get current deployed version.", response = Map.class, notes = "The version is read from 'git.properties' file.")
+	@ApiOperation(value = "Get current deployed version.", response = Map.class, notes = "The version is read from 'git.properties' file.", produces = MEDIA_TYPE_JSON_V1)
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Successfully retrieved the version."),
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
-			@ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
+			@ApiResponse(code = 404, message = "The resource that trying to reach is not found."),
+			@ApiResponse(code = 500, message = "A internal application error.", response = ApiErrorResponseObject.class)})
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping(value = "/version", produces = MEDIA_TYPE_JSON_V1)
 	@Transactional(readOnly = true)

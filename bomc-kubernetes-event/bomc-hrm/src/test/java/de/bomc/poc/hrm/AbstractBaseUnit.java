@@ -28,6 +28,8 @@ import de.bomc.poc.hrm.domain.model.RoleEntity;
 import de.bomc.poc.hrm.domain.model.UserDetailsEntity;
 import de.bomc.poc.hrm.domain.model.UserEntity;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
+import de.bomc.poc.hrm.interfaces.mapper.UserDto;
+import de.bomc.poc.hrm.objmother.UserDetailsMother;
 
 /**
  * A abstract class for unit tests.
@@ -40,17 +42,17 @@ public abstract class AbstractBaseUnit {
 	// _______________________________________________
 	// JPA
 	// -----------------------------------------------
-    public static final String PERSISTENCE_UNIT_NAME = "hrm-pu";
-    
-    @Rule
-    public EntityManagerProvider emProvider1 = EntityManagerProvider.persistenceUnit(PERSISTENCE_UNIT_NAME);
-    @Rule
-    public EntityManagerProvider emProvider2 = EntityManagerProvider.persistenceUnit(PERSISTENCE_UNIT_NAME);
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-    protected EntityManager entityManager1;
-    protected EntityManager entityManager2;
-    
+	public static final String PERSISTENCE_UNIT_NAME = "hrm-pu";
+
+	@Rule
+	public EntityManagerProvider emProvider1 = EntityManagerProvider.persistenceUnit(PERSISTENCE_UNIT_NAME);
+	@Rule
+	public EntityManagerProvider emProvider2 = EntityManagerProvider.persistenceUnit(PERSISTENCE_UNIT_NAME);
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+	protected EntityManager entityManager1;
+	protected EntityManager entityManager2;
+
 	// _______________________________________________
 	// Constants
 	// -----------------------------------------------
@@ -75,57 +77,67 @@ public abstract class AbstractBaseUnit {
 	public static final String USER_PASSWORD = "bomc_password";
 	public static final String USER_NEW_PASSWORD = "bomc_new_password";
 	public static final String USER_FULLNAME = "bomc fullname";
-	
+
 	public static final String USER_DETAILS_COMMENT = "userDetailsComment";
 	public static final String USER_DETAILS_PHONE_NO = "+49 89 123456";
 	public static final byte[] USER_DETAILS_IMAGE = "bomc-image".getBytes();
 	public static final UserDetailsEntity.SEX USER_DETAIL_SEX = UserDetailsEntity.SEX.MALE;
-	
+
 	public static final String PERMISSION_NAME = "read";
 	public static final String PERMISSION_DESCRIPTION = "Describes the permission";
-	
+
 	public static final String ROLE_NAME = "admin";
 	public static final String ROLE_DESCRIPTION = "Describes the role";
 	public static final boolean ROLE_IS_IMMUTABLE = true;
-	
+
 	// _______________________________________________
 	// Helper methods
 	// -----------------------------------------------
-	
-	public static CustomerEntity createCustomerEntity() {
+
+	public static CustomerEntity createNonPersistedCustomerEntity() {
 		return CustomerEntity.builder().city(CUSTOMER_CITY).country(CUSTOMER_COUNTRY)
 				.dateOfBirth(CUSTOMER_DATE_OF_BIRTH).emailAddress(CUSTOMER_E_MAIL).firstName(CUSTOMER_FIRST_NAME)
 				.houseNumber(CUSTOMER_HOUSE_NUMBER).lastName(CUSTOMER_LAST_NAME).phoneNumber(CUSTOMER_PHONE_NUMBER)
 				.postalCode(CUSTOMER_POSTAL_CODE).street(CUSTOMER_STREET).build();
 	}
-	
+
 	public static CustomerDto createCustomerDto() {
 		final CustomerDto customerDto = CustomerDto.builder().city(CUSTOMER_CITY).country(CUSTOMER_COUNTRY)
 				.dateOfBirth(CUSTOMER_DATE_OF_BIRTH).emailAddress(CUSTOMER_E_MAIL).firstName(CUSTOMER_FIRST_NAME)
 				.houseNumber(CUSTOMER_HOUSE_NUMBER).lastName(CUSTOMER_LAST_NAME).phoneNumber(CUSTOMER_PHONE_NUMBER)
 				.postalCode(CUSTOMER_POSTAL_CODE).street(CUSTOMER_STREET).build();
-		
+
 		customerDto.setId(CUSTOMER_ID);
-		
+
 		return customerDto;
 	}
-	
-	public static PermissionEntity createPermissionEntity() {
+
+	public static PermissionEntity createNonPersistedPermissionEntity() {
 		final PermissionEntity permissionEntity = new PermissionEntity(PERMISSION_NAME, PERMISSION_DESCRIPTION);
-		
+
 		return permissionEntity;
 	}
 
-	public static RoleEntity createRoleEntity() {
+	public static RoleEntity createNonPersistedRoleEntity() {
 		final RoleEntity roleEntity = new RoleEntity(ROLE_NAME, ROLE_DESCRIPTION);
-		
+
 		return roleEntity;
 	}
-	
-	public static UserEntity createNewUserEntityWithUsernameAndPassword(final String username, final String password) {
-		final UserEntity user = new UserEntity(username);
-		user.setNewPassword(password);
+
+	public static UserEntity createNonPersistedUserEntityWithUserDetailsEntity(final String username, final String password) {
+		final UserEntity userEntity = new UserEntity(username);
+		userEntity.setNewPassword(password);
+		userEntity.setFullname(USER_FULLNAME);
+		userEntity.setUserDetails(UserDetailsMother.instance());
 		
-		return user;
+		return userEntity;
+	}
+
+	public static UserDto createUserDto() {
+		final UserDto userDto = UserDto.builder().username(USER_USER_NAME).comment(USER_DETAILS_COMMENT)
+				.fullname(USER_FULLNAME).image(USER_DETAILS_IMAGE).password(USER_PASSWORD)
+				.phoneNo(USER_DETAILS_PHONE_NO).sex(USER_DETAIL_SEX.name()).build();
+
+		return userDto;
 	}
 }

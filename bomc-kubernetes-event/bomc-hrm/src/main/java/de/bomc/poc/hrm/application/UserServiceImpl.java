@@ -17,11 +17,10 @@ package de.bomc.poc.hrm.application;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -30,10 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
 import de.bomc.poc.hrm.application.exception.AppErrorCodeEnum;
 import de.bomc.poc.hrm.application.exception.AppRuntimeException;
 import de.bomc.poc.hrm.application.log.method.Loggable;
+import de.bomc.poc.hrm.application.security.SecurityObjectRolesEnum;
+import de.bomc.poc.hrm.domain.model.RoleEntity;
 import de.bomc.poc.hrm.domain.model.UserEntity;
+import de.bomc.poc.hrm.infrastructure.RoleRepository;
 import de.bomc.poc.hrm.infrastructure.UserRepository;
 import de.bomc.poc.hrm.interfaces.mapper.UserDto;
 import de.bomc.poc.hrm.interfaces.mapper.UserMapper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The implementation of {@link UserService}.
@@ -41,14 +44,15 @@ import de.bomc.poc.hrm.interfaces.mapper.UserMapper;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 20.09.2019
  */
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
 	private static final String LOG_PREFIX = "UserService#";
-	private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class.getName());
 
 	/* --------------------- member variables ----------------------- */
 	private final UserRepository userRepository;
+	private final RoleRepository roleRepository;
 	private final UserMapper userMapper;
 
 	/* --------------------- constructor ---------------------------- */
@@ -56,12 +60,16 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * Creates a new instance of <code>UserService</code>.
 	 * 
-	 * @param customerRepository the given customer repository.
-	 * @param customerService    the
+	 * @param userRepository     the given user repository to inject.
+	 * @param roleRepository     the given role repository to inject.
+	 * @param customerRepository the given customer repository to inject.
+	 * @param userMapper         the userMapper to inject.
 	 */
-	public UserServiceImpl(final UserRepository userRepository, final UserMapper userMapper) {
+	public UserServiceImpl(final UserRepository userRepository, final RoleRepository roleRepository,
+			final UserMapper userMapper) {
 
 		this.userRepository = userRepository;
+		this.roleRepository = roleRepository;
 		this.userMapper = userMapper;
 	}
 
@@ -79,8 +87,14 @@ public class UserServiceImpl implements UserService {
 			// Write down to db.
 			final UserEntity retUserEntity = this.userRepository.save(userEntity);
 
-			LOGGER.debug(LOG_PREFIX + "createUser - [id=" + retUserEntity.getId() + "]");
+			// Add user to role 'APPLICATION_USER'.
+			final RoleEntity roleEntity = this.roleRepository
+					.findByName(SecurityObjectRolesEnum.APPLICATION_USER.name()).findFirst().get();
 
+			roleEntity.addUser(retUserEntity);
+			this.roleRepository.save(roleEntity);
+
+			// Map entity to dto.
 			final UserDto retUserDto = this.userMapper.mapEntityToDto(retUserEntity);
 
 			return retUserDto;
@@ -88,10 +102,23 @@ public class UserServiceImpl implements UserService {
 			final AppRuntimeException appRuntimeException = new AppRuntimeException(
 					"There is already a user avaible in db [username=" + userDto.getUsername() + "]", ex,
 					AppErrorCodeEnum.JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401);
-
-			LOGGER.error(LOG_PREFIX + "createUser " + appRuntimeException.stackTraceToString());
+			
+			log.error(LOG_PREFIX + "createUser " + appRuntimeException.stackTraceToString());
 
 			throw appRuntimeException;
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	public Boolean hasUserPermission(final String username, final String permission) {
+		final RoleEntity roleEntity = this.roleRepository.findRoleByUsernameAndPermission(username, permission);
+
+		if(roleEntity == null) {
+			return Boolean.FALSE;
+		} else {
+			return Boolean.TRUE;
 		}
 	}
 

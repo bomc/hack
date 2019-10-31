@@ -1,5 +1,5 @@
 /**
- * Project: POC PaaS
+ * Project: hrm
  * <pre>
  *
  * Last change:
@@ -54,7 +54,7 @@ public class CustomerMapperTest extends AbstractBaseUnit {
 	public void test010_mapEntityToDto_pass() {
 		LOGGER.info(LOG_PREFIX + "test010_mapEntityToDto_pass");
 
-		final CustomerDto dto = this.customerMapper.mapEntityToDto(createCustomerEntity());
+		final CustomerDto dto = this.customerMapper.mapEntityToDto(createNonPersistedCustomerEntity());
 		
 		assertThat(dto, notNullValue());
 		assertThat(dto.getId(), nullValue());
@@ -74,9 +74,9 @@ public class CustomerMapperTest extends AbstractBaseUnit {
 	public void test030_mapEntitiesToDtos_pass() {
 		LOGGER.info(LOG_PREFIX + "test030_mapEntitiesToDtos_pass");
 		
-		final CustomerEntity customerEntity1 = createCustomerEntity();
+		final CustomerEntity customerEntity1 = createNonPersistedCustomerEntity();
 		final String newCity = "Honululu";
-		final CustomerEntity customerEntity2 = createCustomerEntity();
+		final CustomerEntity customerEntity2 = createNonPersistedCustomerEntity();
 		customerEntity2.setCity(newCity);
 		
 		final List<CustomerEntity> customerEntityList = new ArrayList<>();

@@ -32,6 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import javax.xml.bind.DatatypeConverter;
+
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
@@ -135,9 +137,7 @@ public class UserControllerTest extends AbstractBaseUnit {
 		log.debug(LOG_PREFIX + "test010_createUser_pass");
 
 		// GIVEN
-		final UserDto userDto = new UserDto();
-		userDto.setId(null);
-		userDto.setUsername(USER_USER_NAME);
+		final UserDto userDto = createUserDto();
 
 		// WHEN
 		when(this.userService.createUser(any(UserDto.class))).then((Answer<UserDto>) invocationOnMock -> {
@@ -157,24 +157,48 @@ public class UserControllerTest extends AbstractBaseUnit {
 						.contentType(UserController.MEDIA_TYPE_JSON_V1).accept(UserController.MEDIA_TYPE_JSON_V1))
 				.andDo(print()).andExpect(status().isOk()) //
 				.andExpect(jsonPath(JSON_PREFIX + "id").value(42L)) //
-				.andExpect(jsonPath(JSON_PREFIX + "username").value("USER_USER_NAME")).andDo(
-						this.documentationResultHandler.document( //
-								requestFields( //
-										fieldWithPath("id") //
-												.description("Unique identifier of the user."), //
-										fieldWithPath("username") //
-												.description("The given username of the user to be obtained.")),
-								responseFields( //
-										fieldWithPath("id") //
-												.description("Unique identifier of the user."), //
-										fieldWithPath("username") //
-												.description("The given username of the user to be obtained.")) //
+				.andExpect(jsonPath(JSON_PREFIX + "username").value(USER_USER_NAME))
+				.andDo(this.documentationResultHandler.document( //
+						requestFields( //
+								fieldWithPath("id") //
+										.description("A unique identifier of the user."), //
+								fieldWithPath("username") //
+										.description("The username you enter is represented by an email address.."),
+								fieldWithPath("password") //
+										.description("The given password."),
+								fieldWithPath("fullname") //
+										.description("The entered full name, consisting of first and last name."),
+								fieldWithPath("comment") //
+										.description("The given comment."),
+								fieldWithPath("phoneNo") //
+										.description("The given phoneNo."),
+								fieldWithPath("image") //
+										.description("The given image."),
+								fieldWithPath("sex") //
+										.description("The given sex.")),
+						responseFields( //
+								fieldWithPath("id") //
+										.description("A unique identifier of the user."), //
+								fieldWithPath("username") //
+										.description("The username you enter is represented by an email address.."),
+								fieldWithPath("password") //
+										.description("The given password."),
+								fieldWithPath("fullname") //
+										.description("The entered full name, consisting of first and last name."),
+								fieldWithPath("comment") //
+										.description("The given comment."),
+								fieldWithPath("phoneNo") //
+										.description("The given phoneNo."),
+								fieldWithPath("image") //
+										.description("The given image."),
+								fieldWithPath("sex") //
+										.description("The given sex.")) //
 //						responseHeaders( //
 //								headerWithName("X-B3-TraceId") //
 //										.description("A trace-id for each incoming request"), //
 //								headerWithName("X-B3-SpanId") //
 //										.description("A -id for each incoming request"))));
-						));
+				));
 
 	}
 
@@ -185,17 +209,14 @@ public class UserControllerTest extends AbstractBaseUnit {
 		log.debug(LOG_PREFIX + "test015_createUser_fail");
 
 		final String EX_ERR_MSG = "There is already a user avaible in db [username=test]";
-		
+
 		// GIVEN
-		final UserDto userDto = new UserDto();
-		userDto.setId(null);
-		userDto.setUsername(USER_USER_NAME);
+		final UserDto userDto = createUserDto();
 
 		final DataIntegrityViolationException dataIntegrityViolationException = new DataIntegrityViolationException(
 				"UserControllerTest#test015_createUser_fail - errMsg");
-		final AppRuntimeException appRuntimeException = new AppRuntimeException(
-				EX_ERR_MSG, dataIntegrityViolationException,
-				AppErrorCodeEnum.JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401);
+		final AppRuntimeException appRuntimeException = new AppRuntimeException(EX_ERR_MSG,
+				dataIntegrityViolationException, AppErrorCodeEnum.JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401);
 
 		// WHEN
 		when(this.userService.createUser((any(UserDto.class)))).thenThrow(appRuntimeException);
@@ -207,8 +228,7 @@ public class UserControllerTest extends AbstractBaseUnit {
 						.contentType(UserController.MEDIA_TYPE_JSON_V1).accept(UserController.MEDIA_TYPE_JSON_V1))
 				.andDo(print()).andExpect(status().isInternalServerError()) //
 				.andExpect(jsonPath(JSON_PREFIX + "status").value("INTERNAL_SERVER_ERROR")) //
-				.andExpect(jsonPath(JSON_PREFIX + "shortErrorCodeDescription")
-						.value(EX_ERR_MSG)) //
+				.andExpect(jsonPath(JSON_PREFIX + "shortErrorCodeDescription").value(EX_ERR_MSG)) //
 				.andExpect(jsonPath(JSON_PREFIX + "errorCode").value("JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401")) //
 				.andDo(this.documentationResultHandler.document( //
 						responseFields( //
@@ -236,9 +256,8 @@ public class UserControllerTest extends AbstractBaseUnit {
 		log.debug(LOG_PREFIX + "test020_findById_pass");
 
 		// GIVEN
-		final UserDto userDto = new UserDto();
+		final UserDto userDto = createUserDto();
 		userDto.setId(USER_ID);
-		userDto.setUsername(USER_USER_NAME);
 
 		// WHEN
 		when(this.userService.findById((any(Long.class)))).thenReturn(userDto);
@@ -255,9 +274,21 @@ public class UserControllerTest extends AbstractBaseUnit {
 				.andDo(this.documentationResultHandler.document( //
 						responseFields( //
 								fieldWithPath("id") //
-										.description("Unique identifier of the user."), //
+										.description("A unique identifier of the user."), //
 								fieldWithPath("username") //
-										.description("The given username of the user to be obtained."))// , //
+										.description("The username you enter is represented by an email address.."),
+								fieldWithPath("password") //
+										.description("The given password."),
+								fieldWithPath("fullname") //
+										.description("The entered full name, consisting of first and last name."),
+								fieldWithPath("comment") //
+										.description("The given comment."),
+								fieldWithPath("phoneNo") //
+										.description("The given phoneNo."),
+								fieldWithPath("image") //
+										.description("The given image."),
+								fieldWithPath("sex") //
+										.description("The given sex.")) //
 //						responseHeaders( //
 //								headerWithName("X-B3-TraceId") //
 //										.description("A trace-id for each incoming request"), //
@@ -265,5 +296,13 @@ public class UserControllerTest extends AbstractBaseUnit {
 //										.description("A -id for each incoming request"))));
 				));
 
+	}
+	
+	@Test
+	public void test030_generateByteArrayBase64Encoded_pass() {
+		byte[] originalBytes = new byte[] { 1, 2, 3, 4, 5};
+		String base64Encoded = DatatypeConverter.printBase64Binary(originalBytes);
+		
+		System.out.println(base64Encoded);
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * Project: POC PaaS
+ * Project: hrm
  * <pre>
  *
  * Last change:
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Repository;
 import de.bomc.poc.hrm.domain.model.UserEntity;
 
 /**
- * The repository for user handling.
+ * The repository for {@link UserEntity} handling.
  * 
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
@@ -40,4 +40,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 	
 	@Query("FROM UserEntity u LEFT JOIN FETCH u.roles WHERE u.username = ?1 and u.persistedPassword = ?2")
 	Stream<UserEntity> findByUsernameAndPassword(String username, String persistedPassword);
+
 }
