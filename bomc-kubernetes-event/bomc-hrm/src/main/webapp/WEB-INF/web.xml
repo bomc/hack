@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app>
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
