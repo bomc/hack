@@ -19,6 +19,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import de.bomc.poc.hrm.domain.model.values.CoreTypeDefinitions;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -30,9 +32,23 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * <pre>
  * A data transfer object for customer handling. Uses JSR-303 Annotations for
  * validation.
+ * This implementation will also ignore any new fields that may be returned by the API.
  * 
+ * By put this class in client-libraries and share this library between services 
+ * the following benefits are achieved:
+ *  - Service is fully decoupled from the clients and no services depend on one another
+ *    the library is separate and client specific. It can be even technology specific 
+ *    if a mix of technologies is available.
+ *  - Releasing new version of the service is not coupled with clients they may not 
+ *    even need to know if the backward compatibility is still there, it is the 
+ *    clients who maintain the library.
+ *  - The clients are now DRY - no needless code is copy pasted.
+ *  - It is quicker to integrate with the service - this is achieved without losing 
+ *    any of the microservices benefits.
+ * </pre>
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
  */
@@ -45,6 +61,8 @@ import lombok.ToString;
 @Setter
 // SWAGGER
 @ApiModel(description = "All details about a user. ")
+//JSON: accepting all unknown fields.
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDto {
 
 	@ApiModelProperty(notes = "The database generated id.")

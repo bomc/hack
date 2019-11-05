@@ -20,6 +20,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.stereotype.Component;
 
 import de.bomc.poc.hrm.domain.model.CustomerEntity;
 
@@ -29,6 +30,7 @@ import de.bomc.poc.hrm.domain.model.CustomerEntity;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
  */
+@Component
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public abstract class CustomerMapper {
 
@@ -64,18 +66,4 @@ public abstract class CustomerMapper {
 	})
 	public abstract CustomerEntity mapDtoToEntity(CustomerDto customerDto);
 	
-//	@Mappings({ 
-//		@Mapping(target = "id", source = "id"),
-//		@Mapping(target = "emailAddress", source = "emailAddress"),
-//		@Mapping(target = "phoneNumber", source = "phoneNumber"),
-//		@Mapping(target = "firstName", source = "firstName"),
-//		@Mapping(target = "lastName", source = "lastName"),
-//		@Mapping(target = "dateOfBirth", source = "dateOfBirth", dateFormat = "yyyy-MM-dd"),
-//		@Mapping(target = "city", source = "city"),
-//		@Mapping(target = "postalCode", source = "postalCode"),
-//		@Mapping(target = "street", source = "street"),
-//		@Mapping(target = "houseNumber", source = "houseNumber"),
-//		@Mapping(target = "country", source = "country")
-//	})
-//	public abstract void updateEntity(CustomerEntity customerEntity, @MappingTarget CustomerEntity updateCustomerEntity);
 }

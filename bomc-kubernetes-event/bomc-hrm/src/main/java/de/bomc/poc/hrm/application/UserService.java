@@ -41,6 +41,14 @@ public interface UserService {
 	UserDto findById(Long id);
 
 	/**
+	 * Find user by username (email).
+	 * 
+	 * @param username the given username.
+	 * @return a user that corresponds to the given username.
+	 */
+	UserDto findByUsername(final String username);
+
+	/**
 	 * Check if the user has permission.
 	 * 
 	 * @param username   the unique username.

@@ -17,7 +17,6 @@ package de.bomc.poc.hrm.application;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 20.09.2019
  */
 @Slf4j
-@Service
+@Service // makes it eligible for Spring Component Scan
 public class UserServiceImpl implements UserService {
 
 	private static final String LOG_PREFIX = "UserService#";
@@ -77,7 +76,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public UserDto createUser(final UserDto userDto) {
 
 		try {
@@ -111,7 +110,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(readOnly = true)
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public Boolean hasUserPermission(final String username, final String permission) {
 		final RoleEntity roleEntity = this.roleRepository.findRoleByUsernameAndPermission(username, permission);
 
@@ -124,7 +123,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(readOnly = true)
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public UserDto findById(final Long id) {
 
 		final Optional<UserEntity> userEntityOptional = this.userRepository.findById(id);
@@ -138,7 +137,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Transactional(readOnly = true)
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public UserDto findByUsername(final String username) {
 
 		List<UserEntity> mapstream = Collections.emptyList();
@@ -152,7 +151,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Transactional(readOnly = true)
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public UserDto findByUsernameAndPassword(final String username, final String persistedPassword) {
 
 		List<UserEntity> mapstream = Collections.emptyList();
@@ -167,7 +166,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Transactional(readOnly = true)
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public List<UserDto> findAllUsers() {
 
 		final List<UserEntity> userEntityList = this.userRepository.findAll();

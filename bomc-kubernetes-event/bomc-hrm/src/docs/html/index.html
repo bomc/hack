@@ -437,8 +437,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Bomc API Documentation</h1>
 <div class="details">
 <span id="author" class="author">bomc&lt;bomc@bomc.org&gt;</span><br>
-<span id="revnumber">version {git.build.version},</span>
-<span id="revdate">${git.build.time}</span>
+<span id="revdate">@java.version@</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Index</div>
@@ -940,7 +939,7 @@ Content-Length: 247
   "status" : "INTERNAL_SERVER_ERROR",
   "shortErrorCodeDescription" : "There is already a user avaible in db [username=test]",
   "errorCode" : "JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401",
-  "uuid" : "f8d37613-d2cd-4fca-a74f-f3f8a28a14fa"
+  "uuid" : "f1182bf3-c06c-4567-97f6-0f80a2094262"
 }</code></pre>
 </div>
 </div>
@@ -954,7 +953,7 @@ Content-Length: 247
 <div class="sect3">
 <h4 id="_path_parameters"><a class="link" href="#_path_parameters">Path Parameters</a></h4>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. /user/{id}</caption>
+<caption class="title">Table 1. /user/{id}/id</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -977,7 +976,7 @@ Content-Length: 247
 <h4 id="_example_request_3"><a class="link" href="#_example_request_3">Example Request</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /user/1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /user/1/id HTTP/1.1
 Accept: application/vnd.hrm-v1+json;charset=UTF-8
 Host: localhost:8080</code></pre>
 </div>
@@ -987,7 +986,7 @@ Host: localhost:8080</code></pre>
 <h4 id="_curl_sample_3"><a class="link" href="#_curl_sample_3">CURL sample</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/user/1' -i -X GET \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/user/1/id' -i -X GET \
     -H 'Accept: application/vnd.hrm-v1+json;charset=UTF-8'</code></pre>
 </div>
 </div>
@@ -1081,8 +1080,7 @@ Content-Length: 233
 </div>
 <div id="footer">
 <div id="footer-text">
-Version {git.build.version}<br>
-Last updated 2019-10-29 15:14:02 +0100
+Last updated 2019-11-01 13:45:46 +0100
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">

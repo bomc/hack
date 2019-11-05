@@ -91,7 +91,7 @@ public class UserController {
 			@ApiResponse(code = 500, message = "A internal application error.", response = ApiErrorResponseObject.class)
 	})
 	@ApiImplicitParams(@ApiImplicitParam(name = "id", value = "The unique user identifier.", dataType = "Long", dataTypeClass = Long.class, required = true))
-	@GetMapping(value="/{id}", produces = MEDIA_TYPE_JSON_V1)
+	@GetMapping(value="/{id:[\\d]+}/id", produces = MEDIA_TYPE_JSON_V1)
 	@ResponseStatus(HttpStatus.OK)
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public ResponseEntity<UserDto> findById(@PathVariable("id") final Long id) {
@@ -99,7 +99,23 @@ public class UserController {
 		return new ResponseEntity<UserDto>(this.userService.findById(id), HttpStatus.OK);
 	}
 	
-	@ApiOperation(value = "heck if the user has permission.", produces = MEDIA_TYPE_JSON_V1)
+	@ApiOperation(value = "Find a user by given username.", produces = MEDIA_TYPE_JSON_V1)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully find the user by given username.", response = UserDto.class),
+			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
+			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
+			@ApiResponse(code = 404, message = "The resource that trying to reach is not found."),
+			@ApiResponse(code = 500, message = "A internal application error.", response = ApiErrorResponseObject.class)
+	})
+	@ApiImplicitParams(@ApiImplicitParam(name = "username", value = "The unique username.", dataType = "String", dataTypeClass = String.class, required = true))
+	@GetMapping(value="/{username}/username", produces = MEDIA_TYPE_JSON_V1)
+	@ResponseStatus(HttpStatus.OK)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
+	public ResponseEntity<UserDto> findByUsername(@PathVariable("username") final String username) {
+
+		return new ResponseEntity<UserDto>(this.userService.findByUsername(username), HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "Check if the user has permission.", produces = MEDIA_TYPE_JSON_V1)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully perform the action.", responseContainer = "Map[String, String]", response = String.class),
 			@ApiResponse(code = 401, message = "Not authorized to view the resource."),
 			@ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),

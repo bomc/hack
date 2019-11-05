@@ -32,8 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
@@ -79,7 +77,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
-@WebMvcTest(UserController.class)
+@WebMvcTest(UserController.class)  // Cover integration tests with the web layer.
 @Import({ RequestGetLoggingInterceptor.class, RequestResponseLoggerImpl.class, UserServiceImpl.class })
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserControllerTest extends AbstractBaseUnit {
@@ -263,7 +261,7 @@ public class UserControllerTest extends AbstractBaseUnit {
 		when(this.userService.findById((any(Long.class)))).thenReturn(userDto);
 
 		// THEN
-		this.mockMvc.perform(RestDocumentationRequestBuilders.get("/user/{id}", 1L) //
+		this.mockMvc.perform(RestDocumentationRequestBuilders.get("/user/{id}/id", 1L) //
 				.accept(UserController.MEDIA_TYPE_JSON_V1)) //
 				.andExpect(jsonPath(JSON_PREFIX + "id").value(USER_ID)) //
 				.andExpect(jsonPath(JSON_PREFIX + "username").value(USER_USER_NAME)).andDo(print())
@@ -298,11 +296,4 @@ public class UserControllerTest extends AbstractBaseUnit {
 
 	}
 	
-	@Test
-	public void test030_generateByteArrayBase64Encoded_pass() {
-		byte[] originalBytes = new byte[] { 1, 2, 3, 4, 5};
-		String base64Encoded = DatatypeConverter.printBase64Binary(originalBytes);
-		
-		System.out.println(base64Encoded);
-	}
 }

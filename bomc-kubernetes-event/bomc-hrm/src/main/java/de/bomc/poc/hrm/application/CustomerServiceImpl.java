@@ -69,7 +69,7 @@ public class CustomerServiceImpl implements CustomerService {
 	/* --------------------- methods -------------------------------- */
 
 	@Transactional(readOnly = true)
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public CustomerDto findById(final Long id) {
 
 		final CustomerEntity customerEntity = this.customerRepository.findById(id).orElseThrow(
@@ -79,7 +79,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Transactional(readOnly = true)
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public CustomerDto findByEmailAddress(final CustomerEmailDto customerEmailDto) {
 
 		final CustomerEntity customerEntity =  this.customerRepository.findByEmailAddress(customerEmailDto.getEmailAddress())
@@ -91,7 +91,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Transactional
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public CustomerDto createCustomer(final CustomerEntity customerEntity) {
 		// Set metadata.
 		// TODO Hibernate hook PrePersist not working.
@@ -105,14 +105,14 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Transactional
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public void deleteCustomerById(final Long id) {
 
 		this.customerRepository.deleteById(id);
 	}
 
 	@Transactional
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public CustomerDto updateCustomer(final CustomerDto customerDto) {
 
 		final CustomerEntity customerEntity = this.customerMapper.mapDtoToEntity(customerDto);
@@ -144,7 +144,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Transactional(readOnly = true)
-	@Loggable(result = true, params = true, value = LogLevel.DEBUG)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public List<CustomerDto> findAll() {
 
 		final Iterable<CustomerEntity> iterableCustomerEntity = this.customerRepository.findAll();

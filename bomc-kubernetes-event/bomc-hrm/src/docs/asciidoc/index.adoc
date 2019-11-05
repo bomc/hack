@@ -1,6 +1,6 @@
 = Bomc API Documentation
 bomc<bomc@bomc.org>
-${git.build.version}, ${git.build.time}
+@java.version@
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
