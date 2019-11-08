@@ -26,7 +26,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
-import de.bomc.poc.hrm.application.log.http.LoggingClientHttpRequestInterceptor;
+import de.bomc.poc.hrm.application.log.http.client.LoggingClientHttpRequestInterceptor;
 
 /**
  * Here RestTemplate bean is configured which is finally used to invoke REST

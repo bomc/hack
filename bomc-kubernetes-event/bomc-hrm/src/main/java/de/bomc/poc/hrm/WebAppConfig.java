@@ -21,8 +21,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import de.bomc.poc.hrm.application.log.http.RequestGetLoggingInterceptor;
-//import de.bomc.poc.hrm.application.log.mdc.MdcInterceptor;
+import de.bomc.poc.hrm.application.log.http.server.RequestGetLoggingInterceptor;
 
 /**
  * Defines callback methods to customize the Java-based configuration

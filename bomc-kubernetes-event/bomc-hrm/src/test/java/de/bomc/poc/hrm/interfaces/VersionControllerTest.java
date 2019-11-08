@@ -48,8 +48,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import brave.Tracer;
-import de.bomc.poc.hrm.application.log.http.RequestGetLoggingInterceptor;
-import de.bomc.poc.hrm.application.log.http.RequestResponseLoggerImpl;
+import de.bomc.poc.hrm.application.log.http.server.RequestGetLoggingInterceptor;
+import de.bomc.poc.hrm.application.log.http.server.RequestResponseLoggerImpl;
 import de.bomc.poc.hrm.config.git.GitConfig;
 import lombok.extern.slf4j.Slf4j;
 
