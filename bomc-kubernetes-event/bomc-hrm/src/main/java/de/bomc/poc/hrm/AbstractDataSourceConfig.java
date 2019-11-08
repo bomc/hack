@@ -1,9 +1,29 @@
+/**
+ * Project: hrm
+ * <pre>
+ *
+ * Last change:
+ *
+ *  by: $Author: bomc $
+ *
+ *  date: $Date: $
+ *
+ *  revision: $Revision: $
+ *
+ * </pre>
+ */
 package de.bomc.poc.hrm;
 
 import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Value;
 
+/**
+ * A abstract class for datasource configuration.
+ * 
+ * @author <a href="mailto:bomc@bomc.org">bomc</a>
+ * @since 06.05.2019
+ */
 public abstract class AbstractDataSourceConfig {
 
 	// _______________________________________________

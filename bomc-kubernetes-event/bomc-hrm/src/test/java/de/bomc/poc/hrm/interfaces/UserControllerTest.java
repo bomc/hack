@@ -1,5 +1,5 @@
 /**
- * Project: POC PaaS
+ * Project: hrm
  * <pre>
  *
  * Last change:
@@ -58,6 +58,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import brave.Tracer;
 import de.bomc.poc.hrm.AbstractBaseUnit;
+import de.bomc.poc.hrm.GitConfig;
 import de.bomc.poc.hrm.application.UserService;
 import de.bomc.poc.hrm.application.UserServiceImpl;
 import de.bomc.poc.hrm.application.exception.AppErrorCodeEnum;
@@ -69,7 +70,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * <pre>
- * Tests the {@link VersionController} and creates the documentation.
+ * Tests the {@link UserController} and creates the documentation.
  * </pre>
  * 
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
@@ -77,7 +78,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
-@WebMvcTest(UserController.class)  // Cover integration tests with the web layer.
+@WebMvcTest(UserController.class) // Cover integration tests with the web layer.
 @Import({ RequestGetLoggingInterceptor.class, RequestResponseLoggerImpl.class, UserServiceImpl.class })
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserControllerTest extends AbstractBaseUnit {
@@ -115,17 +116,19 @@ public class UserControllerTest extends AbstractBaseUnit {
 	private Tracer tracer;
 	@MockBean
 	private UserService userService;
-
+	@MockBean
+	private GitConfig gitConfig;
+	
 	@Before
 	public void setup() {
 
 		this.documentationResultHandler = document("{class-name}/{method-name}", preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint()));
+		        preprocessResponse(prettyPrint()));
 
 		mockMvc = MockMvcBuilders.webAppContextSetup(context) //
-				.apply(documentationConfiguration(this.jUnitRestDocumentation)) //
-				.alwaysDo(this.documentationResultHandler) //
-				.build();
+		        .apply(documentationConfiguration(this.jUnitRestDocumentation)) //
+		        .alwaysDo(this.documentationResultHandler) //
+		        .build();
 	}
 
 	@Test
@@ -150,47 +153,47 @@ public class UserControllerTest extends AbstractBaseUnit {
 
 		// THEN
 		this.mockMvc
-				.perform(RestDocumentationRequestBuilders.post("/user")
-						.content(this.objectMapper.writeValueAsString(userDto))
-						.contentType(UserController.MEDIA_TYPE_JSON_V1).accept(UserController.MEDIA_TYPE_JSON_V1))
-				.andDo(print()).andExpect(status().isOk()) //
-				.andExpect(jsonPath(JSON_PREFIX + "id").value(42L)) //
-				.andExpect(jsonPath(JSON_PREFIX + "username").value(USER_USER_NAME))
-				.andDo(this.documentationResultHandler.document( //
-						requestFields( //
-								fieldWithPath("id") //
-										.description("A unique identifier of the user."), //
-								fieldWithPath("username") //
-										.description("The username you enter is represented by an email address.."),
-								fieldWithPath("password") //
-										.description("The given password."),
-								fieldWithPath("fullname") //
-										.description("The entered full name, consisting of first and last name."),
-								fieldWithPath("comment") //
-										.description("The given comment."),
-								fieldWithPath("phoneNo") //
-										.description("The given phoneNo."),
-								fieldWithPath("image") //
-										.description("The given image."),
-								fieldWithPath("sex") //
-										.description("The given sex.")),
-						responseFields( //
-								fieldWithPath("id") //
-										.description("A unique identifier of the user."), //
-								fieldWithPath("username") //
-										.description("The username you enter is represented by an email address.."),
-								fieldWithPath("password") //
-										.description("The given password."),
-								fieldWithPath("fullname") //
-										.description("The entered full name, consisting of first and last name."),
-								fieldWithPath("comment") //
-										.description("The given comment."),
-								fieldWithPath("phoneNo") //
-										.description("The given phoneNo."),
-								fieldWithPath("image") //
-										.description("The given image."),
-								fieldWithPath("sex") //
-										.description("The given sex.")) //
+		        .perform(RestDocumentationRequestBuilders.post("/user")
+		                .content(this.objectMapper.writeValueAsString(userDto))
+		                .contentType(UserController.MEDIA_TYPE_JSON_V1).accept(UserController.MEDIA_TYPE_JSON_V1))
+		        .andDo(print()).andExpect(status().isOk()) //
+		        .andExpect(jsonPath(JSON_PREFIX + "id").value(42L)) //
+		        .andExpect(jsonPath(JSON_PREFIX + "username").value(USER_USER_NAME))
+		        .andDo(this.documentationResultHandler.document( //
+		                requestFields( //
+		                        fieldWithPath("id") //
+		                                .description("A unique identifier of the user."), //
+		                        fieldWithPath("username") //
+		                                .description("The username you enter is represented by an email address.."),
+		                        fieldWithPath("password") //
+		                                .description("The given password."),
+		                        fieldWithPath("fullname") //
+		                                .description("The entered full name, consisting of first and last name."),
+		                        fieldWithPath("comment") //
+		                                .description("The given comment."),
+		                        fieldWithPath("phoneNo") //
+		                                .description("The given phoneNo."),
+		                        fieldWithPath("image") //
+		                                .description("The given image."),
+		                        fieldWithPath("sex") //
+		                                .description("The given sex.")),
+		                responseFields( //
+		                        fieldWithPath("id") //
+		                                .description("A unique identifier of the user."), //
+		                        fieldWithPath("username") //
+		                                .description("The username you enter is represented by an email address.."),
+		                        fieldWithPath("password") //
+		                                .description("The given password."),
+		                        fieldWithPath("fullname") //
+		                                .description("The entered full name, consisting of first and last name."),
+		                        fieldWithPath("comment") //
+		                                .description("The given comment."),
+		                        fieldWithPath("phoneNo") //
+		                                .description("The given phoneNo."),
+		                        fieldWithPath("image") //
+		                                .description("The given image."),
+		                        fieldWithPath("sex") //
+		                                .description("The given sex.")) //
 //						responseHeaders( //
 //								headerWithName("X-B3-TraceId") //
 //										.description("A trace-id for each incoming request"), //
@@ -212,32 +215,32 @@ public class UserControllerTest extends AbstractBaseUnit {
 		final UserDto userDto = createUserDto();
 
 		final DataIntegrityViolationException dataIntegrityViolationException = new DataIntegrityViolationException(
-				"UserControllerTest#test015_createUser_fail - errMsg");
+		        "UserControllerTest#test015_createUser_fail - errMsg");
 		final AppRuntimeException appRuntimeException = new AppRuntimeException(EX_ERR_MSG,
-				dataIntegrityViolationException, AppErrorCodeEnum.JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401);
+		        dataIntegrityViolationException, AppErrorCodeEnum.JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401);
 
 		// WHEN
 		when(this.userService.createUser((any(UserDto.class)))).thenThrow(appRuntimeException);
 
 		// THEN
 		this.mockMvc
-				.perform(RestDocumentationRequestBuilders.post("/user")
-						.content(this.objectMapper.writeValueAsString(userDto))
-						.contentType(UserController.MEDIA_TYPE_JSON_V1).accept(UserController.MEDIA_TYPE_JSON_V1))
-				.andDo(print()).andExpect(status().isInternalServerError()) //
-				.andExpect(jsonPath(JSON_PREFIX + "status").value("INTERNAL_SERVER_ERROR")) //
-				.andExpect(jsonPath(JSON_PREFIX + "shortErrorCodeDescription").value(EX_ERR_MSG)) //
-				.andExpect(jsonPath(JSON_PREFIX + "errorCode").value("JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401")) //
-				.andDo(this.documentationResultHandler.document( //
-						responseFields( //
-								fieldWithPath("status") //
-										.description("The http status of the response."), //
-								fieldWithPath("shortErrorCodeDescription") //
-										.description("A short description of the thrown errors."), //
-								fieldWithPath("errorCode") //
-										.description("The error code of the exception."), //
-								fieldWithPath("uuid") //
-										.description("A unique identifier of the error.")) //
+		        .perform(RestDocumentationRequestBuilders.post("/user")
+		                .content(this.objectMapper.writeValueAsString(userDto))
+		                .contentType(UserController.MEDIA_TYPE_JSON_V1).accept(UserController.MEDIA_TYPE_JSON_V1))
+		        .andDo(print()).andExpect(status().isInternalServerError()) //
+		        .andExpect(jsonPath(JSON_PREFIX + "status").value("INTERNAL_SERVER_ERROR")) //
+		        .andExpect(jsonPath(JSON_PREFIX + "shortErrorCodeDescription").value(EX_ERR_MSG)) //
+		        .andExpect(jsonPath(JSON_PREFIX + "errorCode").value("JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401")) //
+		        .andDo(this.documentationResultHandler.document( //
+		                responseFields( //
+		                        fieldWithPath("status") //
+		                                .description("The http status of the response."), //
+		                        fieldWithPath("shortErrorCodeDescription") //
+		                                .description("A short description of the thrown errors."), //
+		                        fieldWithPath("errorCode") //
+		                                .description("The error code of the exception."), //
+		                        fieldWithPath("uuid") //
+		                                .description("A unique identifier of the error.")) //
 //						responseHeaders( //
 //								headerWithName("X-B3-TraceId") //
 //										.description("A trace-id for each incoming request"), //
@@ -262,31 +265,31 @@ public class UserControllerTest extends AbstractBaseUnit {
 
 		// THEN
 		this.mockMvc.perform(RestDocumentationRequestBuilders.get("/user/{id}/id", 1L) //
-				.accept(UserController.MEDIA_TYPE_JSON_V1)) //
-				.andExpect(jsonPath(JSON_PREFIX + "id").value(USER_ID)) //
-				.andExpect(jsonPath(JSON_PREFIX + "username").value(USER_USER_NAME)).andDo(print())
-				.andExpect(status().isOk()) //
-				.andDo(this.documentationResultHandler.document( //
-						pathParameters(parameterWithName("id") //
-								.description("Identifier of the person to be obtained.")))) //
-				.andDo(this.documentationResultHandler.document( //
-						responseFields( //
-								fieldWithPath("id") //
-										.description("A unique identifier of the user."), //
-								fieldWithPath("username") //
-										.description("The username you enter is represented by an email address.."),
-								fieldWithPath("password") //
-										.description("The given password."),
-								fieldWithPath("fullname") //
-										.description("The entered full name, consisting of first and last name."),
-								fieldWithPath("comment") //
-										.description("The given comment."),
-								fieldWithPath("phoneNo") //
-										.description("The given phoneNo."),
-								fieldWithPath("image") //
-										.description("The given image."),
-								fieldWithPath("sex") //
-										.description("The given sex.")) //
+		        .accept(UserController.MEDIA_TYPE_JSON_V1)) //
+		        .andExpect(jsonPath(JSON_PREFIX + "id").value(USER_ID)) //
+		        .andExpect(jsonPath(JSON_PREFIX + "username").value(USER_USER_NAME)).andDo(print())
+		        .andExpect(status().isOk()) //
+		        .andDo(this.documentationResultHandler.document( //
+		                pathParameters(parameterWithName("id") //
+		                        .description("Identifier of the person to be obtained.")))) //
+		        .andDo(this.documentationResultHandler.document( //
+		                responseFields( //
+		                        fieldWithPath("id") //
+		                                .description("A unique identifier of the user."), //
+		                        fieldWithPath("username") //
+		                                .description("The username you enter is represented by an email address.."),
+		                        fieldWithPath("password") //
+		                                .description("The given password."),
+		                        fieldWithPath("fullname") //
+		                                .description("The entered full name, consisting of first and last name."),
+		                        fieldWithPath("comment") //
+		                                .description("The given comment."),
+		                        fieldWithPath("phoneNo") //
+		                                .description("The given phoneNo."),
+		                        fieldWithPath("image") //
+		                                .description("The given image."),
+		                        fieldWithPath("sex") //
+		                                .description("The given sex.")) //
 //						responseHeaders( //
 //								headerWithName("X-B3-TraceId") //
 //										.description("A trace-id for each incoming request"), //
@@ -295,5 +298,5 @@ public class UserControllerTest extends AbstractBaseUnit {
 				));
 
 	}
-	
+
 }

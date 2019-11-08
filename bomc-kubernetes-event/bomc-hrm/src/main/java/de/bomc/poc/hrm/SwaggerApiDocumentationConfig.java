@@ -64,60 +64,67 @@ public class SwaggerApiDocumentationConfig implements WebMvcConfigurer {
 	@Value("${bomc.swagger.port:8080}")
 	private String swaggerPort;
 
+	private final GitConfig gitConfig;
+
+	public SwaggerApiDocumentationConfig(final GitConfig gitConfig) {
+
+		this.gitConfig = gitConfig;
+	}
+
 	@Bean
 	public Docket customerApi(final ServletContext servletContext) {
 
 		return new Docket(DocumentationType.SWAGGER_2).host(this.swaggerHost + ":" + this.swaggerPort)
-				.groupName("customer-hrm-api-1.0")
-				// Specifies the title, description, etc of the Rest API.
-				.apiInfo(this.apiInfo())
+		        .groupName("customer-hrm-api-" + gitConfig.getCommitId())
+		        // Specifies the title, description, etc of the Rest API.
+		        .apiInfo(this.apiInfo())
 //				.produces(Collections.singleton("application/json;charset=UTF-8"))
-				// Provides a way to control the endpoints exposed by swagger.
-				.select()
-				// Specify the package where are the declared controllers. Swagger only picks up
-				// controllers declared in this package.
-				.apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm.interfaces"))
-				// Specify only paths starting with /customer should be picked up.
-				.paths(this.customerPath()) // PathSelectors.any()
-				.build();
+		        // Provides a way to control the endpoints exposed by swagger.
+		        .select()
+		        // Specify the package where are the declared controllers. Swagger only picks up
+		        // controllers declared in this package.
+		        .apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm.interfaces"))
+		        // Specify only paths starting with /customer should be picked up.
+		        .paths(this.customerPath()) // PathSelectors.any()
+		        .build();
 	}
 
 	@Bean
 	public Docket userApi(final ServletContext servletContext) {
 
 		return new Docket(DocumentationType.SWAGGER_2).host(this.swaggerHost + ":" + this.swaggerPort)
-				.groupName("user-hrm-api-1.0")
-				// Specifies the title, description, etc of the Rest API.
-				.apiInfo(this.apiInfo())
+		        .groupName("user-hrm-api-" + gitConfig.getCommitId())
+		        // Specifies the title, description, etc of the Rest API.
+		        .apiInfo(this.apiInfo())
 //				.produces(Collections.singleton("application/json;charset=UTF-8"))
-				// Provides a way to control the endpoints exposed by swagger.
-				.select()
-				// Specify the package where are the declared controllers. Swagger only picks up
-				// controllers declared in this package.
-				.apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm.interfaces"))
-				// Specify only paths starting with /customer should be picked up.
-				.paths(this.userPath()) // PathSelectors.any()
-				.build();
+		        // Provides a way to control the endpoints exposed by swagger.
+		        .select()
+		        // Specify the package where are the declared controllers. Swagger only picks up
+		        // controllers declared in this package.
+		        .apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm.interfaces"))
+		        // Specify only paths starting with /customer should be picked up.
+		        .paths(this.userPath()) // PathSelectors.any()
+		        .build();
 	}
 
 	@Bean
 	public Docket versionApi(final ServletContext servletContext) {
 
 		return new Docket(DocumentationType.SWAGGER_2).host(this.swaggerHost + ":" + this.swaggerPort)
-				.groupName("user-version-api-1.0")
-				// Specifies the title, description, etc of the Rest API.
-				.apiInfo(this.apiInfo())
+		        .groupName("user-version-api-" + gitConfig.getCommitId())
+		        // Specifies the title, description, etc of the Rest API.
+		        .apiInfo(this.apiInfo())
 //				.produces(Collections.singleton("application/json;charset=UTF-8"))
-				// Provides a way to control the endpoints exposed by swagger.
-				.select()
-				// Specify the package where are the declared controllers. Swagger only picks up
-				// controllers declared in this package.
-				.apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm.interfaces"))
-				// Specify only paths starting with /customer should be picked up.
-				.paths(this.versionPath()) // PathSelectors.any()
-				.build();
+		        // Provides a way to control the endpoints exposed by swagger.
+		        .select()
+		        // Specify the package where are the declared controllers. Swagger only picks up
+		        // controllers declared in this package.
+		        .apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm.interfaces"))
+		        // Specify only paths starting with /customer should be picked up.
+		        .paths(this.versionPath()) // PathSelectors.any()
+		        .build();
 	}
-	
+
 	/**
 	 * Enables the adopting of the swagger-ui path from
 	 * 'http://localhost:8080/bomc-hrm/swagger-ui.html' to
@@ -125,13 +132,13 @@ public class SwaggerApiDocumentationConfig implements WebMvcConfigurer {
 	 */
 	@Override
 	public void addViewControllers(final ViewControllerRegistry registry) {
-		
+
 		registry.addRedirectViewController(SWAGGER_CONTEXT_ROOT + "/v2/api-docs", "/v2/api-docs")
-				.setKeepQueryParams(true);
+		        .setKeepQueryParams(true);
 		registry.addRedirectViewController(SWAGGER_CONTEXT_ROOT + "/swagger-resources/configuration/ui",
-				"/swagger-resources/configuration/ui");
+		        "/swagger-resources/configuration/ui");
 		registry.addRedirectViewController(SWAGGER_CONTEXT_ROOT + "/swagger-resources/configuration/security",
-				"/swagger-resources/configuration/security");
+		        "/swagger-resources/configuration/security");
 		registry.addRedirectViewController(SWAGGER_CONTEXT_ROOT + "/swagger-resources", "/swagger-resources");
 	}
 
@@ -143,12 +150,12 @@ public class SwaggerApiDocumentationConfig implements WebMvcConfigurer {
 	@Override
 	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
 		registry.addResourceHandler(SWAGGER_CONTEXT_ROOT + "/**")
-				.addResourceLocations("classpath:/META-INF/resources/");
+		        .addResourceLocations("classpath:/META-INF/resources/");
 	}
 
 	private ApiInfo apiInfo() {
 		ApiInfo apiInfo = new ApiInfo("HRM REST API", "A simple application for testing the PaaS plattform.",
-				"1.0.0-SNAPSHOT", "Terms of service", new Contact("bomc", "www.bomc.org", "bomc@bomc.org"),
+				gitConfig.getCommitId(), "Terms of service", new Contact("bomc", "www.bomc.org", "bomc@bomc.org"),
 				"License of API", "API license URL", Collections.emptyList());
 
 		return apiInfo;
