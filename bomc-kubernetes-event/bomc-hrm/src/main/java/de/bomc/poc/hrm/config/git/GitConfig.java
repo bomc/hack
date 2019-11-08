@@ -12,7 +12,7 @@
  *
  * </pre>
  */
-package de.bomc.poc.hrm;
+package de.bomc.poc.hrm.config.git;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

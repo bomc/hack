@@ -12,7 +12,7 @@
  *
  * </pre>
  */
-package de.bomc.poc.hrm;
+package de.bomc.poc.hrm.config.swagger;
 
 import java.util.Collections;
 
@@ -29,6 +29,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
+import de.bomc.poc.hrm.config.git.GitConfig;
 import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;

@@ -31,7 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import de.bomc.poc.hrm.AbstractBaseUnit;
-import de.bomc.poc.hrm.application.UserService;
+import de.bomc.poc.hrm.application.service.UserService;
 import de.bomc.poc.hrm.domain.model.UserEntity;
 import de.bomc.poc.hrm.interfaces.mapper.UserDto;
 import de.bomc.poc.hrm.interfaces.mapper.UserMapper;

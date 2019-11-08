@@ -34,8 +34,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.bomc.poc.hrm.application.CustomerService;
 import de.bomc.poc.hrm.application.log.method.Loggable;
+import de.bomc.poc.hrm.application.service.CustomerService;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerMapper;

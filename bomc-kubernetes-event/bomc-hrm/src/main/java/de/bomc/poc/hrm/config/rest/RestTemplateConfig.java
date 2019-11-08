@@ -12,7 +12,7 @@
  *
  * </pre>
  */
-package de.bomc.poc.hrm;
+package de.bomc.poc.hrm.config.rest;
 
 import java.util.ArrayList;
 import java.util.List;

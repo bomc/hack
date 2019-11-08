@@ -12,7 +12,7 @@
  *
  * </pre>
  */
-package de.bomc.poc.hrm;
+package de.bomc.poc.hrm.config.scheduling;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -25,7 +25,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import de.bomc.poc.hrm.application.log.method.Loggable;
-import de.bomc.poc.hrm.application.poller.HrmScheduledTaskExceptionHandler;
 import de.bomc.poc.hrm.application.poller.PollerJob;
 
 /**

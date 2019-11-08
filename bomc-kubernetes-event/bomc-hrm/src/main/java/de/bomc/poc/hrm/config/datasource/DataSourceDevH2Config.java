@@ -12,7 +12,7 @@
  *
  * </pre>
  */
-package de.bomc.poc.hrm;
+package de.bomc.poc.hrm.config.datasource;
 
 import java.util.Properties;
 

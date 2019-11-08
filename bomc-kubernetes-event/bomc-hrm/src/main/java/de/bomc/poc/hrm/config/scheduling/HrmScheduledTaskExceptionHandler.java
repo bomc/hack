@@ -1,4 +1,4 @@
-package de.bomc.poc.hrm.application.poller;
+package de.bomc.poc.hrm.config.scheduling;
 
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.util.ErrorHandler;

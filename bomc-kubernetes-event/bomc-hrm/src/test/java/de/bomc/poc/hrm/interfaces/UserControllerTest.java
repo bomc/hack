@@ -58,13 +58,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import brave.Tracer;
 import de.bomc.poc.hrm.AbstractBaseUnit;
-import de.bomc.poc.hrm.GitConfig;
-import de.bomc.poc.hrm.application.UserService;
-import de.bomc.poc.hrm.application.UserServiceImpl;
 import de.bomc.poc.hrm.application.exception.AppErrorCodeEnum;
 import de.bomc.poc.hrm.application.exception.AppRuntimeException;
 import de.bomc.poc.hrm.application.log.http.RequestGetLoggingInterceptor;
 import de.bomc.poc.hrm.application.log.http.RequestResponseLoggerImpl;
+import de.bomc.poc.hrm.application.service.UserService;
+import de.bomc.poc.hrm.application.service.UserServiceImpl;
+import de.bomc.poc.hrm.config.git.GitConfig;
 import de.bomc.poc.hrm.interfaces.mapper.UserDto;
 import lombok.extern.slf4j.Slf4j;
 
