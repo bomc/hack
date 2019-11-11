@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -41,39 +42,51 @@ import de.bomc.poc.hrm.application.log.http.client.LoggingClientHttpRequestInter
  * ScheduledThreadPoolExecutor to schedule commands to run after a given delay,
  * or to execute periodically.
  * 
+ * Why should using {code RestTemplateBuilder}:
+ * 
+ * https://medium.com/@TimvanBaarsen/spring-boot-why-you-should-always-use-the-resttemplatebuilder-to-create-a-resttemplate-instance-d5a44ebad9e9
+ * 
+ * TO SEE THE METRICS:
+ * 
+ * @formatter:off
+ * curl -v http://localhost:8080/bomc-hrm/actuator/metrics/http.client.requests |jq
+ * @formatter:on
+ * 
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.11.2019
  */
 @Configuration
-public class RestTemplateConfig {
+public class HrmRestTemplateConfig {
 
 	// _______________________________________________
 	// Member variables.
 	// -----------------------------------------------
 	@Autowired
 	private CloseableHttpClient httpClient;
+	@Autowired
+	private LoggingClientHttpRequestInterceptor loggingClientHttpRequestInterceptor;
 	
 	@Bean
-	public RestTemplate restTemplate() {
-		
+	public RestTemplate restTemplate(final RestTemplateBuilder restTemplateBuilder) {
+
 		final RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
 
 		// Add new interceptors.
-	    List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();
-	    
-	    if (CollectionUtils.isEmpty(interceptors)) {
-	        interceptors = new ArrayList<>();
-	    }
+		List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();
 
-	    interceptors.add(new LoggingClientHttpRequestInterceptor());
-	    restTemplate.setInterceptors(interceptors);
-	    
-		return restTemplate;
+		if (CollectionUtils.isEmpty(interceptors)) {
+			interceptors = new ArrayList<>();
+		}
+
+		interceptors.add(loggingClientHttpRequestInterceptor);
+		restTemplate.setInterceptors(interceptors);
+
+		return restTemplateBuilder.configure(restTemplate);
 	}
 
 	@Bean
 	public HttpComponentsClientHttpRequestFactory clientHttpRequestFactory() {
-		
+
 		final HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
 		clientHttpRequestFactory.setHttpClient(httpClient);
 

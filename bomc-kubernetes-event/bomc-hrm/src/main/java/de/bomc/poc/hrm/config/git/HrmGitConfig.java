@@ -37,7 +37,7 @@ import lombok.Setter;
 @Configuration
 @Profile({"local", "dev", "prod"})
 @PropertySource("classpath:git.properties")
-public class GitConfig {
+public class HrmGitConfig {
 
 	// _______________________________________________
 	// Member variables

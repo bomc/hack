@@ -53,7 +53,7 @@ import de.bomc.poc.hrm.AbstractBaseUnit;
 import de.bomc.poc.hrm.application.log.http.server.RequestGetLoggingInterceptor;
 import de.bomc.poc.hrm.application.log.http.server.RequestResponseLoggerImpl;
 import de.bomc.poc.hrm.application.service.CustomerService;
-import de.bomc.poc.hrm.config.git.GitConfig;
+import de.bomc.poc.hrm.config.git.HrmGitConfig;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
 
@@ -105,7 +105,7 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 	@MockBean
 	private CustomerService customerService;
 	@MockBean
-	private GitConfig gitConfig;
+	private HrmGitConfig hrmGitConfig;
 	@MockBean
 	private Tracer tracer;
 

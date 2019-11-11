@@ -24,7 +24,7 @@ public class HrmScheduledTaskExceptionHandler implements ErrorHandler {
 		// ______________________________________
 		// DO SOMETHIN USEFULL WITH THE ERRORMESSAGE (e.g. notifying)
 		// --------------------------------------
-		log.error(LOG_PREFIX + "handleError - " + throwable.getMessage() + "\n" + throwable);
+		log.error(LOG_PREFIX + "handleError - " + throwable.getMessage() + "\n", throwable);
 		
         if (existingErrorHandler != null
                 && !(existingErrorHandler instanceof HrmScheduledTaskExceptionHandler)) {

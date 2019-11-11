@@ -37,6 +37,7 @@ import org.apache.http.message.BasicHeaderElementIterator;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -45,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @formatter:off
- * In HttpClientConfig class, there are configuring mainly two things 
+ * In HrmHttpClientConfig class, there are configuring mainly two things 
  * – PoolingHttpClientConnectionManager – As name suggest, its connection pool manager. 
  *   Here, connections are pooled on a per route basis. A request for a route which 
  *   already the manager has persistent connections for available in the pool will be 
@@ -69,30 +70,36 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Configuration
-public class HttpClientConfig {
+public class HrmHttpClientConfig {
 
-	private static final String LOG_PREFIX = HttpClientConfig.class.getName() + "#";
+	private static final String LOG_PREFIX = HrmHttpClientConfig.class.getName() + "#";
 
-	// Determines the timeout in milliseconds until a connection is established.
-	private static final int CONNECT_TIMEOUT = 5000;
-	// The timeout when requesting a connection from the connection manager.
-	private static final int REQUEST_TIMEOUT = 5000;
-	// The timeout for waiting for data
-	private static final int SOCKET_TIMEOUT = 60000;
-
-	private static final int MAX_TOTAL_CONNECTIONS = 50;
-	private static final int DEFAULT_KEEP_ALIVE_TIME_MILLIS = 20 * 1000;
-	private static final int CLOSE_IDLE_CONNECTION_WAIT_TIME_SECS = 30;
+	// _______________________________________________
+	// Configuration constants
+	// -----------------------------------------------
+	// The timeout for a schdeuler that checks for idle connecitons.
+	private static final int IDLE_CONNECTION_MONITOR_SCHEDULER_MS = 10 * 1000;
+	// _______________________________________________
+	// Member variables
+	// -----------------------------------------------
+	@Autowired
+	private HrmHttpClientProperties hrmHttpClientProperties;
 
 	@Bean
 	public PoolingHttpClientConnectionManager poolingConnectionManager() {
 
+
+		System.out.println("####################################1" + hrmHttpClientProperties.toString());
+		
+		
+		
 		final SSLContextBuilder builder = new SSLContextBuilder();
 
 		try {
 			builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
 		} catch (final NoSuchAlgorithmException | KeyStoreException e) {
-			log.error(LOG_PREFIX + "poolingConnectionManager - initialisation failure because of " + e.getMessage(), e);
+			log.error(LOG_PREFIX + "poolingConnectionManager - initialization failure because of: " + e.getMessage(),
+			        e);
 		}
 
 		SSLConnectionSocketFactory sslsf = null;
@@ -100,7 +107,8 @@ public class HttpClientConfig {
 		try {
 			sslsf = new SSLConnectionSocketFactory(builder.build());
 		} catch (final KeyManagementException | NoSuchAlgorithmException e) {
-			log.error(LOG_PREFIX + "poolingConnectionManager - initialisation failure because of " + e.getMessage(), e);
+			log.error(LOG_PREFIX + "poolingConnectionManager - initialisation failure because of: " + e.getMessage(),
+			        e);
 		}
 
 		final Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
@@ -109,7 +117,7 @@ public class HttpClientConfig {
 
 		final PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager(
 		        socketFactoryRegistry);
-		poolingConnectionManager.setMaxTotal(MAX_TOTAL_CONNECTIONS);
+		poolingConnectionManager.setMaxTotal(this.hrmHttpClientProperties.getMaxTotalConnections());
 
 		return poolingConnectionManager;
 	}
@@ -117,6 +125,10 @@ public class HttpClientConfig {
 	@Bean
 	public ConnectionKeepAliveStrategy connectionKeepAliveStrategy() {
 
+
+		System.out.println("####################################2" + hrmHttpClientProperties.toString());
+		
+		
 		return new ConnectionKeepAliveStrategy() {
 			@Override
 			public long getKeepAliveDuration(HttpResponse response, HttpContext context) {
@@ -132,7 +144,10 @@ public class HttpClientConfig {
 						return Long.parseLong(value) * 1000;
 					}
 				}
-				return DEFAULT_KEEP_ALIVE_TIME_MILLIS;
+
+				log.info(LOG_PREFIX + "ConnectionKeepAliveStrategy - using default keep alive time. [keepAlive in ms="
+				        + hrmHttpClientProperties.getKeppAliveTime() + "]");
+				return hrmHttpClientProperties.getKeppAliveTime();
 			}
 		};
 	}
@@ -140,8 +155,16 @@ public class HttpClientConfig {
 	@Bean
 	public CloseableHttpClient httpClient() {
 
-		final RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(REQUEST_TIMEOUT)
-		        .setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+
+		System.out.println("####################################3" + hrmHttpClientProperties.toString());
+		
+		
+		
+		
+		final RequestConfig requestConfig = RequestConfig.custom()
+		        .setConnectionRequestTimeout(this.hrmHttpClientProperties.getRequestTimeout())
+		        .setConnectTimeout(this.hrmHttpClientProperties.getConnectionTimeoutInMillis())
+		        .setSocketTimeout(this.hrmHttpClientProperties.getSocketTimeout()).build();
 
 		return HttpClients.custom().setDefaultRequestConfig(requestConfig)
 		        .setConnectionManager(poolingConnectionManager()).setKeepAliveStrategy(connectionKeepAliveStrategy())
@@ -151,16 +174,21 @@ public class HttpClientConfig {
 	@Bean
 	public Runnable idleConnectionMonitor(final PoolingHttpClientConnectionManager connectionManager) {
 
+
+		System.out.println("####################################4" + hrmHttpClientProperties.toString());
+		
+		
 		return new Runnable() {
 			@Override
-			@Scheduled(fixedDelay = 10000)
+			@Scheduled(fixedDelay = IDLE_CONNECTION_MONITOR_SCHEDULER_MS)
 			public void run() {
 				try {
 					if (connectionManager != null) {
 						log.trace(LOG_PREFIX + "idleConnectionMonitor#run closing expired and idle connections...");
 
 						connectionManager.closeExpiredConnections();
-						connectionManager.closeIdleConnections(CLOSE_IDLE_CONNECTION_WAIT_TIME_SECS, TimeUnit.SECONDS);
+						connectionManager.closeIdleConnections(hrmHttpClientProperties.getCloseIdleConnectionWaitTime(),
+						        TimeUnit.SECONDS);
 					} else {
 						log.trace(LOG_PREFIX
 						        + "idleConnectionMonitor#run - HttpClientConnectionManager is not initialised!");

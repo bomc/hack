@@ -50,7 +50,7 @@ import org.springframework.web.context.WebApplicationContext;
 import brave.Tracer;
 import de.bomc.poc.hrm.application.log.http.server.RequestGetLoggingInterceptor;
 import de.bomc.poc.hrm.application.log.http.server.RequestResponseLoggerImpl;
-import de.bomc.poc.hrm.config.git.GitConfig;
+import de.bomc.poc.hrm.config.git.HrmGitConfig;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -97,7 +97,7 @@ public class VersionControllerTest {
 	// Mocks
 	// -----------------------------------------------
 	@MockBean
-	private GitConfig gitConfig;
+	private HrmGitConfig hrmGitConfig;
 	@MockBean
 	private Tracer tracer;
 
@@ -122,9 +122,9 @@ public class VersionControllerTest {
 		// GIVEN
 
 		// WHEN
-		when(this.gitConfig.getVersion()).thenReturn(VersionController.GIT_VERSION);
-		when(this.gitConfig.getCommitId()).thenReturn(VersionController.GIT_COMMIT_ID);
-		when(this.gitConfig.getCommitMessage()).thenReturn(VersionController.GIT_COMMIT_MESSAGE);
+		when(this.hrmGitConfig.getVersion()).thenReturn(VersionController.GIT_VERSION);
+		when(this.hrmGitConfig.getCommitId()).thenReturn(VersionController.GIT_COMMIT_ID);
+		when(this.hrmGitConfig.getCommitMessage()).thenReturn(VersionController.GIT_COMMIT_MESSAGE);
 
 		// THEN
 		this.mockMvc

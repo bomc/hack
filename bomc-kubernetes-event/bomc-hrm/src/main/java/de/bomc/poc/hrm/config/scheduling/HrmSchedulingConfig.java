@@ -39,7 +39,7 @@ import de.bomc.poc.hrm.application.poller.PollerJob;
 // only thread. So if there are multiple scheduled tasks in the application, it 
 // might see weird behavior of invocation (since the tasks are queued).
 @PropertySource("classpath:scheduled.properties")
-public class SchedulingConfig implements SchedulingConfigurer {
+public class HrmSchedulingConfig implements SchedulingConfigurer {
 
 	@Value("${bomc.hrm.schedule.task.pool.size:1}")
 	private int poolSize;

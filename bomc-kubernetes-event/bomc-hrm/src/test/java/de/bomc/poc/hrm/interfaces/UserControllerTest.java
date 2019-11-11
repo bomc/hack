@@ -64,7 +64,7 @@ import de.bomc.poc.hrm.application.log.http.server.RequestGetLoggingInterceptor;
 import de.bomc.poc.hrm.application.log.http.server.RequestResponseLoggerImpl;
 import de.bomc.poc.hrm.application.service.UserService;
 import de.bomc.poc.hrm.application.service.UserServiceImpl;
-import de.bomc.poc.hrm.config.git.GitConfig;
+import de.bomc.poc.hrm.config.git.HrmGitConfig;
 import de.bomc.poc.hrm.interfaces.mapper.UserDto;
 import lombok.extern.slf4j.Slf4j;
 
@@ -117,7 +117,7 @@ public class UserControllerTest extends AbstractBaseUnit {
 	@MockBean
 	private UserService userService;
 	@MockBean
-	private GitConfig gitConfig;
+	private HrmGitConfig hrmGitConfig;
 	
 	@Before
 	public void setup() {

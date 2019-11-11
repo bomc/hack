@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.bomc.poc.hrm.application.log.method.Loggable;
-import de.bomc.poc.hrm.config.git.GitConfig;
+import de.bomc.poc.hrm.config.git.HrmGitConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -55,11 +55,11 @@ public class VersionController {
 	// _______________________________________________
 	// Member variables
 	// -----------------------------------------------
-	private final GitConfig gitConfig;
+	private final HrmGitConfig hrmGitConfig;
 	
-	public VersionController(final GitConfig gitConfig) {
+	public VersionController(final HrmGitConfig hrmGitConfig) {
 		
-		this.gitConfig = gitConfig;
+		this.hrmGitConfig = hrmGitConfig;
 	}
 	
 	// _______________________________________________
@@ -79,9 +79,9 @@ public class VersionController {
 	public @ResponseBody Map<String, String> getVersion() {
 		
 		final Map<String, String> resultMap = new HashMap<>();
-		resultMap.put(GIT_VERSION, this.gitConfig.getVersion());
-		resultMap.put(GIT_COMMIT_MESSAGE, this.gitConfig.getCommitMessage());
-		resultMap.put(GIT_COMMIT_ID, this.gitConfig.getCommitId());
+		resultMap.put(GIT_VERSION, this.hrmGitConfig.getVersion());
+		resultMap.put(GIT_COMMIT_MESSAGE, this.hrmGitConfig.getCommitMessage());
+		resultMap.put(GIT_COMMIT_ID, this.hrmGitConfig.getCommitId());
 
 		return resultMap;
 	}

@@ -29,7 +29,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
-import de.bomc.poc.hrm.config.git.GitConfig;
+import de.bomc.poc.hrm.config.git.HrmGitConfig;
 import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -54,7 +54,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 @Import(BeanValidatorPluginsConfiguration.class)
-public class SwaggerApiDocumentationConfig implements WebMvcConfigurer {
+public class HrmSwaggerApiDocumentationConfig implements WebMvcConfigurer {
 
 	private static final String SWAGGER_CONTEXT_ROOT = "/bomc-api";
 
@@ -65,18 +65,18 @@ public class SwaggerApiDocumentationConfig implements WebMvcConfigurer {
 	@Value("${bomc.swagger.port:8080}")
 	private String swaggerPort;
 
-	private final GitConfig gitConfig;
+	private final HrmGitConfig hrmGitConfig;
 
-	public SwaggerApiDocumentationConfig(final GitConfig gitConfig) {
+	public HrmSwaggerApiDocumentationConfig(final HrmGitConfig hrmGitConfig) {
 
-		this.gitConfig = gitConfig;
+		this.hrmGitConfig = hrmGitConfig;
 	}
 
 	@Bean
 	public Docket customerApi(final ServletContext servletContext) {
 
 		return new Docket(DocumentationType.SWAGGER_2).host(this.swaggerHost + ":" + this.swaggerPort)
-		        .groupName("customer-hrm-api-" + gitConfig.getCommitId())
+		        .groupName("customer-hrm-api-" + hrmGitConfig.getCommitId())
 		        // Specifies the title, description, etc of the Rest API.
 		        .apiInfo(this.apiInfo())
 //				.produces(Collections.singleton("application/json;charset=UTF-8"))
@@ -94,7 +94,7 @@ public class SwaggerApiDocumentationConfig implements WebMvcConfigurer {
 	public Docket userApi(final ServletContext servletContext) {
 
 		return new Docket(DocumentationType.SWAGGER_2).host(this.swaggerHost + ":" + this.swaggerPort)
-		        .groupName("user-hrm-api-" + gitConfig.getCommitId())
+		        .groupName("user-hrm-api-" + hrmGitConfig.getCommitId())
 		        // Specifies the title, description, etc of the Rest API.
 		        .apiInfo(this.apiInfo())
 //				.produces(Collections.singleton("application/json;charset=UTF-8"))
@@ -112,7 +112,7 @@ public class SwaggerApiDocumentationConfig implements WebMvcConfigurer {
 	public Docket versionApi(final ServletContext servletContext) {
 
 		return new Docket(DocumentationType.SWAGGER_2).host(this.swaggerHost + ":" + this.swaggerPort)
-		        .groupName("user-version-api-" + gitConfig.getCommitId())
+		        .groupName("user-version-api-" + hrmGitConfig.getCommitId())
 		        // Specifies the title, description, etc of the Rest API.
 		        .apiInfo(this.apiInfo())
 //				.produces(Collections.singleton("application/json;charset=UTF-8"))
@@ -156,7 +156,7 @@ public class SwaggerApiDocumentationConfig implements WebMvcConfigurer {
 
 	private ApiInfo apiInfo() {
 		ApiInfo apiInfo = new ApiInfo("HRM REST API", "A simple application for testing the PaaS plattform.",
-				gitConfig.getCommitId(), "Terms of service", new Contact("bomc", "www.bomc.org", "bomc@bomc.org"),
+				hrmGitConfig.getCommitId(), "Terms of service", new Contact("bomc", "www.bomc.org", "bomc@bomc.org"),
 				"License of API", "API license URL", Collections.emptyList());
 
 		return apiInfo;
