@@ -84,7 +84,9 @@
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-core</artifactId>
 		</dependency>
-		<!-- Micrometer prometheus registry -->
+		<!-- Micrometer prometheus registry, Spring Boot will automatically configure 
+			PrometheusMeterRegistry and a CollectorRegistry to collect and export metrics 
+			data in a format that can be scrapped by a Prometheus server. -->
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
@@ -95,7 +97,7 @@
 			<artifactId>spring-cloud-starter-sleuth</artifactId>
 			<version>${version.spring-cloud-starter-sleuth}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -125,7 +127,8 @@
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 
-		<!-- https://github.com/ttddyy/datasource-proxy/wiki/How-To-Guide -->
+		<!-- https://github.com/ttddyy/datasource-proxy/wiki/How-To-Guide, used 
+			for logging. -->
 		<dependency>
 			<groupId>net.ttddyy</groupId>
 			<artifactId>datasource-proxy</artifactId>
@@ -227,6 +230,11 @@
 							<mainClass>de.bomc.poc.hrm.HrmApplication</mainClass>
 						</configuration>
 					</execution>
+					<!-- <execution> -->
+					<!-- <goals> -->
+					<!-- <goal>build-info</goal> -->
+					<!-- </goals> -->
+					<!-- </execution> -->
 				</executions>
 				<configuration>
 					<redeploy>true</redeploy>

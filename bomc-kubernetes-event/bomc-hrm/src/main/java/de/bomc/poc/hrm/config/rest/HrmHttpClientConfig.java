@@ -87,11 +87,6 @@ public class HrmHttpClientConfig {
 
 	@Bean
 	public PoolingHttpClientConnectionManager poolingConnectionManager() {
-
-
-		System.out.println("####################################1" + hrmHttpClientProperties.toString());
-		
-		
 		
 		final SSLContextBuilder builder = new SSLContextBuilder();
 
@@ -124,10 +119,6 @@ public class HrmHttpClientConfig {
 
 	@Bean
 	public ConnectionKeepAliveStrategy connectionKeepAliveStrategy() {
-
-
-		System.out.println("####################################2" + hrmHttpClientProperties.toString());
-		
 		
 		return new ConnectionKeepAliveStrategy() {
 			@Override
@@ -154,12 +145,6 @@ public class HrmHttpClientConfig {
 
 	@Bean
 	public CloseableHttpClient httpClient() {
-
-
-		System.out.println("####################################3" + hrmHttpClientProperties.toString());
-		
-		
-		
 		
 		final RequestConfig requestConfig = RequestConfig.custom()
 		        .setConnectionRequestTimeout(this.hrmHttpClientProperties.getRequestTimeout())
@@ -173,10 +158,6 @@ public class HrmHttpClientConfig {
 
 	@Bean
 	public Runnable idleConnectionMonitor(final PoolingHttpClientConnectionManager connectionManager) {
-
-
-		System.out.println("####################################4" + hrmHttpClientProperties.toString());
-		
 		
 		return new Runnable() {
 			@Override

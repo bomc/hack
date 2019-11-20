@@ -30,6 +30,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.client.RestTemplate;
 
 import de.bomc.poc.hrm.application.log.method.Loggable;
+import io.micrometer.core.annotation.Timed;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -62,6 +63,7 @@ public class PollerJob {
 	 * NOTE: The 'fixedDelay' task is invoked for every specified interval but the
 	 * time is measured from the completion time of each preceding invocation.
 	 */
+	@Timed(value = "bomc.hrm.poller.job.poll", longTask = true)
 	@Loggable(result = false, params = false, value = LogLevel.DEBUG, time = true)
 	@Scheduled(initialDelayString = "${bomc.hrm.schedule.poller.startDelay:PT1S}", fixedDelayString = "${bomc.hrm.schedule.poller.repeatInterval:PT10S}")
 	public void poll() {
@@ -73,7 +75,7 @@ public class PollerJob {
 		}
 
 		final HttpEntity<?> requestEntity = new HttpEntity(requestHeaders);
-		/*final ResponseEntity<Feed> response = */restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+		/*final ResponseEntity<Feed> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class); */
 
 //		if (response.getStatusCode() != HttpStatus.NOT_MODIFIED) {
 //			log.trace("data has been modified");

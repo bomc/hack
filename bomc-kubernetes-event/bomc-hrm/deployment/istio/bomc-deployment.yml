@@ -11,6 +11,12 @@ spec:
       labels:
         app: bomc-hrm
         # version: v1.0.0
+      # Monitoring: Adjust prometheus configuration
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/bomc-hrm/actuator/prometheus"
+        prometheus.io/port: "8080"
+        prometheus.io/scheme: "http"
     spec:
       containers:
       - name: bomc-hrm
@@ -22,19 +28,17 @@ spec:
         ports:
         - containerPort: 8080
           protocol: TCP
-#        livenessProbe:
-#          exec:
-#            command:
-#            - /bin/bash
-#            - -c
-#            - curl -f localhost:8080/
-#          initialDelaySeconds: 10
-#        readinessProbe:
-#          exec:
-#            command:
-#            - /bin/bash
-#            - -c
-#            - curl -f localhost:8080/bomc-hrm/rest/version/current-version
-#          initialDelaySeconds: 20
+        livenessProbe:
+          initialDelaySeconds: 30
+          timeoutSeconds: 15
+          httpGet:
+            path: /bomc-hrm/actuator/health
+            port: 8080
+        readinessProbe:
+          initialDelaySeconds: 15
+#          periodSeconds: 5
+          httpGet:
+            path: /bomc-hrm/actuator/info
+            port: 8080
 #      restartPolicy: Always
 ---

@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
 
 	private static final String LOG_PREFIX = "ResponseEntityExceptionHandlerAdvice#";
-
+    
 	// _______________________________________________
 	// Constants
 	// -----------------------------------------------

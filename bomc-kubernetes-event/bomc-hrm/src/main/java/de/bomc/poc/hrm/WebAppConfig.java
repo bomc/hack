@@ -33,7 +33,7 @@ import de.bomc.poc.hrm.application.log.http.server.RequestGetLoggingInterceptor;
 public class WebAppConfig implements WebMvcConfigurer {
 
 	private static final String PATHS = "/**";
-	
+
 	@Autowired
 	private RequestGetLoggingInterceptor requestGetLoggingInterceptor;
 //	@Autowired
@@ -73,7 +73,7 @@ public class WebAppConfig implements WebMvcConfigurer {
 	 */
 	@Override
 	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-		
+
 		// Add swagger sources.
 //		registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
 //		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");

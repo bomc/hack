@@ -40,11 +40,11 @@ public enum AppErrorCodeEnum implements ErrorCode {
 	JPA_PERSISTENCE_ENTITY_NOT_AVAILABLE_10401(10401, Category.ERROR, "No entity available in db."),
 	JPA_PERSISTENCE_ENTITY_ALREADY_AVAILABLE_10402(10402, Category.ERROR, "Entity is with given attribute already available in db."),
 	JPA_PERSISTENCE_CONSTRAINT_VIOLATION_10403(10403, Category.ERROR,
-			"Iindicating that the requested DML operation resulted in a violation of a defined integrity constraint."),
+			"Indicating that the requested DML operation resulted in a violation of a defined integrity constraint."),
 	JPA_PERSISTENCE_DATA_INTEGRITY_VIOLATION_10404(10404, Category.ERROR,
 			"Exception thrown when an attempt to insert or update data results in violation of an integrity constraint. Note that this is not purely a relational concept; unique primary keys are required by most database types."),
 	// Indicates connection error (10500-10599)
-	//
+	IO_DATASOURCE_CONNECTION_IS_BROKEN(10500, Category.FATAL , "Indicating the connection to the db is broken."),
 	// Application error codes (10600-10699)
 	APP_INITILIZATION_START_COMPONENT_FAILURE_10600(10600, Category.ERROR,
 			"Error during initialization of component. "),

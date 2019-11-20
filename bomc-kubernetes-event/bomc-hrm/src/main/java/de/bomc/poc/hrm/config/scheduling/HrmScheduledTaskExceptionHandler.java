@@ -11,18 +11,22 @@ public class HrmScheduledTaskExceptionHandler implements ErrorHandler {
 
 	private static final String LOG_PREFIX = "HrmScheduledTaskExceptionHandler#";
 	
+	// _______________________________________________
+	// Member variables
+	// -----------------------------------------------
+	//
 	private volatile ErrorHandler existingErrorHandler;
 	
 	@Override
 	@Loggable(result = false, params = true, value = LogLevel.DEBUG, time = true)
 	public void handleError(final Throwable throwable) {
-		
+
 		if (throwable == null) {
 			return;
 		}
 		
 		// ______________________________________
-		// DO SOMETHIN USEFULL WITH THE ERRORMESSAGE (e.g. notifying)
+		// DO SOMETHING USEFULL WITH THE ERRORMESSAGE (e.g. notifying)
 		// --------------------------------------
 		log.error(LOG_PREFIX + "handleError - " + throwable.getMessage() + "\n", throwable);
 		

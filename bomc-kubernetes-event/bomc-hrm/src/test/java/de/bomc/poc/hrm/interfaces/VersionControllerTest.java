@@ -14,6 +14,7 @@
  */
 package de.bomc.poc.hrm.interfaces;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -34,6 +35,7 @@ import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -51,6 +53,8 @@ import brave.Tracer;
 import de.bomc.poc.hrm.application.log.http.server.RequestGetLoggingInterceptor;
 import de.bomc.poc.hrm.application.log.http.server.RequestResponseLoggerImpl;
 import de.bomc.poc.hrm.config.git.HrmGitConfig;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -96,10 +100,15 @@ public class VersionControllerTest {
 	// _______________________________________________
 	// Mocks
 	// -----------------------------------------------
+	@Mock
+	private Counter counter;
+	
 	@MockBean
 	private HrmGitConfig hrmGitConfig;
 	@MockBean
 	private Tracer tracer;
+	@MockBean
+	private MeterRegistry meterRegistry;
 
 	@Before
 	public void setup() {
@@ -120,9 +129,13 @@ public class VersionControllerTest {
 		log.debug(LOG_PREFIX + "test010_getGitVersion_pass");
 
 		// GIVEN
-
+		
 		// WHEN
 		when(this.hrmGitConfig.getVersion()).thenReturn(VersionController.GIT_VERSION);
+		
+		when(this.meterRegistry.counter("bomc.metrics.counter.version", "value", this.hrmGitConfig.getVersion())).thenReturn(counter);
+		doNothing().when(this.counter).increment();
+		
 		when(this.hrmGitConfig.getCommitId()).thenReturn(VersionController.GIT_COMMIT_ID);
 		when(this.hrmGitConfig.getCommitMessage()).thenReturn(VersionController.GIT_COMMIT_MESSAGE);
 
