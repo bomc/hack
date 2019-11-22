@@ -43,7 +43,7 @@ import io.swagger.annotations.ApiResponses;
  */
 @RestController
 @RequestMapping(value = "/git")
-@Api(tags = "Git properties", value = "Git version", description = "Show git repository information.", produces = "application/vnd.version-v1+json;charset=UTF-8")
+@Api(tags = "Git properties", value = "Git version", description = "Show git repository information.", produces = "application/vnd.hrm-version-v1+json;charset=UTF-8")
 public class VersionController {
 
 	public static final String MEDIA_TYPE_JSON_V1 = "application/vnd.hrm-version-v1+json;charset=UTF-8";

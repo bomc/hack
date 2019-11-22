@@ -56,7 +56,7 @@ import io.swagger.annotations.ApiResponses;
 @RestController
 @RequestMapping(value = "/customer")
 @CrossOrigin(origins = "*") // TODO: security issue
-@Api(tags = "Customer queries", value = "Customer Management System", description = "Operations pertaining to customer in Customer Management System", produces = "application/json;charset=UTF-8")
+@Api(tags = "Customer queries", value = "Customer Management System", description = "Operations pertaining to customer in Customer Management System", produces = "application/vnd.hrm-customer-v1+json;charset=UTF-8")
 public class CustomerController {
 
 	private static final String LOG_PREFIX = "CustomerController#";

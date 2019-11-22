@@ -50,7 +50,7 @@ import io.swagger.annotations.ApiResponses;
 @RestController
 @RequestMapping(value = "/user")
 @CrossOrigin(origins = "*") // TODO: security issue
-@Api(tags = "User queries", value = "User Management System", description = "Operations pertaining to user in User Management System", produces = "application/vnd.hrm-v1+json;charset=UTF-8")
+@Api(tags = "User queries", value = "User Management System", description = "Operations pertaining to user in User Management System", produces = "application/vnd.hrm-user-v1+json;charset=UTF-8")
 public class UserController {
 
 	public static final String MEDIA_TYPE_JSON_V1 = "application/vnd.hrm-user-v1+json;charset=UTF-8";
