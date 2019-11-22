@@ -14,6 +14,7 @@
  */
 package de.bomc.poc.hrm.config.swagger;
 
+import java.time.LocalDate;
 import java.util.Collections;
 
 import javax.servlet.ServletContext;
@@ -22,14 +23,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.http.ResponseEntity;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 import de.bomc.poc.hrm.config.git.HrmGitConfig;
+import de.bomc.poc.hrm.interfaces.CustomerController;
+import de.bomc.poc.hrm.interfaces.UserController;
+import de.bomc.poc.hrm.interfaces.VersionController;
 import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -53,20 +55,28 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  */
 @Configuration
 @EnableSwagger2
-@Import(BeanValidatorPluginsConfiguration.class)
-public class HrmSwaggerApiDocumentationConfig implements WebMvcConfigurer {
+@Import({ BeanValidatorPluginsConfiguration.class }) // Get Java Bean Validation to work with swagger.
+public class HrmSwaggerApiDocumentationConfig {
 
-	private static final String SWAGGER_CONTEXT_ROOT = "/bomc-api";
-
+	// _______________________________________________
 	// Get host and port in case the 'prod' configuration is enabled.
 	// The properties are defined in 'application-prod.properties'.
+	// -----------------------------------------------
 	@Value("${bomc.swagger.host:localhost}")
 	private String swaggerHost;
 	@Value("${bomc.swagger.port:8080}")
 	private String swaggerPort;
 
+	// _______________________________________________
+	// Member variables
+	// -----------------------------------------------
 	private final HrmGitConfig hrmGitConfig;
 
+	/**
+	 * Autowired constructor.
+	 *
+	 * @param hrmGitConfig contains data for configuration.
+	 */
 	public HrmSwaggerApiDocumentationConfig(final HrmGitConfig hrmGitConfig) {
 
 		this.hrmGitConfig = hrmGitConfig;
@@ -79,7 +89,7 @@ public class HrmSwaggerApiDocumentationConfig implements WebMvcConfigurer {
 		        .groupName("customer-hrm-api-" + hrmGitConfig.getCommitId())
 		        // Specifies the title, description, etc of the Rest API.
 		        .apiInfo(this.apiInfo())
-//				.produces(Collections.singleton("application/json;charset=UTF-8"))
+				.produces(Collections.singleton(CustomerController.MEDIA_TYPE_JSON_V1))
 		        // Provides a way to control the endpoints exposed by swagger.
 		        .select()
 		        // Specify the package where are the declared controllers. Swagger only picks up
@@ -87,7 +97,10 @@ public class HrmSwaggerApiDocumentationConfig implements WebMvcConfigurer {
 		        .apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm.interfaces"))
 		        // Specify only paths starting with /customer should be picked up.
 		        .paths(this.customerPath()) // PathSelectors.any()
-		        .build();
+		        .build() //
+		        .directModelSubstitute(LocalDate.class, String.class) //
+		        .genericModelSubstitutes(ResponseEntity.class) //
+		        .pathMapping("/");
 	}
 
 	@Bean
@@ -96,8 +109,8 @@ public class HrmSwaggerApiDocumentationConfig implements WebMvcConfigurer {
 		return new Docket(DocumentationType.SWAGGER_2).host(this.swaggerHost + ":" + this.swaggerPort)
 		        .groupName("user-hrm-api-" + hrmGitConfig.getCommitId())
 		        // Specifies the title, description, etc of the Rest API.
-		        .apiInfo(this.apiInfo())
-//				.produces(Collections.singleton("application/json;charset=UTF-8"))
+		        .apiInfo(this.apiInfo()).pathMapping("/")
+				.produces(Collections.singleton(UserController.MEDIA_TYPE_JSON_V1))
 		        // Provides a way to control the endpoints exposed by swagger.
 		        .select()
 		        // Specify the package where are the declared controllers. Swagger only picks up
@@ -105,7 +118,10 @@ public class HrmSwaggerApiDocumentationConfig implements WebMvcConfigurer {
 		        .apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm.interfaces"))
 		        // Specify only paths starting with /customer should be picked up.
 		        .paths(this.userPath()) // PathSelectors.any()
-		        .build();
+		        .build() //
+		        .directModelSubstitute(LocalDate.class, String.class) //
+		        .genericModelSubstitutes(ResponseEntity.class)
+		        .pathMapping("/");
 	}
 
 	@Bean
@@ -114,8 +130,8 @@ public class HrmSwaggerApiDocumentationConfig implements WebMvcConfigurer {
 		return new Docket(DocumentationType.SWAGGER_2).host(this.swaggerHost + ":" + this.swaggerPort)
 		        .groupName("user-version-api-" + hrmGitConfig.getCommitId())
 		        // Specifies the title, description, etc of the Rest API.
-		        .apiInfo(this.apiInfo())
-//				.produces(Collections.singleton("application/json;charset=UTF-8"))
+		        .apiInfo(this.apiInfo()).pathMapping("/")
+				.produces(Collections.singleton(VersionController.MEDIA_TYPE_JSON_V1))
 		        // Provides a way to control the endpoints exposed by swagger.
 		        .select()
 		        // Specify the package where are the declared controllers. Swagger only picks up
@@ -123,41 +139,16 @@ public class HrmSwaggerApiDocumentationConfig implements WebMvcConfigurer {
 		        .apis(RequestHandlerSelectors.basePackage("de.bomc.poc.hrm.interfaces"))
 		        // Specify only paths starting with /customer should be picked up.
 		        .paths(this.versionPath()) // PathSelectors.any()
-		        .build();
-	}
-
-	/**
-	 * Enables the adopting of the swagger-ui path from
-	 * 'http://localhost:8080/bomc-hrm/swagger-ui.html' to
-	 * 'http://localhost:8080/bomc-hrm/bomc-api/swagger-ui.html'.
-	 */
-	@Override
-	public void addViewControllers(final ViewControllerRegistry registry) {
-
-		registry.addRedirectViewController(SWAGGER_CONTEXT_ROOT + "/v2/api-docs", "/v2/api-docs")
-		        .setKeepQueryParams(true);
-		registry.addRedirectViewController(SWAGGER_CONTEXT_ROOT + "/swagger-resources/configuration/ui",
-		        "/swagger-resources/configuration/ui");
-		registry.addRedirectViewController(SWAGGER_CONTEXT_ROOT + "/swagger-resources/configuration/security",
-		        "/swagger-resources/configuration/security");
-		registry.addRedirectViewController(SWAGGER_CONTEXT_ROOT + "/swagger-resources", "/swagger-resources");
-	}
-
-	/**
-	 * Enables the adopting of the swagger-ui path from
-	 * 'http://localhost:8080/bomc-hrm/swagger-ui.html' to
-	 * 'http://localhost:8080/bomc-hrm/bomc-api/swagger-ui.html'.
-	 */
-	@Override
-	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-		registry.addResourceHandler(SWAGGER_CONTEXT_ROOT + "/**")
-		        .addResourceLocations("classpath:/META-INF/resources/");
+		        .build() //
+		        .directModelSubstitute(LocalDate.class, String.class) //
+		        .genericModelSubstitutes(ResponseEntity.class) //
+		        .pathMapping("/");
 	}
 
 	private ApiInfo apiInfo() {
 		ApiInfo apiInfo = new ApiInfo("HRM REST API", "A simple application for testing the PaaS plattform.",
-				hrmGitConfig.getCommitId(), "Terms of service", new Contact("bomc", "www.bomc.org", "bomc@bomc.org"),
-				"License of API", "API license URL", Collections.emptyList());
+		        hrmGitConfig.getCommitId(), "Terms of service", new Contact("bomc", "www.bomc.org", "bomc@bomc.org"),
+		        "License of API", "API license URL", Collections.emptyList());
 
 		return apiInfo;
 	}

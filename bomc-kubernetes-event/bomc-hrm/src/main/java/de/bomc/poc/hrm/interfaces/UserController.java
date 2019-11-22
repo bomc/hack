@@ -53,7 +53,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(tags = "User queries", value = "User Management System", description = "Operations pertaining to user in User Management System", produces = "application/vnd.hrm-v1+json;charset=UTF-8")
 public class UserController {
 
-	protected static final String MEDIA_TYPE_JSON_V1 = "application/vnd.hrm-v1+json;charset=UTF-8";
+	public static final String MEDIA_TYPE_JSON_V1 = "application/vnd.hrm-user-v1+json;charset=UTF-8";
 
 	private final UserService userService;
 

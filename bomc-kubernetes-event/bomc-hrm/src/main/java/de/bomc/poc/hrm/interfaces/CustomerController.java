@@ -62,7 +62,7 @@ public class CustomerController {
 	private static final String LOG_PREFIX = "CustomerController#";
 	private static final Logger LOGGER = LoggerFactory.getLogger(CustomerController.class.getName());
 
-	protected static final String MEDIA_TYPE_JSON_V1 = "application/vnd.hrm-v1+json;charset=UTF-8";
+	public static final String MEDIA_TYPE_JSON_V1 = "application/vnd.hrm-customer-v1+json;charset=UTF-8";
 	
 	private final CustomerService customerService;
 	private final CustomerMapper customerMapper;

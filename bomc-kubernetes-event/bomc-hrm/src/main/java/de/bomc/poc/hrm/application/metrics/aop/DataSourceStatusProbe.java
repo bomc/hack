@@ -47,19 +47,26 @@ import lombok.extern.slf4j.Slf4j;
 public class DataSourceStatusProbe implements MeterBinder {
 
 	private static final String LOG_PREFIX = "DataSourceStatusProbe#";
-	
-	private final String name;
-	private final String description;
-	private final Iterable<Tag> tags;
+
+	// _______________________________________________
+	// Constants.
+	// -----------------------------------------------
 	private static final String SELECT_1 = "SELECT 1;";
 	private static final int QUERY_TIMEOUT_IN_SECONDS = 1;
 	private static final double UP = 1.0;
 	private static final double DOWN = 0.0;
+
+	// _______________________________________________
+	// Member variables.
+	// -----------------------------------------------
+	private final String name;
+	private final String description;
+	private final Iterable<Tag> tags;
 	private final DataSource dataSource;
 
 	/**
-	 * Creates a new instance of <code>DataSourceStatusProbe</code>.
-	 * 
+	 * Autowired constructor.
+	 *
 	 * @param dataSource the dataSource to monitor.
 	 */
 	public DataSourceStatusProbe(final DataSource dataSource) {
@@ -70,6 +77,12 @@ public class DataSourceStatusProbe implements MeterBinder {
 		this.name = "bomc_hrm_data_source";
 		this.description = "DataSource status";
 		this.tags = tags(dataSource);
+	}
+
+	@Override
+	public void bindTo(final MeterRegistry meterRegistry) {
+		Gauge.builder(name, this, value -> value.status() ? UP : DOWN).description(description).tags(tags)
+		        .baseUnit("status").register(meterRegistry);
 	}
 
 	private boolean status() {
@@ -85,12 +98,6 @@ public class DataSourceStatusProbe implements MeterBinder {
 		}
 	}
 
-	@Override
-	public void bindTo(final MeterRegistry meterRegistry) {
-		Gauge.builder(name, this, value -> value.status() ? UP : DOWN).description(description).tags(tags)
-		        .baseUnit("status").register(meterRegistry);
-	}
-
 	protected static Iterable<Tag> tags(final DataSource dataSource) {
 
 		Objects.requireNonNull(dataSource, "dataSource cannot be null");
@@ -99,16 +106,17 @@ public class DataSourceStatusProbe implements MeterBinder {
 			return Tags.of(Tag.of("url", dataSource.getConnection().getMetaData().getURL()));
 		} catch (final SQLException sqlException) {
 			String exceptionMessage = "";
-			
-			if(sqlException != null) {
+
+			if (sqlException != null) {
 				exceptionMessage = sqlException.getMessage();
 			}
-			
-			final String errMsg = LOG_PREFIX + "#co#tags - [errMsg=" + exceptionMessage + "]"; 
-			final AppRuntimeException appRuntimeException = new AppRuntimeException(errMsg, AppErrorCodeEnum.IO_DATASOURCE_CONNECTION_IS_BROKEN);
-			
+
+			final String errMsg = LOG_PREFIX + "#co#tags - [errMsg=" + exceptionMessage + "]";
+			final AppRuntimeException appRuntimeException = new AppRuntimeException(errMsg,
+			        AppErrorCodeEnum.IO_DATASOURCE_CONNECTION_IS_BROKEN);
+
 			log.error(appRuntimeException.stackTraceToString());
-			
+
 			throw appRuntimeException;
 		}
 	}

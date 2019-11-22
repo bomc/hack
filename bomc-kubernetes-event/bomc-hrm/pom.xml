@@ -42,6 +42,7 @@
 		<version.springfox-swagger-ui>2.9.2</version.springfox-swagger-ui>
 		<version.springfox-bean-validators>2.9.2</version.springfox-bean-validators>
 		<version.spring-cloud-starter-sleuth>2.1.4.RELEASE</version.spring-cloud-starter-sleuth>
+		<version.spring-cloud-starter-kubernetes-config>1.0.4.RELEASE</version.spring-cloud-starter-kubernetes-config>
 		<version.org.jacoco.core>0.8.4</version.org.jacoco.core>
 		<version.commons-lang>2.6</version.commons-lang>
 		<version.datasource-proxy>1.5.1</version.datasource-proxy>
@@ -66,7 +67,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jersey</artifactId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<!-- Starter for building web, including RESTful, applications using Spring 
 			MVC. Uses Tomcat as the default embedded container. -->
@@ -79,6 +81,33 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<!-- Add test tools to the development. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- Starter for testing Spring Boot applications with libraries including 
+			JUnit, Hamcrest and Mockito. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-kubernetes-config</artifactId>
+            <version>${version.spring-cloud-starter-kubernetes-config}</version>
+        </dependency>
+        
+		<!-- Enable tracing -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-sleuth</artifactId>
+			<version>${version.spring-cloud-starter-sleuth}</version>
+		</dependency>
+
 		<!-- Micrometer core dependency -->
 		<dependency>
 			<groupId>io.micrometer</groupId>
@@ -91,19 +120,7 @@
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
-		<!-- Enable tracing -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-sleuth</artifactId>
-			<version>${version.spring-cloud-starter-sleuth}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
+		
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -150,18 +167,7 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<!-- Starter for testing Spring Boot applications with libraries including 
-			JUnit, Hamcrest and Mockito. -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>

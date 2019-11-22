@@ -22,9 +22,13 @@ spec:
       - name: bomc-hrm
         image: bomc/bomc-hrm:v1.0.0
         imagePullPolicy: IfNotPresent
-        resources:
-          requests:
-            cpu: "200m"
+#         resources:
+#           limits:
+#             cpu: "250m"
+#             memory: "750Mi"
+#           requests:
+#             cpu: "200m"
+#             memory: "700Mi"
         ports:
         - containerPort: 8080
           protocol: TCP

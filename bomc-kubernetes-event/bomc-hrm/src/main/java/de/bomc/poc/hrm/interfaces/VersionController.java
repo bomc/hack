@@ -46,7 +46,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(tags = "Git properties", value = "Git version", description = "Show git repository information.", produces = "application/vnd.version-v1+json;charset=UTF-8")
 public class VersionController {
 
-	protected static final String MEDIA_TYPE_JSON_V1 = "application/vnd.version-v1+json;charset=UTF-8";
+	public static final String MEDIA_TYPE_JSON_V1 = "application/vnd.hrm-version-v1+json;charset=UTF-8";
 
 	// _______________________________________________
 	// Constants

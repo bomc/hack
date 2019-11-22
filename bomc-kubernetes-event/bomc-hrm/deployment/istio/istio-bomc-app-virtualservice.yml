@@ -14,6 +14,8 @@ spec:
   - match:
     - uri:
        prefix: /bomc-hrm/bomc-api
+    rewrite:
+      uri: /bomc-hrm
     route:
     - destination:
         # The metadata.name, bomc-hrm-service, is the short form of the kubernetes name.
