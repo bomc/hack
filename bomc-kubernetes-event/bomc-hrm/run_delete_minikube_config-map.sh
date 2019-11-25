@@ -6,5 +6,5 @@ echo -------------------------------------------------
 
 
 echo Delete hrm configMap
-kubectl delete -f ./deployment/istio/bomc-hrm-config-map.yml
+kubectl delete -f ./deployment/istio/bomc-config-map.yml
 

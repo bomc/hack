@@ -6,5 +6,5 @@ echo -------------------------------------------------
 
 
 echo Delete hrm secret
-kubectl delete -f ./deployment/istio/bomc-hrm-secret.yml
+kubectl delete -f ./deployment/istio/bomc-secret.yml
 

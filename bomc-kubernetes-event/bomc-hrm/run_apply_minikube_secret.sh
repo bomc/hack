@@ -6,5 +6,5 @@ echo -------------------------------------------------
 
 
 echo Apply hrm secret
-kubectl apply -f ./deployment/istio/bomc-hrm-secret.yml
+kubectl apply -f ./deployment/istio/bomc-secret.yml
 

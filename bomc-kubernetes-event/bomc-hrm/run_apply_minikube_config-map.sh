@@ -6,5 +6,5 @@ echo -------------------------------------------------
 
 
 echo Apply hrm configMap
-kubectl apply -f ./deployment/istio/bomc-hrm-config-map.yml
+kubectl apply -f ./deployment/istio/bomc-config-map.yml
 
