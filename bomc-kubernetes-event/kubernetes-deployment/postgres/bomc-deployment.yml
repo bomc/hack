@@ -20,11 +20,28 @@ spec:
         ports:
         - containerPort: 5432
         env:
-        - name: POSTGRES_DB
-          value: bomcdb
+        # Define the environment variable
+        - name: POSTGRES_DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              # The ConfigMap containing the value to assign to POSTGRES_DB_NAME
+              name: hrm
+              # Specify the key associated with the value
+              key: POSTGRES_DB_NAME
+        # Define the environment variable
         - name: POSTGRES_USER
-          value: bomc
+          valueFrom:
+            secretKeyRef:
+              # The secrets containing the value to assign to POSTGRES_DB_USER
+              name: bomc-hrm-secret
+              # Specify the key associated with the value
+              key: POSTGRES_DB_SECRETS_USER
+        # Define the environment variable
         - name: POSTGRES_PASSWORD
-          value: bomc
-
+          valueFrom:
+            secretKeyRef:
+              # The secrets containing the value to assign to POSTGRES_DB_PASSWORD
+              name: bomc-hrm-secret
+              # Specify the key associated with the value
+              key: POSTGRES_DB_SECRETS_PASSWORD
 ---

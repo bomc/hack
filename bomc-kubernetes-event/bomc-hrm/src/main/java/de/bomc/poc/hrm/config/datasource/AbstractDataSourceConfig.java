@@ -51,7 +51,7 @@ public abstract class AbstractDataSourceConfig {
 	// -----------------------------------------------
     @Value("${spring.flyway.enabled:true}")
     protected boolean isFlywayEnabled;
-	@Value("${driver.url}")
+    @Value("${driver.url}")
 	protected String driverSourceUrl;
 	@Value("${driver.username}")
 	protected String driverSourceUsername;

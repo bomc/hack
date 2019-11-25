@@ -51,7 +51,7 @@ import com.zaxxer.hikari.HikariDataSource;
 public class DataSourceProdPostgreSqlConfig extends AbstractDataSourceConfig {
 
 	private static final String DATASOURCE_POOL_NAME_VALUE = "bomc-postgresql";
-	
+		
 	@Bean(name = "postgresqlDataSource")
 	public DataSource postgresqlDataSource() {
 

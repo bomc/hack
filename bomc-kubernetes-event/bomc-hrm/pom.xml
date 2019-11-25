@@ -94,13 +94,17 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-kubernetes-config</artifactId>
-            <version>${version.spring-cloud-starter-kubernetes-config}</version>
-        </dependency>
-        
+		<!-- To use kubernetes-ConfigMaps to externalize the application configuration. -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-kubernetes-config</artifactId>
+			<version>${version.spring-cloud-starter-kubernetes-config}</version>
+		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.springframework.boot</groupId> -->
+<!-- 			<artifactId>spring-boot-configuration-processor</artifactId> -->
+<!-- 			<optional>true</optional> -->
+<!-- 		</dependency> -->
 		<!-- Enable tracing -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -120,7 +124,7 @@
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
