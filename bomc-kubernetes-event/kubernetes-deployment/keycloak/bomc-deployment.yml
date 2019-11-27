@@ -1,7 +1,8 @@
-apiVersion: apps/v1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: keycloak
+  namespace: bomc-app
   labels:
     name: keycloak
     app: keycloak
@@ -20,7 +21,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: keycloak
-        image: jboss/keycloak:3.4.3.Final
+        image: jboss/keycloak:7.0.1
         imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 8080
@@ -41,13 +42,15 @@ spec:
             value: "admin"
           - name: KEYCLOAK_PASSWORD
             value: "password"
-          - name: POSTGRES_USER
-            value: "admin"
-          - name: POSTGRES_PASSWORD
-            value: "password"
-          - name: POSTGRES_PORT_5432_TCP_ADDR
-            value: "keycloak-db-postgresql"
-          - name: POSTGRES_PORT_5432_TCP_PORT
-            value: "5432"
-          - name: POSTGRES_DATABASE
-            value: "keycloak-db"
+          - name: DB_VENDOR
+            value: "H2"
+          # - name: POSTGRES_USER
+          #   value: "admin"
+          # - name: POSTGRES_PASSWORD
+          #   value: "password"
+          # - name: POSTGRES_PORT_5432_TCP_ADDR
+          #   value: "keycloak-db-postgresql"
+          # - name: POSTGRES_PORT_5432_TCP_PORT
+          #   value: "5432"
+          # - name: POSTGRES_DATABASE
+          #  value: "keycloak-db"

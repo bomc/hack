@@ -57,7 +57,20 @@
 		<version.jpa2ddl-maven-plugin>0.9.12</version.jpa2ddl-maven-plugin>
 		<version.asciidoctor-maven-plugin>1.6.0</version.asciidoctor-maven-plugin>
 		<version.dependency-check-maven>5.2.2</version.dependency-check-maven>
+		<version.keycloak-adapter-bom>7.0.1</version.keycloak-adapter-bom>
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.keycloak.bom</groupId>
+				<artifactId>keycloak-adapter-bom</artifactId>
+				<version>${version.keycloak-adapter-bom}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<!-- Starter for using Spring Data JPA with Hibernate. -->
@@ -100,11 +113,11 @@
 			<artifactId>spring-cloud-starter-kubernetes-config</artifactId>
 			<version>${version.spring-cloud-starter-kubernetes-config}</version>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.springframework.boot</groupId> -->
-<!-- 			<artifactId>spring-boot-configuration-processor</artifactId> -->
-<!-- 			<optional>true</optional> -->
-<!-- 		</dependency> -->
+		<!-- Enables keycloak functionality -->
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-spring-boot-starter</artifactId>
+		</dependency>
 		<!-- Enable tracing -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -401,37 +414,6 @@
 					</includeOnlyProperties>
 				</configuration>
 			</plugin>
-
-			<plugin>
-				<groupId>org.asciidoctor</groupId>
-				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>${version.asciidoctor-maven-plugin}</version>
-				<executions>
-					<execution>
-						<id>generate-docs</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>process-asciidoc</goal>
-						</goals>
-						<configuration>
-							<backend>html</backend>
-							<doctype>book</doctype>
-							<attributes>
-								<snippets>${project.build.directory}/generated-snippets</snippets>
-							</attributes>
-							<sourceDirectory>src/docs/asciidoc</sourceDirectory>
-							<outputDirectory>src/docs/html</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.springframework.restdocs</groupId>
-						<artifactId>spring-restdocs-asciidoctor</artifactId>
-						<version>${version.spring-restdocs-asciidoctor}</version>
-					</dependency>
-				</dependencies>
-			</plugin>
 		</plugins>
 	</build>
 
@@ -523,9 +505,47 @@
 			</build>
 		</profile>
 
+		<profile>
+			<id>api-docs-ascii</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.asciidoctor</groupId>
+						<artifactId>asciidoctor-maven-plugin</artifactId>
+						<version>${version.asciidoctor-maven-plugin}</version>
+						<executions>
+							<execution>
+								<id>generate-docs</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>process-asciidoc</goal>
+								</goals>
+								<configuration>
+									<backend>html</backend>
+									<doctype>book</doctype>
+									<attributes>
+										<snippets>${project.build.directory}/generated-snippets</snippets>
+									</attributes>
+									<sourceDirectory>src/docs/asciidoc</sourceDirectory>
+									<outputDirectory>src/docs/html</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>org.springframework.restdocs</groupId>
+								<artifactId>spring-restdocs-asciidoctor</artifactId>
+								<version>${version.spring-restdocs-asciidoctor}</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 		<!-- A profile that creates the api-docs from swagger -->
 		<profile>
-			<id>api-docs</id>
+			<id>api-docs-swagger</id>
 			<build>
 				<plugins>
 					<!-- Reads the current project-version form git. For mor information 

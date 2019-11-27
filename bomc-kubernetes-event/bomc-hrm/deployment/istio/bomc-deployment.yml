@@ -70,14 +70,15 @@ spec:
         - containerPort: 8080
           protocol: TCP
         livenessProbe:
-          initialDelaySeconds: 30
+          initialDelaySeconds: 20
           timeoutSeconds: 15
+          periodSeconds: 15
           httpGet:
             path: /bomc-hrm/actuator/health
             port: 8080
         readinessProbe:
           initialDelaySeconds: 15
-#          periodSeconds: 5
+#          periodSeconds: 15
           httpGet:
             path: /bomc-hrm/actuator/info
             port: 8080
