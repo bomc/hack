@@ -51,7 +51,7 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 	// Constants
 	// -----------------------------------------------
 	// @TODO see {@link TraceHeaderFilter.class}
-	private static final String X_B3_TraceId_HEADER = "X-B3-TraceId";
+	private static final String X_B3_TRACE_ID_HEADER = "X-B3-TraceId";
 
 	public ResponseEntityExceptionHandlerAdvice() {
 		super();
@@ -104,7 +104,7 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 		final String errorUuid = UUID.randomUUID().toString();
 
 		log.error(LOG_PREFIX + "handleInternal (ConstraintViolationException) [ex=" + ex + ", request=" + request
-				+ ", traceId=" + MDC.get(X_B3_TraceId_HEADER) + ", errorUuid= " + errorUuid + "]");
+				+ ", traceId=" + MDC.get(X_B3_TRACE_ID_HEADER) + ", errorUuid= " + errorUuid + "]");
 
 		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
 				.shortErrorCodeDescription(
@@ -120,7 +120,7 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 		final String errorUuid = UUID.randomUUID().toString();
 
 		log.error(LOG_PREFIX + "handleInternal (DataIntegrityViolationException) [ex=" + ex + ", request=" + request
-				+ ", traceId=" + MDC.get(X_B3_TraceId_HEADER) + ", errorUuid= " + errorUuid + "]");
+				+ ", traceId=" + MDC.get(X_B3_TRACE_ID_HEADER) + ", errorUuid= " + errorUuid + "]");
 
 		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
 				.shortErrorCodeDescription(
@@ -142,7 +142,7 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 		final String errorUuid = UUID.randomUUID().toString();
 
 		log.error(LOG_PREFIX + "handleInternal (MethodArgumentNotValidException) [ex=" + ex + ", status=" + status
-				+ ", request=" + request + ", traceId=" + MDC.get(X_B3_TraceId_HEADER) + ", errorUuid= " + errorUuid
+				+ ", request=" + request + ", traceId=" + MDC.get(X_B3_TRACE_ID_HEADER) + ", errorUuid= " + errorUuid
 				+ "]");
 
 		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
@@ -156,7 +156,7 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 	@ExceptionHandler({ AppRuntimeException.class })
 	public ResponseEntity<Object> handleInternal(final RuntimeException ex, final WebRequest request) {
 		log.error(LOG_PREFIX + "handleInternal [ex=" + ex + ", request=" + request + ", traceId="
-				+ MDC.get(X_B3_TraceId_HEADER) + "]");
+				+ MDC.get(X_B3_TRACE_ID_HEADER) + "]");
 
 		final AppRuntimeException appRuntimeException = ExceptionUtil.unwrap(ex, AppRuntimeException.class);
 
@@ -165,9 +165,11 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 		}
 
 		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
-				.shortErrorCodeDescription(appRuntimeException.getMessage())
-				.errorCode(appRuntimeException.getErrorCode().toString()).uuid(appRuntimeException.getUuid())
-				.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+				.shortErrorCodeDescription(appRuntimeException.getMessage()) //
+				.errorCode(appRuntimeException.getErrorCode().toString()) //
+				.uuid(appRuntimeException.getUuid()) //
+				.status(HttpStatus.INTERNAL_SERVER_ERROR) //
+				.build();
 
 		return handleExceptionInternal(ex, apiErrorResponseObject, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR,
 				request);
