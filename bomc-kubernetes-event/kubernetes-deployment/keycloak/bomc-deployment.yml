@@ -1,4 +1,5 @@
-apiVersion: extensions/v1beta1
+---
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: keycloak
@@ -17,11 +18,13 @@ spec:
       labels:
         app: keycloak
         name: keycloak
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       restartPolicy: Always
       containers:
       - name: keycloak
-        image: jboss/keycloak:7.0.1
+        image: bomc/keycloak:v8.0.0
         imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 8080
@@ -42,8 +45,8 @@ spec:
             value: "admin"
           - name: KEYCLOAK_PASSWORD
             value: "password"
-          - name: DB_VENDOR
-            value: "H2"
+          # - name: DB_VENDOR
+          #  value: "H2"
           # - name: POSTGRES_USER
           #   value: "admin"
           # - name: POSTGRES_PASSWORD
@@ -54,3 +57,15 @@ spec:
           #   value: "5432"
           # - name: POSTGRES_DATABASE
           #  value: "keycloak-db"
+        livenessProbe:
+          httpGet:
+            path: /auth
+            port: 8080
+          initialDelaySeconds: 120
+          timeoutSeconds: 90
+        readinessProbe:
+          httpGet:
+            path: /auth
+            port: 8080
+          initialDelaySeconds: 120
+          timeoutSeconds: 90

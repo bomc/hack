@@ -4,7 +4,7 @@ echo #################################################
 echo Start port-forwarding for jaeger
 echo -------------------------------------------------
 
-echo Navigate to jaeger dashboard with:
+echo Navigate to jaeger-query dashboard with:
 echo .
 echo http://localhost:16686
 

@@ -6,12 +6,17 @@ metadata:
   namespace: bomc-app
   labels:
     app: bomc-hrm
+    name: bomc-hrm
 spec:
+  type: NodePort
   selector:
     app: bomc-hrm
+    name: bomc-hrm
   ports:
   - protocol: TCP
-    port: 80
     name: http
-    targetPort: 8080
+    port: 8080
+    nodePort: 30081
+    #port: 80
+    #targetPort: 8080
 ---

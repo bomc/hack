@@ -1,0 +1,28 @@
+# Scaling is achieved by increasing the number of replicas of application pod.
+# Scaling out a deployment will ensure that new pods are created and scheduled 
+# to nodes with available resources. This is can either be done manually, or 
+# kubernetes also support autoscaling of pods, through Horizontal Pod AutoScaler (HPA).
+#
+# Below is the HPA for bomc-hrm deployment, which tracks the avg CPU utilization 
+# by all the bomc-hrm pods and if it crosses the targetCPUUtilization, hpa will 
+# create a new bomc-hrm pod.
+#
+# When bomc-hrm avg CPU utilization increases the 40% usage, bomc-hrm hpa will 
+# auto create a new pod, with maximum number of pods to be 4.
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: bomc-hrm
+  namespace: bomc-app
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: bomc-hrm
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 40

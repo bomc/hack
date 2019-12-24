@@ -12,7 +12,7 @@
  *
  * </pre>
  */
-package de.bomc.poc.hrm.application.service;
+package de.bomc.poc.hrm.application.service.crud;
 
 import java.time.LocalDateTime;
 import java.util.List;

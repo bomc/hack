@@ -31,8 +31,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 21.11.2019
  */
-@Profile("dev")
 @Configuration
+@Profile({ "dev", "prod" })
 public class WebAppSwaggerConfig implements WebMvcConfigurer {
 
 	// _______________________________________________

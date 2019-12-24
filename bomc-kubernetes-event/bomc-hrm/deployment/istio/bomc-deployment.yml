@@ -1,34 +1,42 @@
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: bomc-hrm
   namespace: bomc-app
+  labels:
+    name: bomc-hrm
+    app: bomc-hrm
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: bomc-hrm
   template:
     metadata:
       labels:
         app: bomc-hrm
+        name: bomc-hrm
         # version: v1.0.0
-      # Monitoring: Adjust prometheus configuration
       annotations:
+        # Monitoring: Adjust prometheus configuration
         prometheus.io/scrape: "true"
         prometheus.io/path: "/bomc-hrm/actuator/prometheus"
         prometheus.io/port: "8080"
         prometheus.io/scheme: "http"
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - name: bomc-hrm
         image: bomc/bomc-hrm:v1.0.0
         imagePullPolicy: IfNotPresent
 #         resources:
-#           limits:
-#             cpu: "250m"
-#             memory: "750Mi"
 #           requests:
-#             cpu: "200m"
-#             memory: "700Mi"
+#             cpu: 200m
+#             memory: 256Mi
+#           limits:
+#             cpu: 400m
+#             memory: 512Mi
         # Set 'envFrom' to references 'bomc-hrm-config-map' file, see bomc-hrm-config-map.
         envFrom:
         - configMapRef:
@@ -51,15 +59,15 @@ spec:
               # Specify the key associated with the value
               key: POSTGRES_DB_NAME
         # Define the environment variable
-        - name: POSTGRES_DB_SECRETS_USER
+        - name: POSTGRES_DB_USERNAME
           valueFrom:
             secretKeyRef:
-              # The secrets containing the value to assign to POSTGRES_DB_USER
+              # The secrets containing the value to assign to POSTGRES_DB_USERNAME
               name: bomc-hrm-secret
               # Specify the key associated with the value
               key: POSTGRES_DB_SECRETS_USER
         # Define the environment variable
-        - name: POSTGRES_DB_SECRETS_PASSWORD
+        - name: POSTGRES_DB_PASSWORD
           valueFrom:
             secretKeyRef:
               # The secrets containing the value to assign to POSTGRES_DB_PASSWORD

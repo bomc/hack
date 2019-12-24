@@ -52,7 +52,7 @@ import brave.Tracer;
 import de.bomc.poc.hrm.AbstractBaseUnit;
 import de.bomc.poc.hrm.application.log.http.server.RequestGetLoggingInterceptor;
 import de.bomc.poc.hrm.application.log.http.server.RequestResponseLoggerImpl;
-import de.bomc.poc.hrm.application.service.CustomerService;
+import de.bomc.poc.hrm.application.service.crud.CustomerService;
 import de.bomc.poc.hrm.config.git.HrmGitConfig;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
@@ -88,7 +88,7 @@ import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
  * @since 06.05.2019
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@WebMvcTest(CustomerController.class)
+@WebMvcTest(controllers = CustomerController.class)
 @Import({ RequestGetLoggingInterceptor.class, RequestResponseLoggerImpl.class })
 @ComponentScan(value = { "de.bomc.poc.hrm.interfaces.mapper" })
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -134,8 +134,8 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 
 		// THEN
 		this.mvc.perform(post("/customer").accept(CustomerController.MEDIA_TYPE_JSON_V1)
-				.contentType(CustomerController.MEDIA_TYPE_JSON_V1).content(requestJson)).andDo(print())
-				.andExpect(status().isOk());
+		        .contentType(CustomerController.MEDIA_TYPE_JSON_V1).content(requestJson)).andDo(print())
+		        .andExpect(status().isOk());
 	}
 
 	@Test
@@ -154,9 +154,9 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 
 		// THEN
 		this.mvc.perform(post("/customer/email-address", CUSTOMER_E_MAIL).accept(CustomerController.MEDIA_TYPE_JSON_V1)
-				.contentType(CustomerController.MEDIA_TYPE_JSON_V1).content(requestJson)).andDo(print())
-				.andExpect(status().isOk()).andExpect(content().contentType(CustomerController.MEDIA_TYPE_JSON_V1))
-				.andExpect(jsonPath("$.emailAddress").value(CUSTOMER_E_MAIL));
+		        .contentType(CustomerController.MEDIA_TYPE_JSON_V1).content(requestJson)).andDo(print())
+		        .andExpect(status().isOk()).andExpect(content().contentType(CustomerController.MEDIA_TYPE_JSON_V1))
+		        .andExpect(jsonPath("$.emailAddress").value(CUSTOMER_E_MAIL));
 	}
 
 	@Test
@@ -168,9 +168,9 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 
 		// THEN
 		this.mvc.perform(get("/customer/{id}", Long.toString(CUSTOMER_ID)).accept(CustomerController.MEDIA_TYPE_JSON_V1)
-				.contentType(CustomerController.MEDIA_TYPE_JSON_V1)).andDo(print()).andExpect(status().isOk())
-				.andExpect(content().contentType(CustomerController.MEDIA_TYPE_JSON_V1))
-				.andExpect(jsonPath("$.emailAddress").value(CUSTOMER_E_MAIL));
+		        .contentType(CustomerController.MEDIA_TYPE_JSON_V1)).andDo(print()).andExpect(status().isOk())
+		        .andExpect(content().contentType(CustomerController.MEDIA_TYPE_JSON_V1))
+		        .andExpect(jsonPath("$.emailAddress").value(CUSTOMER_E_MAIL));
 	}
 
 	@Test
@@ -192,9 +192,9 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 
 		// THEN
 		this.mvc.perform(get("/customer")).andDo(print()).andExpect(status().isOk())
-				.andExpect(content().contentType(CustomerController.MEDIA_TYPE_JSON_V1))
-				.andExpect(jsonPath("$").isArray()).andExpect(jsonPath("$", hasSize(2)))
-				.andExpect(jsonPath("$.[0].emailAddress").value(equalTo(CUSTOMER_E_MAIL)));
+		        .andExpect(content().contentType(CustomerController.MEDIA_TYPE_JSON_V1))
+		        .andExpect(jsonPath("$").isArray()).andExpect(jsonPath("$", hasSize(2)))
+		        .andExpect(jsonPath("$.[0].emailAddress").value(equalTo(CUSTOMER_E_MAIL)));
 	}
 
 	@Test
@@ -215,8 +215,8 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 
 		// THENs
 		this.mvc.perform(put("/customer").accept(CustomerController.MEDIA_TYPE_JSON_V1)
-				.contentType(CustomerController.MEDIA_TYPE_JSON_V1).content(requestJson)).andDo(print())
-				.andExpect(status().isOk());
+		        .contentType(CustomerController.MEDIA_TYPE_JSON_V1).content(requestJson)).andDo(print())
+		        .andExpect(status().isOk());
 	}
 
 	@Test
@@ -228,8 +228,8 @@ public class CustomerControllerTest extends AbstractBaseUnit {
 
 		// THEN
 		this.mvc.perform(delete("/customer/{id}", Long.toString(CUSTOMER_ID))
-				.accept(CustomerController.MEDIA_TYPE_JSON_V1).contentType(CustomerController.MEDIA_TYPE_JSON_V1))
-				.andDo(print()).andExpect(status().isOk());
+		        .accept(CustomerController.MEDIA_TYPE_JSON_V1).contentType(CustomerController.MEDIA_TYPE_JSON_V1))
+		        .andDo(print()).andExpect(status().isOk());
 	}
 
 }

@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
 
 	private static final String LOG_PREFIX = "ResponseEntityExceptionHandlerAdvice#";
-    
+
 	// _______________________________________________
 	// Constants
 	// -----------------------------------------------
@@ -104,13 +104,13 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 		final String errorUuid = UUID.randomUUID().toString();
 
 		log.error(LOG_PREFIX + "handleInternal (ConstraintViolationException) [ex=" + ex + ", request=" + request
-				+ ", traceId=" + MDC.get(X_B3_TRACE_ID_HEADER) + ", errorUuid= " + errorUuid + "]");
+		        + ", traceId=" + MDC.get(X_B3_TRACE_ID_HEADER) + ", errorUuid= " + errorUuid + "]");
 
 		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
-				.shortErrorCodeDescription(
-						AppErrorCodeEnum.JPA_PERSISTENCE_CONSTRAINT_VIOLATION_10403.getShortErrorCodeDescription())
-				.errorCode(AppErrorCodeEnum.JPA_PERSISTENCE_CONSTRAINT_VIOLATION_10403.toString()).uuid(errorUuid)
-				.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		        .shortErrorCodeDescription(
+		                AppErrorCodeEnum.JPA_PERSISTENCE_CONSTRAINT_VIOLATION_10403.getShortErrorCodeDescription())
+		        .errorCode(AppErrorCodeEnum.JPA_PERSISTENCE_CONSTRAINT_VIOLATION_10403.toString()).uuid(errorUuid)
+		        .status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
 		return handleExceptionInternal(ex, apiErrorResponseObject, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
@@ -120,15 +120,37 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 		final String errorUuid = UUID.randomUUID().toString();
 
 		log.error(LOG_PREFIX + "handleInternal (DataIntegrityViolationException) [ex=" + ex + ", request=" + request
-				+ ", traceId=" + MDC.get(X_B3_TRACE_ID_HEADER) + ", errorUuid= " + errorUuid + "]");
+		        + ", traceId=" + MDC.get(X_B3_TRACE_ID_HEADER) + ", errorUuid= " + errorUuid + "]");
 
 		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
-				.shortErrorCodeDescription(
-						AppErrorCodeEnum.JPA_PERSISTENCE_DATA_INTEGRITY_VIOLATION_10404.getShortErrorCodeDescription())
-				.errorCode(AppErrorCodeEnum.JPA_PERSISTENCE_DATA_INTEGRITY_VIOLATION_10404.toString()).uuid(errorUuid)
-				.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		        .shortErrorCodeDescription(
+		                AppErrorCodeEnum.JPA_PERSISTENCE_DATA_INTEGRITY_VIOLATION_10404.getShortErrorCodeDescription())
+		        .errorCode(AppErrorCodeEnum.JPA_PERSISTENCE_DATA_INTEGRITY_VIOLATION_10404.toString()).uuid(errorUuid)
+		        .status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
 		return handleExceptionInternal(ex, apiErrorResponseObject, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}
+
+	@ExceptionHandler({ AppRuntimeException.class })
+	public ResponseEntity<Object> handleInternal(final RuntimeException ex, final WebRequest request) {
+		log.error(LOG_PREFIX + "handleInternal [ex=" + ex + ", request=" + request + ", traceId="
+		        + MDC.get(X_B3_TRACE_ID_HEADER) + "]");
+
+		final AppRuntimeException appRuntimeException = ExceptionUtil.unwrap(ex, AppRuntimeException.class);
+
+		if (!appRuntimeException.isLogged()) {
+			logger.error(LOG_PREFIX + "handleInternal" + appRuntimeException.stackTraceToString());
+		}
+
+		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
+		        .shortErrorCodeDescription(appRuntimeException.getMessage()) //
+		        .errorCode(appRuntimeException.getErrorCode().toString()) //
+		        .uuid(appRuntimeException.getUuid()) //
+		        .status(HttpStatus.INTERNAL_SERVER_ERROR) //
+		        .build();
+
+		return handleExceptionInternal(ex, apiErrorResponseObject, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR,
+		        request);
 	}
 
 	/**
@@ -138,41 +160,19 @@ public class ResponseEntityExceptionHandlerAdvice extends ResponseEntityExceptio
 	 */
 	@Override
 	public ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex,
-			HttpHeaders headers, HttpStatus status, final WebRequest request) {
+	        HttpHeaders headers, HttpStatus status, final WebRequest request) {
 		final String errorUuid = UUID.randomUUID().toString();
 
 		log.error(LOG_PREFIX + "handleInternal (MethodArgumentNotValidException) [ex=" + ex + ", status=" + status
-				+ ", request=" + request + ", traceId=" + MDC.get(X_B3_TRACE_ID_HEADER) + ", errorUuid= " + errorUuid
-				+ "]");
+		        + ", request=" + request + ", traceId=" + MDC.get(X_B3_TRACE_ID_HEADER) + ", errorUuid= " + errorUuid
+		        + "]");
 
 		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
-				.shortErrorCodeDescription(AppErrorCodeEnum.APP_VALDIDATION_ERROR_10610.getShortErrorCodeDescription())
-				.errorCode(AppErrorCodeEnum.APP_VALDIDATION_ERROR_10610.toString()).uuid(errorUuid)
-				.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		        .shortErrorCodeDescription(AppErrorCodeEnum.APP_VALDIDATION_ERROR_10610.getShortErrorCodeDescription())
+		        .errorCode(AppErrorCodeEnum.APP_VALDIDATION_ERROR_10610.toString()).uuid(errorUuid)
+		        .status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
 		return handleExceptionInternal(ex, apiErrorResponseObject, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-	}
-
-	@ExceptionHandler({ AppRuntimeException.class })
-	public ResponseEntity<Object> handleInternal(final RuntimeException ex, final WebRequest request) {
-		log.error(LOG_PREFIX + "handleInternal [ex=" + ex + ", request=" + request + ", traceId="
-				+ MDC.get(X_B3_TRACE_ID_HEADER) + "]");
-
-		final AppRuntimeException appRuntimeException = ExceptionUtil.unwrap(ex, AppRuntimeException.class);
-
-		if (!appRuntimeException.isLogged()) {
-			logger.error(LOG_PREFIX + "handleInternal" + appRuntimeException.stackTraceToString());
-		}
-
-		final ApiErrorResponseObject apiErrorResponseObject = ApiErrorResponseObject.builder()
-				.shortErrorCodeDescription(appRuntimeException.getMessage()) //
-				.errorCode(appRuntimeException.getErrorCode().toString()) //
-				.uuid(appRuntimeException.getUuid()) //
-				.status(HttpStatus.INTERNAL_SERVER_ERROR) //
-				.build();
-
-		return handleExceptionInternal(ex, apiErrorResponseObject, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR,
-				request);
 	}
 
 }

@@ -12,7 +12,7 @@
  *
  * </pre>
  */
-package de.bomc.poc.hrm.application.service;
+package de.bomc.poc.hrm.application.service.crud;
 
 import java.util.Collections;
 import java.util.List;

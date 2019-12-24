@@ -42,8 +42,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import de.bomc.poc.hrm.AbstractBaseUnit;
 import de.bomc.poc.hrm.application.exception.AppRuntimeException;
-import de.bomc.poc.hrm.application.service.CustomerService;
-import de.bomc.poc.hrm.application.service.CustomerServiceImpl;
+import de.bomc.poc.hrm.application.service.crud.CustomerService;
+import de.bomc.poc.hrm.application.service.crud.CustomerServiceImpl;
 import de.bomc.poc.hrm.domain.model.CustomerEntity;
 import de.bomc.poc.hrm.infrastructure.CustomerRepository;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;

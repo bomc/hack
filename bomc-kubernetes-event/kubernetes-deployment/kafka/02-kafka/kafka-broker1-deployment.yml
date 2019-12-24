@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+  namespace: bomc-app
+  labels:
+    name: kafka
+    app: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      name: kafka
+      labels:
+        app: kafka
+        name: kafka
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      restartPolicy: Always
+      containers:
+      - image: bomc/kafka:2.12-2.3.0
+        imagePullPolicy: IfNotPresent
+        name: kafka
+        ports:
+        - containerPort: 9092
+        env:
+        - name: KAFKA_BROKER_ID
+          value: "1"
+        - name: MY_MINIKUBE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        # It is the host:port reference to the Zookeeper service.
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value: "$(MY_MINIKUBE_IP):30181"
+        # Creates a topic with one partition and one replica.
+        - name: KAFKA_CREATE_TOPICS
+          value: "bomc:1:1"
+        - name: KAFKA_LISTENERS
+          value: "PLAINTEXT://:9092"  
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        # It is the listener configurated for Zookeeper service.
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: "PLAINTEXT://$(MY_POD_IP):9092"
+        - name: KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS
+          value: "20000"
+        - name: KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS
+          value: "20000"
+---

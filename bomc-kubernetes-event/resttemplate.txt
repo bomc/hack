@@ -1,0 +1,29 @@
+docker inspect <image-name>
+
+
+@RestController
+@RequestMapping("/customers")
+public class CustomerController {
+
+    private CustomerRepository customerRepository;
+
+    public CustomerController(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
+    @PostMapping
+    public ResponseEntity saveCustomer(@RequestBody Customer customer) {
+        customerRepository.save(customer);
+        return new ResponseEntity<>(customer, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity getCustomerById(@PathVariable Long id) {
+        return customerRepository.findById(id)
+                .map(customer -> new ResponseEntity<>(customer, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+    }
+}
+
+openjdk-12.0.2_windows-x64_bin

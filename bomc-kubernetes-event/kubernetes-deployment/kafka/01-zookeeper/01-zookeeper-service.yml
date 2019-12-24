@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-service
+  namespace: bomc-app
+  labels:
+    app: zookeeper-service
+    name: zookeeper-service
+spec:
+  type: NodePort
+  ports:
+  - name: zookeeper-port
+    port: 2181
+    nodePort: 30181
+    targetPort: 2181
+  selector:
+    name: zookeeper
+    app: zookeeper
+

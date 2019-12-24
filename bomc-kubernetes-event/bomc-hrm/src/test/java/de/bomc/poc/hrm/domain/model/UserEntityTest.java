@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,11 +66,12 @@ public class UserEntityTest extends AbstractBaseUnit {
 
 		assertThat(this.entityManager1, notNullValue());
 	}
-
+    
 	// _______________________________________________
 	// Test methods
 	// -----------------------------------------------
 	@Test
+	@DisplayName("010 - Create user - pass")
 	public void test010_createUser_pass() {
 		LOGGER.info(LOG_PREFIX + "test010_createUser_pass");
 
@@ -163,9 +165,9 @@ public class UserEntityTest extends AbstractBaseUnit {
 	@Test
 	public void test050_passwordFlow_pass() {
 		LOGGER.info(LOG_PREFIX + "test050_passwordFlow_pass");
-		
+	
 		this.thrown.expect(AppRuntimeException.class);
-		
+	
 		final UserEntity userEntity = createNonPersistedUserEntityWithUserDetailsEntity(USER_USER_NAME, USER_PASSWORD);
 
 		this.emProvider1.tx().begin();

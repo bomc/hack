@@ -1,0 +1,30 @@
+# The VirtualService instructs the Ingress Gateway how to route the requests that were allowed into the cluster.
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: istio-bomc-app-hrm-virtualservice
+  namespace: bomc-app
+spec:
+  hosts:
+  - "*"
+  gateways:
+  # This VirtualService applies to requests coming through the istio-bomc-app-gateway.
+  - istio-bomc-app-gateway.istio-system.svc.cluster.local
+  #- istio-bomc-app-gateway.bomc-app.svc.cluster.local
+  http:
+  # Used for swagger /bomc-api
+  - match:
+    - uri:              
+       prefix: /bomc-hrm
+    route:
+    - destination:
+        # The metadata.name, keycloak, is the short form of the kubernetes name.
+        # keycloak.bomc-app.svc.cluster.local is the Fully Qualified Domain Name.
+        # The reason for using the fully qualified name is to refer to the Gateway from different namespaces.
+        # If the service is in the same namespace the short name should work, here is the service in the
+        # namespace bomc-app and the gateway in istio-system.
+        host: bomc-hrm-service.bomc-app.svc.cluster.local
+        port:
+          number: 80
+        # subset: v1
+---

@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+  namespace: bomc-app
+  labels:
+    name: zookeeper
+    app: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      name: zookeeper
+      labels:
+        app: zookeeper
+        name: zookeeper
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - image: bomc/zookeeper:v3.4.14
+        imagePullPolicy: IfNotPresent
+        name: zookeeper
+        ports:
+        - containerPort: 2181
+---

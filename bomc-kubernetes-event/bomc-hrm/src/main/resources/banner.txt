@@ -1,0 +1,14 @@
+${AnsiColor.BRIGHT_BLUE}                ,----..              ____               ${AnsiColor.DEFAULT}           ${AnsiColor.BRIGHT_YELLOW}        ,--,                       ____   
+${AnsiColor.BRIGHT_BLUE}    ,---,.     /   /   \           ,'  , `.   ,----..   ${AnsiColor.DEFAULT}           ${AnsiColor.BRIGHT_YELLOW}      ,--.'| ,-.----.            ,'  , `. 
+${AnsiColor.BRIGHT_BLUE}  ,'  .'  \   /   .     :       ,-+-,.' _ |  /   /   \  ${AnsiColor.DEFAULT}           ${AnsiColor.BRIGHT_YELLOW}   ,--,  | : \    /  \        ,-+-,.' _ | 
+${AnsiColor.BRIGHT_BLUE},---.' .' |  .   /   ;.  \   ,-+-. ;   , || |   :     : ${AnsiColor.DEFAULT}    ,---,. ${AnsiColor.BRIGHT_YELLOW},---.'|  : ' ;   :    \    ,-+-. ;   , || 
+${AnsiColor.BRIGHT_BLUE}|   |  |: | .   ;   /  ` ;  ,--.'|'   |  ;| .   |  ;. / ${AnsiColor.DEFAULT}  ,'  .' | ${AnsiColor.BRIGHT_YELLOW}|   | : _' | |   | .\ :   ,--.'|'   |  ;| 
+${AnsiColor.BRIGHT_BLUE}:   :  :  / ;   |  ; \ ; | |   |  ,', |  ': .   ; /--`  ${AnsiColor.DEFAULT},---.'   , ${AnsiColor.BRIGHT_YELLOW}:   : |.'  | .   : |: |  |   |  ,', |  ': 
+${AnsiColor.BRIGHT_BLUE}:   |    ;  |   :  | ; | ' |   | /  | |  || ;   | ;     ${AnsiColor.DEFAULT}|   |    | ${AnsiColor.BRIGHT_YELLOW}|   ' '  ; : |   |  \ :  |   | /  | |  || 
+${AnsiColor.BRIGHT_BLUE}|   :     \ .   |  ' ' ' : '   | :  | :  |, |   : |     ${AnsiColor.DEFAULT}:   :  .'  ${AnsiColor.BRIGHT_YELLOW}'   |  .'. | |   : .  /  '   | :  | :  |, 
+${AnsiColor.BRIGHT_BLUE}|   |   . | '   ;  \; /  | ;   . |  ; |--'  .   | '___  ${AnsiColor.DEFAULT}:   |.'    ${AnsiColor.BRIGHT_YELLOW}|   | :  | ' ;   | |  \  ;   . |  ; |--'  
+${AnsiColor.BRIGHT_BLUE}'   :  '; |  \   \  ',  /  |   : |  | ,     '   ; : .'| ${AnsiColor.DEFAULT}`---'      ${AnsiColor.BRIGHT_YELLOW}'   : |  : ; |   | ;\  \ |   : |  | ,     
+${AnsiColor.BRIGHT_BLUE}|   |  | ;    ;   :    /   |   : '  |/      '   | '/  : ${AnsiColor.DEFAULT}           ${AnsiColor.BRIGHT_YELLOW}|   | '  ,/  :   ' | \.' |   : '  |/      
+${AnsiColor.BRIGHT_BLUE}|   :   /      \   \ .'    ;   | |`-'       |   :    /  ${AnsiColor.DEFAULT}           ${AnsiColor.BRIGHT_YELLOW};   : ;--'   :   : :-'   ;   | |`-'       
+${AnsiColor.BRIGHT_BLUE}|   | ,'        `---`      |   ;/            \   \ .'   ${AnsiColor.DEFAULT}           ${AnsiColor.BRIGHT_YELLOW}|   ,/       |   |.'     |   ;/           
+${AnsiColor.BRIGHT_BLUE}`----'                     '---'              `---`     ${AnsiColor.DEFAULT}           ${AnsiColor.BRIGHT_YELLOW}'---'        `---'       '---'      

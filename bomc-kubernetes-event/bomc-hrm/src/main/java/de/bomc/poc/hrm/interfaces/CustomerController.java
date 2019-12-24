@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.bomc.poc.hrm.application.log.method.Loggable;
-import de.bomc.poc.hrm.application.service.CustomerService;
+import de.bomc.poc.hrm.application.service.crud.CustomerService;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerDto;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerEmailDto;
 import de.bomc.poc.hrm.interfaces.mapper.CustomerMapper;
@@ -53,7 +53,7 @@ import io.swagger.annotations.ApiResponses;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
  */
-@RestController
+@RestController // Used only for REST interfaces.
 @RequestMapping(value = "/customer")
 @CrossOrigin(origins = "*") // TODO: security issue
 @Api(tags = "Customer queries", value = "Customer Management System", description = "Operations pertaining to customer in Customer Management System", produces = "application/vnd.hrm-customer-v1+json;charset=UTF-8")
@@ -78,7 +78,7 @@ public class CustomerController {
 		this.customerService = customerService;
 		this.customerMapper = customerMapper;
 	}
-
+ 
 	@ApiOperation(value = "Get customer by technical id.", response = CustomerDto.class, notes = "The 'id' is the technical id.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Successfully retrieved a customer dto by the given id."),
@@ -165,5 +165,5 @@ public class CustomerController {
 
 		return new ResponseEntity<List<CustomerDto>>(this.customerService.findAll(), HttpStatus.OK);
 	}
-
+	
 }

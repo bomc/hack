@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.bomc.poc.hrm.application.log.method.Loggable;
-import de.bomc.poc.hrm.application.service.UserService;
+import de.bomc.poc.hrm.application.service.crud.UserService;
 import de.bomc.poc.hrm.interfaces.mapper.UserDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
