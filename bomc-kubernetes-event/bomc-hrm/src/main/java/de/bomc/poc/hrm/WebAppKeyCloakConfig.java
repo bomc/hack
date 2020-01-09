@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -44,6 +45,10 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
  * @since 27.11.2019
  */
 @KeycloakConfiguration
+// Priority is by WebSecurityConfigurer equals 100, but there are two implementations.
+// see 'de.bomc.poc.hrm.WebTestSecurityConfig'. Only one configurer with priority
+// 100 is allowed.
+@Order(value = 100)
 @Profile({ "prod" })
 public class WebAppKeyCloakConfig extends KeycloakWebSecurityConfigurerAdapter {
 

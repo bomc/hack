@@ -16,6 +16,7 @@ package de.bomc.poc.hrm;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -32,6 +33,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  */
 @Configuration
 @EnableWebSecurity
+// Priority is by WebSecurityConfigurer equals 100, but there are two implementations.
+// see 'de.bomc.poc.hrm.WebAppKeyCloakConfig'. Only one configurer with priority
+// 100 is allowed.
+@Order(value = 99)
 @Profile({ "!dev", "!prod" })
 public class WebTestSecurityConfig extends WebSecurityConfigurerAdapter {
 

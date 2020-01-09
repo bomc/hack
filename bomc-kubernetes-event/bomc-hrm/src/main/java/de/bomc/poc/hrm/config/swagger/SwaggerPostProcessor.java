@@ -14,18 +14,18 @@
  */
 package de.bomc.poc.hrm.config.swagger;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.cors.CorsConfiguration;
-
-import springfox.documentation.spring.web.PropertySourcedRequestMappingHandlerMapping;
+//import java.util.Arrays;
+//import java.util.Collections;
+//import java.util.LinkedHashMap;
+//import java.util.Map;
+//
+//import org.springframework.beans.BeansException;
+//import org.springframework.beans.factory.config.BeanPostProcessor;
+//import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
+//import org.springframework.stereotype.Component;
+//import org.springframework.web.cors.CorsConfiguration;
+//
+//import springfox.documentation.spring.web.PropertySourcedRequestMappingHandlerMapping;
 
 /**
  * TODO ...
@@ -36,7 +36,7 @@ import springfox.documentation.spring.web.PropertySourcedRequestMappingHandlerMa
 //@Component
 public class SwaggerPostProcessor /*implements BeanPostProcessor*/ {
 
-	private static final String SWAGGER_BEAN_NAME = "swagger2ContollerMapping";
+//	private static final String SWAGGER_BEAN_NAME = "swagger2ContollerMapping";
 
 //	/**
 //	 * Apply this {@code BeanPostProcessor} to the given new bean instance
