@@ -34,9 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 public class HrmKafkaConsumer {
 
 	private static final String LOG_PREFIX = HrmKafkaConsumer.class + "#";
-	
+
 	@Loggable(time = true)
-	@KafkaListener(id = "${kafka.topic.consumer.group-id}", topics = "${kafka.topic.data.name}", containerFactory = "concurrentKafkaListenerContainerFactory")
+	@KafkaListener(id = "${kafka.topic.consumer.group-id}", clientIdPrefix = "bomc", topics = "${kafka.topic.data.name}", containerFactory = "concurrentKafkaListenerContainerFactory", properties = { "enable.auto.commit=true", "auto.commit.interval.ms=1000", "poll-interval=100"})
 	public void listen(final ConsumerRecord<String, String> consumerRecord) {
 		
 		consumerRecord.headers().forEach(header -> {

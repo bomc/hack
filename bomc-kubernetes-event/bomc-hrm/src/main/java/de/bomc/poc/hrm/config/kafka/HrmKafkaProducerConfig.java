@@ -41,7 +41,7 @@ public class HrmKafkaProducerConfig {
 
 	@Value(value = "${kafka.bootstrap-servers}")
 	private String bootstrapAddress;
-
+	
 	/**
 	 * Default properties will be injected to obtain the default KafkaProperties
 	 * bean and then map (see configProps) will be built passing the default values
@@ -72,12 +72,16 @@ public class HrmKafkaProducerConfig {
 		return new DefaultKafkaProducerFactory<>(this.producerConfigs());
 	}
 
+	/**
+	 * See 'https://kafka.apache.org/documentation/#producerconfigs' for more properties. 
+	 */
 	@Bean
 	public Map<String, Object> producerConfigs() {
 
-		System.out.println("-----------------------------------------" + bootstrapAddress);
 		final Map<String, Object> configProps = new HashMap<>(kafkaProperties.buildProducerProperties());
+
 		configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.bootstrapAddress);
+		configProps.put(ProducerConfig.CLIENT_ID_CONFIG, "bomc-producer");
 		configProps.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432);
 		configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);

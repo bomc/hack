@@ -57,8 +57,10 @@ public class PollerJob {
 
 //	@Autowired
 //	private RestTemplate restTemplate;
+//	@Autowired
+//	private AsyncMessageProducer asyncMessageProducer;
 	@Autowired
-	private AsyncMessageProducer asyncMessageProducer;
+	private HrmKafkaProducer hrmKafkaProducer;
 
 	@PostConstruct
 	public void init() {
@@ -92,7 +94,7 @@ public class PollerJob {
 //					        .getBody();
 //					log.trace("saving invoice {}", invoice.getId());
 //					invoiceService.generateInvoice(invoice);
-//				}m
+//				}
 //			}
 //			if (response.getHeaders().getFirst(HttpHeaders.LAST_MODIFIED) != null) {
 //				lastModified = DateUtils.parseDate(response.getHeaders().getFirst(HttpHeaders.LAST_MODIFIED));
@@ -105,15 +107,17 @@ public class PollerJob {
 		final String messageToSend = "message on:" + Long.toString(System.currentTimeMillis());
 		final String kafkaKey = "pollerKey";
 		
-//		this.hrmKafkaProducer.publishMessageToTopic(kafkaKey, messageToSend);
+////		this.hrmKafkaProducer.publishMessageToTopic(kafkaKey, messageToSend);
 		
-		final CompletableFuture<String> retMessage = this.asyncMessageProducer.sendMessage(kafkaKey, messageToSend);
-		
-		try {
-			log.debug(LOG_PREFIX + "poll [retMessage=" + retMessage.get() + "]");
-		} catch (InterruptedException | ExecutionException e) {
-			log.error(LOG_PREFIX + "poll failed! " + e);
-		}
+		this.hrmKafkaProducer.publishMessageToTopic(kafkaKey, messageToSend);
+//		
+//		final CompletableFuture<String> retMessage = this.asyncMessageProducer.sendMessage(kafkaKey, messageToSend);
+//		
+//		try {
+//			log.debug(LOG_PREFIX + "poll [retMessage=" + retMessage.get() + "]");
+//		} catch (InterruptedException | ExecutionException e) {
+//			log.error(LOG_PREFIX + "poll failed! " + e);
+//		}
 	}
 
 }
