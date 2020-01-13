@@ -41,6 +41,8 @@ public class HrmKafkaProducerConfig {
 
 	@Value(value = "${kafka.bootstrap-servers}")
 	private String bootstrapAddress;
+	@Value(value = "${kafka.producer.config.client-id}")
+	private String producerClientId;
 	
 	/**
 	 * Default properties will be injected to obtain the default KafkaProperties
@@ -81,7 +83,7 @@ public class HrmKafkaProducerConfig {
 		final Map<String, Object> configProps = new HashMap<>(kafkaProperties.buildProducerProperties());
 
 		configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.bootstrapAddress);
-		configProps.put(ProducerConfig.CLIENT_ID_CONFIG, "bomc-producer");
+		configProps.put(ProducerConfig.CLIENT_ID_CONFIG, this.producerClientId);
 		configProps.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432);
 		configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);

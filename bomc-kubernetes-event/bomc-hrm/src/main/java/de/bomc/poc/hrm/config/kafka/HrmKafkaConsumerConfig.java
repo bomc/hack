@@ -41,11 +41,11 @@ public class HrmKafkaConsumerConfig {
 
 	@Value(value = "${kafka.bootstrap-servers}")
 	private String bootstrapAddress;
-	@Value(value = "${kafka.topic.consumer.group-id}")
+	@Value(value = "${kafka.consumer.topic.group-id}")
 	private String groupId;
-	@Value(value = "${kafka.topic.consumer.concurrent}")
+	@Value(value = "${kafka.consumer.factory.concurrent}")
 	private String concurrentConsumer;
-	@Value(value = "${kafka.topic.consumer.auto-startup}")
+	@Value(value = "${kafka.consumer.factory.auto-startup}")
 	private String autoStartup;
 	
 	private HrmKafkaRecordFilter hrmKafkaRecordFilter;

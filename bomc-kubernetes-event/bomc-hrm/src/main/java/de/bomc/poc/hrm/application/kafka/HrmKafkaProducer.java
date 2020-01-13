@@ -304,9 +304,9 @@ The average number of bytes sent per second to the broker.
 		});
 
 		// Printout kafka metrics.
-		this.displayMetrics(this.kafkaTemplate.metrics());
-
-		this.printMetrics(this.kafkaTemplate.metrics());
+//		this.displayMetrics(this.kafkaTemplate.metrics());
+//
+//		this.printMetrics(this.kafkaTemplate.metrics());
 
 	} // end method
 

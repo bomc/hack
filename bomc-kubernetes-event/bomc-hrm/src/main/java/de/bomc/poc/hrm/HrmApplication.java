@@ -22,6 +22,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ public class HrmApplication {
 
 	private static final String LOG_PREFIX = "HrmApplication#";
 
-	@Value(value = "${kafka.topic.consumer.group-id}")
+	@Value(value = "${kafka.consumer.topic.group-id}")
 	private String consumerGroupId;
 
 	@Autowired
@@ -58,13 +59,14 @@ public class HrmApplication {
 		// @formatter:off
     	log.info("\n"
                 + "___________________________________\n"
-                + LOG_PREFIX + "onApplicationEvent - Receiving application ready event, so the kafka consumer will started. \n"
+                + LOG_PREFIX + "onApplicationEvent - Receiving application ready event, so the kafka consumer is starting. \n"
                 + "-----------------------------------");
          // @formatter:on
 
 		// Start the consumer from configuration HrmKafkaConsumerConfig and the consumer
 		// HrmKafkaConsumer.
-		this.kafkaListenerEndpointRegistry.getListenerContainer(this.consumerGroupId);
+		final MessageListenerContainer listenerContainer = this.kafkaListenerEndpointRegistry.getListenerContainer(this.consumerGroupId);
+		listenerContainer.start();
 	}
 
 }

@@ -59,7 +59,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(tags = "Customer queries", value = "Customer Management System", description = "Operations pertaining to customer in Customer Management System", produces = "application/vnd.hrm-customer-v1+json;charset=UTF-8")
 public class CustomerController {
 
-	private static final String LOG_PREFIX = "CustomerController#";
+	private static final String LOG_PREFIX = CustomerController.class.getName() + "#";
 	private static final Logger LOGGER = LoggerFactory.getLogger(CustomerController.class.getName());
 
 	public static final String MEDIA_TYPE_JSON_V1 = "application/vnd.hrm-customer-v1+json;charset=UTF-8";
