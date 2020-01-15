@@ -14,6 +14,12 @@
  */
 package de.bomc.poc.hrm.interfaces;
 
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.kafka.common.Metric;
+import org.apache.kafka.common.MetricName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.context.annotation.Profile;
@@ -55,6 +61,11 @@ public class KafkaMaintanceController {
 	@Autowired
 	private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
+	/**
+	 * Creates a new instance of <code>KafkaMaintanceController</code>.
+	 * 
+	 * @param kafkaListenerEndpointRegistry
+	 */
 	public KafkaMaintanceController(final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry) {
 
 		this.kafkaListenerEndpointRegistry = kafkaListenerEndpointRegistry;
@@ -67,7 +78,7 @@ public class KafkaMaintanceController {
 	        @ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
 	        @ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
 	@ApiImplicitParams(@ApiImplicitParam(name = "group-id", value = "The unique identifier of the container managing for this kafka consumer endpoint.", dataType = "String", dataTypeClass = java.lang.String.class, required = true))
-	@GetMapping(value = "/start/{group-id}", produces = MEDIA_TYPE_JSON_V1)
+	@GetMapping(value = "/start/{group-id}")
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public void startConsumerByGroupId(@PathVariable final String groupId) {
 
@@ -81,14 +92,14 @@ public class KafkaMaintanceController {
 		}
 	}
 
-	@ApiOperation(value = "Stops the consumer by given group-id.", response = String.class, notes = "The unique identifier of the container managing for this kafka consumer endpoint.")
+	@ApiOperation(value = "Stops the consumer by given group-id.", notes = "The unique identifier of the container managing for this kafka consumer endpoint.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 200, message = "Successfully stops the consumer by the given group-id."),
 	        @ApiResponse(code = 401, message = "Not authorized to view the resource."),
 	        @ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
 	        @ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
 	@ApiImplicitParams(@ApiImplicitParam(name = "group-id", value = "The unique identifier of the container managing for this kafka consumer endpoint.", dataType = "String", dataTypeClass = java.lang.String.class, required = true))
-	@GetMapping(value = "/stop/{group-id}", produces = MEDIA_TYPE_JSON_V1)
+	@GetMapping(value = "/stop/{group-id}")
 	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
 	public void stopConsumerByGroupId(@PathVariable final String groupId) {
 
@@ -96,5 +107,53 @@ public class KafkaMaintanceController {
 		        .getListenerContainer(groupId);
 
 		messageListenerContainer.stop();
+	}
+
+	@ApiOperation(value = "Get all kafka metrics.", response = String.class, notes = "The unique identifier of the container managing for this kafka consumer endpoint.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully stops the consumer by the given group-id."),
+	        @ApiResponse(code = 401, message = "Not authorized to view the resource."),
+	        @ApiResponse(code = 403, message = "Accessing the resource that trying to reach is forbidden."),
+	        @ApiResponse(code = 404, message = "The resource that trying to reach is not found.") })
+	@ApiImplicitParams(@ApiImplicitParam(name = "group-id", value = "The unique identifier of the container managing for this kafka consumer endpoint.", dataType = "String", dataTypeClass = java.lang.String.class, required = true))
+	@GetMapping(value = "/metrics", produces = MEDIA_TYPE_JSON_V1)
+	@Loggable(result = true, params = true, value = LogLevel.DEBUG, time = true)
+	public void getMetrics() {
+
+		 // TODO
+	}
+
+	/**
+	 * Print out all kafka metrics in alphabetical order.
+	 * 
+	 * @param metrics the metrics to be printed out.
+	 */
+	private void printMetrics(final Map<MetricName, ? extends Metric> metrics) {
+
+		if (metrics != null && !metrics.isEmpty()) {
+			int maxLengthOfDisplayName = 0;
+
+			final TreeMap<String, Double> sortedMetrics = new TreeMap<>(new Comparator<String>() {
+				@Override
+				public int compare(final String o1, final String o2) {
+					return o1.compareTo(o2);
+				}
+			});
+
+			for (final Metric metric : metrics.values()) {
+				final MetricName mName = metric.metricName();
+				final String mergedName = mName.group() + ":" + mName.name() + ":" + mName.tags();
+				maxLengthOfDisplayName = maxLengthOfDisplayName < mergedName.length() ? mergedName.length()
+				        : maxLengthOfDisplayName;
+				sortedMetrics.put(mergedName, metric.value());
+			}
+
+			final String outputFormat = "%-" + maxLengthOfDisplayName + "s : %.3f";
+			log.debug(String.format("\n%-" + maxLengthOfDisplayName + "s   %s", "Metric Name", "Value"));
+
+			for (Map.Entry<String, Double> entry : sortedMetrics.entrySet()) {
+				log.debug(String.format(outputFormat, entry.getKey(), entry.getValue()));
+			}
+		}
 	}
 }
