@@ -73,3 +73,71 @@ curl -v -X POST "http://localhost:8080/bomc-hrm/customer/email-address" -H "acce
 {
   "emailAddress": "bomc@bomc.org"
 }
+
+
+echo "rouk" | nc localhost 2181 ; echo
+
+rouk = are you ok
+nc = netcat
+
+
+
+Clients werden mit SSL/TLS authentisert.
+
+ACLs (Access Control List) unterstützt 2 unterschiedliche Möglichkeiten
+
+1. Topics: Schränkt ein welcher Cliient Daten lesen/schreiben kann.
+2. Consumer Groups: Welcher Client kann von welcher Consumer Group konsumieren.
+3. Cluster: Welcher Client kann create/delete Topics oder kann Konfigurationsänderungen durchführen.
+
+Weiterhin gibt es das Konzept des "Super Users", der über alle obengenannten Rechte verfügt,
+ohne spezielle ACLs.
+ACLs werden in Zookeeper gespeichert und in Strimzi über einen "KafkaUser" angelegt.
+
+Deshalb ist es zwingend den Zugriff auf den Cluster einzuschränken (Security oder Network Rules),
+nur Kafka admins sollten das Recht haben Topics oder ACLs zu erstellen.
+
+
+
+Check server.properties vom Kafka Broker
+
+suche "super.users=User:admin;User:kafka"
+und   "allow.everyone.if.no.acl.found=false"
+
+
+LIst all ACLs:
+
+./kafka-acls.sh --authorizer-properties zookeeper.connect=localhost:2181 --list --topic my_topiy
+
+see logs, gehe zum Kafka-Broker server:
+
+ll kafka/logs/kafka-authorizer.logs
+
+______________________________________________________
+Sollten wir Zugang haben.
+------------------------------------------------------
+
+Ändern des Log-Levels
+
+cat kafka/config/log4j.properties
+
+Change in the file, level from INFO TO DEBUG
+log4j.logger.kafka.authorizer.logger=DEBUG, authorizeAppender
+
+
+
+
+Mit SSL, Clients haben auch Zertifikate die vom Broker validiert werden, und der Clinet hat einen Identität.
+
+Der Kafka-Client hat einen Keystore, der Client startet eine Request um die Zertifikate zu signieren bei einem CA.
+Das CA sendet ein signiertes Zertifikat (Client.crt) zurück, dass im Keystore des Clients gespeichert wird.
+
+Im Encryption Fall:
+- Nur der Broker hat signierte Zertifikate.
+- Der Client verifiziert die Broker Zertifikate um eine SSL Connection herzustellen.
+- Der Client ist "Anonymous" zum Broker (no identity)
+
+Im Authentication Fall:
+- Die Clients UND der Broker haben signierte Server Zertifikate.
+- Der Client und Broker verfizieren gegenseitig ihre Zertifikate.
+- Der Client hat nun eine Identität "Identity" gegenüber dem Broker (ACLs können hinzugefügt werden).

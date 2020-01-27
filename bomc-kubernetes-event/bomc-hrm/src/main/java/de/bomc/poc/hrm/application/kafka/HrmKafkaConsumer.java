@@ -38,12 +38,12 @@ public class HrmKafkaConsumer {
 	private static final String LOG_PREFIX = HrmKafkaConsumer.class + "#";
 
 	@Loggable(time = true)
-	@KafkaListener(containerGroup = "bomc.consumer.factory.container-group", id = "${kafka.consumer.topic.group-id}", clientIdPrefix = "bomc", topics = "${kafka.topic.data.name}", containerFactory = "concurrentKafkaListenerContainerFactory", properties = {
+	@KafkaListener(containerGroup = "${spring.kafka.consumer.group-id}", id = "${spring.kafka.consumer.group-id}", clientIdPrefix = "bomc", topics = "${kafka.topic.data.name}", containerFactory = "concurrentKafkaListenerContainerFactory", properties = {
 	        "enable.auto.commit=true", "auto.commit.interval.ms=1000", "poll-interval=100" })
 	public void listen(final ConsumerRecord<String, String> consumerRecord, //
 	        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) final Integer partition, //
 	        @Header(KafkaHeaders.OFFSET) final Long offset) {
-		
+
 		consumerRecord.headers().forEach(header -> {
 			final String value = new String(header.value(), StandardCharsets.UTF_8);
 
@@ -51,6 +51,6 @@ public class HrmKafkaConsumer {
 		});
 
 		log.info(LOG_PREFIX + "listen [consumerRecord=" + consumerRecord + ", consumerRecord.value="
-		        + consumerRecord.value() + ", partition=" + partition + ", offset=" + offset +  "]");
+		        + consumerRecord.value() + ", partition=" + partition + ", offset=" + offset + "]");
 	}
 }

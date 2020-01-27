@@ -40,7 +40,7 @@ public class HrmApplication {
 
 	private static final String LOG_PREFIX = "HrmApplication#";
 
-	@Value(value = "${kafka.consumer.topic.group-id}")
+	@Value(value = "${spring.kafka.consumer.group-id}")
 	private String consumerGroupId;
 
 	@Autowired
