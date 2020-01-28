@@ -619,3 +619,144 @@ Im Authentication Fall:
 - Die Clients UND der Broker haben signierte Server Zertifikate.
 - Der Client und Broker verfizieren gegenseitig ihre Zertifikate.
 - Der Client hat nun eine Identität "Identity" gegenüber dem Broker (ACLs können hinzugefügt werden).
+
+
+
+
+
+
+
+
+
+
+
+clientside-ssl-config
+
+# Client configuration for using SSL
+
+## grab CA certificate from remote server and add it to local CLIENT truststore
+
+```
+export CLIPASS=clientpass
+cd ~
+mkdir ssl
+cd ssl
+scp -i ~/kafka-security.pem ubuntu@<<your-public-DNS>>:/home/ubuntu/ssl/ca-cert .
+keytool -keystore kafka.client.truststore.jks -alias CARoot -import -file ca-cert  -storepass $CLIPASS -keypass $CLIPASS -noprompt
+
+keytool -list -v -keystore kafka.client.truststore.jks
+```
+
+## create client.properties and configure SSL parameters
+security.protocol
+ssl.truststore.location
+ssl.truststore.password
+==> use template [client.properties](./client.properties)
+
+## TEST
+test using the console-consumer/-producer and the [client.properties](./client.properties)
+### Producer
+```
+~/kafka/bin/kafka-console-producer.sh --broker-list <<your-public-DNS>>:9093 --topic kafka-security-topic --producer.config ~/ssl/client.properties
+
+~/kafka/bin/kafka-console-producer.sh --broker-list <<your-public-DNS>>:9093 --topic kafka-security-topic
+
+
+```
+### Consumer
+```
+~/kafka/bin/kafka-console-consumer.sh --bootstrap-server <<your-public-DNS>>:9093 --topic kafka-security-topic --consumer.config ~/ssl/client.properties
+```
+
+
+Cofigure-kafka-ssl-config
+keytool -list -v -keystore kafka.server.keystore.jks
+```
+
+## create a certification request file, to be signed by the CA
+```
+keytool -keystore kafka.server.keystore.jks -certreq -file cert-file -storepass $SRVPASS -keypass $SRVPASS
+#> ll
+```
+
+## sign the server certificate => output: file "cert-signed"
+```
+openssl x509 -req -CA ca-cert -CAkey ca-key -in cert-file -out cert-signed -days 365 -CAcreateserial -passin pass:$SRVPASS
+#> ll
+```
+
+## check certificates
+### our local certificates
+```
+keytool -printcert -v -file cert-signed
+keytool -list -v -keystore kafka.server.keystore.jks
+```
+
+
+
+# Trust the CA by creating a truststore and importing the ca-cert
+```
+keytool -keystore kafka.server.truststore.jks -alias CARoot -import -file ca-cert -storepass $SRVPASS -keypass $SRVPASS -noprompt
+
+```
+# Import CA and the signed server certificate into the keystore
+```
+keytool -keystore kafka.server.keystore.jks -alias CARoot -import -file ca-cert -storepass $SRVPASS -keypass $SRVPASS -noprompt
+keytool -keystore kafka.server.keystore.jks -import -file cert-signed -storepass $SRVPASS -keypass $SRVPASS -noprompt
+```
+
+# Adjust Broker configuration  
+Replace the server.properties in AWS, by using [this one](./server.properties).   
+*Ensure that you set your public-DNS* !!
+
+# Restart Kafka
+```
+sudo systemctl restart kafka
+sudo systemctl status kafka  
+```
+# Verify Broker startup
+```
+sudo grep "EndPoint" /home/ubuntu/kafka/logs/server.log
+```
+# Adjust SecurityGroup to open port 9093
+
+# Verify SSL config
+from your local computer
+```
+openssl s_client -connect <<your-public-DNS>>:9093
+```
+
+
+
+create-CA-Certs
+
+# Setup CA
+create CA => result: file ca-cert and the priv.key ca-key  
+
+```
+mkdir ssl
+cd ssl 
+openssl req -new -newkey rsa:4096 -days 365 -x509 -subj "/CN=Kafka-Security-CA" -keyout ca-key -out ca-cert -nodes
+
+cat ca-cert
+cat ca-key
+keytool -printcert -v -file ca-cert
+```
+
+
+### Add-On: public certificates check
+```
+echo |
+  openssl s_client -connect www.google.com:443 2>/dev/null |
+  openssl x509 -noout -text -certopt no_header,no_version,no_serial,no_signame,no_pubkey,no_sigdump,no_aux -subject -nameopt multiline -issuer
+```
+
+
+
+
+
+client.properties
+
+security.protocol=SSL
+ssl.truststore.location=/home/gerd/ssl/kafka.client.truststore.jks
+ssl.truststore.password=clientpass
