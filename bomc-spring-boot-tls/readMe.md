@@ -44,50 +44,16 @@ server.ssl.client-auth=need
 logging.level.org.springframework.security=DEBUG
 ```
 
-### Setup Server identity
+## Run the tests
 ```bash
-# Create Server public/private PEM
-openssl req -x509 -new -newkey rsa:3072 -nodes -subj '/C=CH/ST=BL/L=Liestal/O=Test/CN=localhost' -keyout server-private-key.pem -out server-public-cert.pem -days 7300
-
-# Create Server public/private PEM - for windows MINGW64
-openssl req -x509 -new -newkey rsa:3072 -nodes -subj '//C=CH\ST=BL\L=Liestal\O=Test\CN=localhost' -keyout server-private-key.pem -out server-public-cert.pem -days 7300
-
-# Convert Server public/private PEM to PKCS12
-openssl pkcs12 -export -out server-key.pkcs12 -inkey server-private-key.pem -in server-public-cert.pem -password pass:secret
-
-# Import Server PCKS12 into a JKS file
-keytool -importkeystore -srckeystore server-key.pkcs12 -srcstoretype pkcs12 -destkeystore server-identity.jks -storepass secret -keypass secret -srcstorepass secret
-```
-
-### Setup Client identity
-
-```bash
-# Create Client public/private PEM
-openssl req -x509 -new -newkey rsa:3072 -nodes -subj '/C=CH/ST=BL/L=Liestal/O=Test/CN=localhost' -keyout client-private-key.pem -out client-public-cert.pem -days 7300
-
-# Create Client public/private PEM - for windows MINGW64
-openssl req -x509 -new -newkey rsa:3072 -nodes -subj '//C=CH\ST=BL\L=Liestal\O=Test\CN=localhost' -keyout client-private-key.pem -out client-public-cert.pem -days 7300
-
-# Convert Client public/private PEM to PKCS12
-openssl pkcs12 -export -out client-key.pkcs12 -inkey client-private-key.pem -in client-public-cert.pem -name test -password pass:secret
-
-# Import Client PCKS12 into a JKS file
-keytool -importkeystore -srckeystore client-key.pkcs12 -srcstoretype pkcs12 -destkeystore client-identity.jks -alias test -storepass secret -keypass secret -srcstorepass secret
-```
-
-### Create Server/Client trust stores
-```bash
-# Create Client truststore from server public cert
-keytool -keystore client-truststore.jks -importcert -file server-public-cert.pem -alias test -storepass secret -noprompt
-
-# Create Server truststore from client public cert
-keytool -keystore server-truststore.jks -importcert -file client-public-cert.pem -alias test -storepass secret -noprompt
+mvn clean test
 ```
 
 ## Testing with Curl
 ```bash
 mvn clean spring-boot:run
-curl https://localhost:8443/api/tls --key client-private-key.pem  --cert client-public-cert.pem -k
+
+curl -v -ik https://localhost:8443/api/tls --key ./ssl/client_key.pem --pass secret --cert ./ssl/client_cert.pem
 ```
 
 ## Example 1: Using JKS files
@@ -176,9 +142,4 @@ ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFac
 RestTemplate restTemplate = new RestTemplate(requestFactory);
 
 ResponseEntity<String> response = restTemplate.getForEntity("https://localhost:" + port + "/cred", String.class);
-```
-
-## Run the tests
-```bash
-mvn clean test
 ```
