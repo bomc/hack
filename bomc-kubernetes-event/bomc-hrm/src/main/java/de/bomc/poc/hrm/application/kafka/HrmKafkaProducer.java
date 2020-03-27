@@ -134,7 +134,7 @@ public class HrmKafkaProducer {
 					final String mergedName = mName.group() + ":" + mName.name() + ":" + mName.tags();
 					maxLengthOfDisplayName = maxLengthOfDisplayName < mergedName.length() ? mergedName.length()
 				        : maxLengthOfDisplayName;
-					sortedMetrics.put(mergedName, metric.value());
+					sortedMetrics.put(mergedName, (Double)metric.metricValue());
 				}
 			}
 			
