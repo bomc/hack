@@ -6,7 +6,7 @@ metadata:
   name: ping
   namespace: kustomize-poc
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     app: ping
     deploymentconfig: ping
