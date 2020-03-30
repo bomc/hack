@@ -6,5 +6,7 @@ commonLabels:
   app: ping
 
 resources:
-- 010-dc.yaml
-- 020-svc.yaml
+- 010-ping-dc-base.yaml
+- 020-ping-svc-base.yaml
+- 030-postgres-dc-base.yaml
+- 040-postgres-svc-base.yaml
