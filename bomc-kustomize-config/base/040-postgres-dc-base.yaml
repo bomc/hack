@@ -27,7 +27,7 @@ spec:
         - name: POSTGRES_DB_SERVICE_NAME
           valueFrom:
             configMapKeyRef:
-              # The ConfigMap containing the value to assign to POSTGRESQL_DATABASE
+              # The ConfigMap containing the value to assign to POSTGRES_DB_SERVICE_NAME
               name: ping-cm
               # Specify the key associated with the value
               key: POSTGRES_DB_SERVICE_NAME
@@ -39,7 +39,7 @@ spec:
               # Specify the key associated with the value
               key: POSTGRES_DB_NAME
         # Define the environment variable
-        - name: POSTGRES_USER
+        - name: POSTGRESQL_USER
           valueFrom:
             secretKeyRef:
               # The secrets containing the value to assign to POSTGRES_DB_USER
@@ -47,7 +47,7 @@ spec:
               # Specify the key associated with the value
               key: POSTGRES_DB_SECRETS_USER
         # Define the environment variable
-        - name: POSTGRES_PASSWORD
+        - name: POSTGRESQL_PASSWORD
           valueFrom:
             secretKeyRef:
               # The secrets containing the value to assign to POSTGRES_DB_PASSWORD

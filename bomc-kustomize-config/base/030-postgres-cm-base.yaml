@@ -4,6 +4,8 @@ metadata:
   name: ping-cm
 data:
   POSTGRES_DB_SERVICE_NAME: postgres
-  POSTGRES_DB_NAME: bomcdb
+  POSTGRESQL_DATABASE: bomcdb
   # POSTGRES_DB_USER: bomc
   # POSTGRES_DB_PASSWORD: bomc
+
+
