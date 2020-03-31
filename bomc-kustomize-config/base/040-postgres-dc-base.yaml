@@ -1,5 +1,5 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
 metadata:
   name: postgres
   labels:
@@ -16,16 +16,16 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: 172.30.1.1:5000/bomc/postgres:v9.6.3
+        image: 172.30.1.1:5000/openshift/postgresql@sha256:617c75aab798753ee5e0323d60069757b17a2255abd9de44ca342e4a8bb68b15
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5432
         env:
         # Define the environment variable
-        - name: POSTGRES_DB_NAME
+        - name: POSTGRESQL_DATABASE
           valueFrom:
             configMapKeyRef:
-              # The ConfigMap containing the value to assign to POSTGRES_DB_NAME
+              # The ConfigMap containing the value to assign to POSTGRESQL_DATABASE
               name: ping-cm
               # Specify the key associated with the value
               key: POSTGRES_DB_NAME
