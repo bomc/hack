@@ -7,12 +7,13 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: postgres
+    app: postgres
+    deploymentconfig: postgres
   template:
     metadata:
       labels:
         app: postgres
+        deploymentconfig: postgres
     spec:
       containers:
       - name: postgres
@@ -20,6 +21,7 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5432
+          protocol: TCP
         env:
         # Define the environment variable
         - name: POSTGRESQL_DATABASE
