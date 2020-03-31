@@ -24,6 +24,13 @@ spec:
           protocol: TCP
         env:
         # Define the environment variable
+        - name: POSTGRES_DB_SERVICE_NAME
+          valueFrom:
+            configMapKeyRef:
+              # The ConfigMap containing the value to assign to POSTGRESQL_DATABASE
+              name: ping-cm
+              # Specify the key associated with the value
+              key: POSTGRES_DB_SERVICE_NAME
         - name: POSTGRESQL_DATABASE
           valueFrom:
             configMapKeyRef:

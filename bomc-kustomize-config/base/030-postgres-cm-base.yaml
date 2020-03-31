@@ -7,5 +7,3 @@ data:
   POSTGRES_DB_NAME: bomcdb
   # POSTGRES_DB_USER: bomc
   # POSTGRES_DB_PASSWORD: bomc
-  application.properties: |-
-    logging.level.de.bomc.poc=DEBUG
