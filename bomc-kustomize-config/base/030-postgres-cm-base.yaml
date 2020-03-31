@@ -5,7 +5,3 @@ metadata:
 data:
   POSTGRES_DB_SERVICE_NAME: postgres
   POSTGRESQL_DATABASE: bomcdb
-  # POSTGRES_DB_USER: bomc
-  # POSTGRES_DB_PASSWORD: bomc
-
-
