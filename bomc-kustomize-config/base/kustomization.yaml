@@ -11,3 +11,4 @@ resources:
 - 030-postgres-cm-base.yaml
 - 040-postgres-dc-base.yaml
 - 050-postgres-svc-base.yaml
+- 060-postgres-secret-base.yaml

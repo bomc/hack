@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ping
+  name: ping-cm
 data:
   POSTGRES_DB_SERVICE_NAME: postgres
   POSTGRES_DB_NAME: bomcdb

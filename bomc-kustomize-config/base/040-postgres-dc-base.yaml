@@ -26,7 +26,7 @@ spec:
           valueFrom:
             configMapKeyRef:
               # The ConfigMap containing the value to assign to POSTGRES_DB_NAME
-              name: hrm
+              name: ping-cm
               # Specify the key associated with the value
               key: POSTGRES_DB_NAME
         # Define the environment variable
@@ -34,7 +34,7 @@ spec:
           valueFrom:
             secretKeyRef:
               # The secrets containing the value to assign to POSTGRES_DB_USER
-              name: bomc-hrm-secret
+              name: bomc-ping-secret
               # Specify the key associated with the value
               key: POSTGRES_DB_SECRETS_USER
         # Define the environment variable
@@ -42,6 +42,6 @@ spec:
           valueFrom:
             secretKeyRef:
               # The secrets containing the value to assign to POSTGRES_DB_PASSWORD
-              name: bomc-hrm-secret
+              name: bomc-ping-secret
               # Specify the key associated with the value
               key: POSTGRES_DB_SECRETS_PASSWORD
