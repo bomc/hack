@@ -8,5 +8,6 @@ commonLabels:
 resources:
 - 010-ping-dc-base.yaml
 - 020-ping-svc-base.yaml
-- 030-postgres-dc-base.yaml
-- 040-postgres-svc-base.yaml
+- 030-postgres-cm-base.yaml
+- 040-postgres-dc-base.yaml
+- 050-postgres-svc-base.yaml
