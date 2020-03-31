@@ -5,7 +5,7 @@ metadata:
     app: ping
   name: ping
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     app: ping
     deploymentconfig: ping
