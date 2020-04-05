@@ -1,0 +1,25 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: ping
+  name: ping
+  namespace: kustomize-poc
+spec:
+  replicas: 1
+  selector:
+    app: ping
+    deploymentconfig: ping
+  template:
+    metadata:
+      labels:
+        app: ping
+        deploymentconfig: ping
+    spec:
+      containers:
+      - name: ping
+        image: 172.30.1.1:5000/kustomize-poc/ping:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          protocol: TCP
