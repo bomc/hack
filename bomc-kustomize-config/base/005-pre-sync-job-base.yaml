@@ -9,8 +9,8 @@ spec:
   template:
     spec:
       containers:
-      - name: sleep
+      - name: oc-client
         image: 172.30.1.1:5000/bomc/appuio-oc:v3.11
-        command: ["sleep", "10"]
+        command: ["echo $(oc projects)"]
       restartPolicy: Never
   backoffLimit: 0
