@@ -11,6 +11,6 @@ spec:
       containers:
       - name: oc-client
         image: 172.30.1.1:5000/bomc/appuio-oc:v3.11
-        command: ["/bin/echo", $PATH]
+        command: ["/bin/bash", "-xvc", "|", "/bin/echo "starting""]
       restartPolicy: Never
   backoffLimit: 0
