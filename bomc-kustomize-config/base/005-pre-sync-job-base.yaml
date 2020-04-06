@@ -4,13 +4,13 @@ metadata:
   name: before
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+#    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   template:
     spec:
       containers:
       - name: oc-client
         image: 172.30.1.1:5000/bomc/appuio-oc:v3.11
-        command: ["echo", "$PATH"]
+        command: ["oc", "get po 2>&1"]
       restartPolicy: Never
   backoffLimit: 0
