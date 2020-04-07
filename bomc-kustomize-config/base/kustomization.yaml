@@ -13,3 +13,6 @@ resources:
 - 040-postgres-dc-base.yaml
 - 050-postgres-svc-base.yaml
 - 060-postgres-secret-base.yaml
+- 070-role.yaml
+- 080-rolebinding.yaml
+
