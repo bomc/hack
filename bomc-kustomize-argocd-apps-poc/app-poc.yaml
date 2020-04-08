@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: poc
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: poc
+  source:
+    repoUrl: 
+    targetRevision: master
+    path: "overlays/prod"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: poc
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
