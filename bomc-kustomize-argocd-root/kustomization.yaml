@@ -5,6 +5,6 @@ namespace: argocd
 
 resources:
 - app-ping.yaml
-- app-poc.yaml
+#- app-poc.yaml
 - prj-ping.yaml
-- prj-poc.yaml
+#- prj-poc.yaml
