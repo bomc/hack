@@ -5,9 +5,9 @@ metadata:
 spec:
   project: ping
   source:
-    repoURL: https://github.com/bomc/hack
+    repoURL: https://github.com/bomc/hack/bomc-kustomize-argocd-apps-ping
     targetRevision: master
-    path: "bomc-kustomize-argocd-apps-ping"
+    path: "."
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
