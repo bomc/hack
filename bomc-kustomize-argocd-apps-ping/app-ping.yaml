@@ -2,8 +2,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: ping
-  annotations:
-    argocd.argoproj.io/sync-wave: "-2"
 spec:
   project: ping
   source:
