@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: ping
 spec:
-  project: ping
+  project: kustomize-poc
   source:
     repoUrl: https://github.com/bomc/hack
     targetRevision: master
