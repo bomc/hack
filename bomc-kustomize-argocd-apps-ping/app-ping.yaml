@@ -5,9 +5,9 @@ metadata:
 spec:
   project: ping
   source:
-    repoUrl: https://github.com/bomc/hack/bomc-kustomize-argocd-ping
+    repoUrl: https://github.com/bomc/hack
     targetRevision: master
-    path: "overlays/prod"
+    path: "bomc-kustomize-argocd-ping/overlays/prod"
   destination:
     server: https://kubernetes.default.svc
     namespace: kustomize-poc
