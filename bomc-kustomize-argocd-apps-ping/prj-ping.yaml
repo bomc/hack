@@ -13,7 +13,7 @@ spec:
   
   # Only permit applications to deploy to the guestbook namespace in the same cluster
   destinations:
-  - namespace: 'bomc-kustomize-ping'
+  - namespace: '*'
     server: 'https://kubernetes.default.svc'
     
   # Deny all cluster-scoped resources from being created, except for Namespace
