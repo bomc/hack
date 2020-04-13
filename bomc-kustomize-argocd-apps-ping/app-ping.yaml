@@ -1,17 +1,31 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ping
+  name: bomc-kustomize-apps-ping
+  # You'll usually want to add your resources to the argocd namespace.
+  namespace: argocd
+  # Add a this finalizer ONLY if you want these to cascade delete.
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
-  project: ping
+  # The project the application belongs to.
+  project: default
+  
+  # Source of the application manifests
   source:
     repoUrl: https://github.com/bomc/hack
     targetRevision: master
     path: "bomc-kustomize-argocd-ping/overlays/prod"
+    
+  # Destination cluster and namespace to deploy the application
   destination:
     server: https://kubernetes.default.svc
-    namespace: kustomize-poc
+    namespace: argocd
+  
+  # Sync policy
   syncPolicy:
     automated:
+      # Specifies if resources should be pruned during auto-syncing ( false by default ).
       prune: false
+      # Specifies if partial app sync should be executed when resources are changed only in target Kubernetes cluster and no git change.
       selfHeal: true
