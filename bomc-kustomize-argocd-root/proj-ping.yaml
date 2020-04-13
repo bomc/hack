@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: kustomize-project
+  name: bomc-kustomize-argocd-root-project
   namespace: argocd
 spec:
   # Project description
@@ -13,10 +13,10 @@ spec:
   
   # Only permit applications to deploy to the guestbook namespace in the same cluster
   destinations:
-  - namespace: 'bomc-kustomize-ping'
+  - namespace: '*'
     server: 'https://kubernetes.default.svc'
     
   # Deny all cluster-scoped resources from being created, except for Namespace
   clusterResourceWhitelist:
-  - group: ''
-    kind: Namespace
+  - group: '*'
+    kind: '*'
