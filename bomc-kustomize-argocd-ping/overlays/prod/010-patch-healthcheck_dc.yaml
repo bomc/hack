@@ -3,13 +3,18 @@ kind: DeploymentConfig
 metadata:
   name: ping
 spec:
-  selector:
-    app: ping
-    deploymentconfig: ping
   template:
     spec:
       containers:
       - name: ping
+        image: 172.30.1.1:5000/bomc/ping:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
         livenessProbe:
           httpGet:
             path: /
