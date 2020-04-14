@@ -2,11 +2,11 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   name: bomc-role-binding-kustomize-poc
-  namespace: kustomize-poc-ping
+  namespace: bomc-kustomize-ping
 subjects:
   - kind: ServiceAccount
     name: default
-    namespace: kustomize-poc
+    namespace: bomc-kustomize-ping
 roleRef:
   kind: Role
   name: bomc-role-kustomize-poc
