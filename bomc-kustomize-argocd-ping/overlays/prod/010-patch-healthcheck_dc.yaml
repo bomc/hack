@@ -3,6 +3,9 @@ kind: DeploymentConfig
 metadata:
   name: ping
 spec:
+  selector:
+    app: ping
+    deploymentconfig: ping
   template:
     spec:
       containers:
