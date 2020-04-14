@@ -6,14 +6,14 @@ commonLabels:
   app: ping
 
 resources:
-- 001-namespace-base.yaml
-- 005-pre-sync-job-base.yaml
-- 010-ping-dc-base.yaml
-- 020-ping-svc-base.yaml
+- 010-namespace-base.yaml
+#- 020-pre-sync-job-base.yaml
 - 030-postgres-cm-base.yaml
 - 040-postgres-dc-base.yaml
 - 050-postgres-svc-base.yaml
 - 060-postgres-secret-base.yaml
-- 070-role.yaml
-- 080-rolebinding.yaml
+- 070-role-pre-sync-job-base.yaml
+- 080-rolebinding-pre-sync-job-base.yaml
+- 090-ping-dc-base.yaml
+- 100-ping-svc-base.yaml
 
