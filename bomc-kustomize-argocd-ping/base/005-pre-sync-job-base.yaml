@@ -10,7 +10,7 @@ spec:
     spec:
       containers:
       - name: oc-client
-        image: 172.30.1.1:5000/bomc/appuio-oc:v3.11
+        image: 172.30.1.1:5000/appuio/oc:v3.11
         # Run command
         command: ["/bin/bash", "/opt/bomc-oc-script.sh"]
       restartPolicy: Never

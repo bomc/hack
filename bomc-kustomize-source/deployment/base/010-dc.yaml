@@ -4,7 +4,7 @@ metadata:
   labels:
     app: ping
   name: ping
-  namespace: kustomize-poc
+  namespace: bomc-kustomize-ping
 spec:
   replicas: 1
   selector:

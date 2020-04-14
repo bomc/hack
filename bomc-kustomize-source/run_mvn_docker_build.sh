@@ -1,4 +1,4 @@
 #!/bin/bash
 eval $(minikube docker-env)
 
-mvn clean package -PskipTest && docker build -t bomc/ping:v1.0.0 .
+mvn clean install -Dmaven.test.skip=true && docker build -t bomc/ping:v1.0.0 .

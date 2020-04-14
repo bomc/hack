@@ -3,9 +3,11 @@ kind: Kustomization
 
 # Add labels to all objects created by this kustomize manifest.
 commonLabels:
-  app: pingu
+  app: ping
 
 resources:
 - 010-dc.yaml
 - 020-svc.yaml
-#- /030-route.yaml
+- 030-role.yaml
+- 040-rolebinding.yaml
+#- 050-route.yaml

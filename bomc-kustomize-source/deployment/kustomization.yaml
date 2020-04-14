@@ -4,23 +4,25 @@ kind: Kustomization
 # kustomize does not have edit set label command to add a label, but one can always edit kustomization.yaml directly:
 commonLabels:
   env: prod
+  
 resources:
-- /base/010-dc.yaml
-- /base/020-svc.yaml
-- /base/040-role.yaml
-- /base/050-rolebinding.yaml
 - ./base/010-dc.yaml
 - ./base/020-svc.yaml
+- ./base/030-role.yaml
+- ./base/040-rolebinding.yaml
+- ./base/050-route.yaml
+
 configMapGenerator:
 - files:
-  - /prod/application.properties
-  - /prod/application-prod.properties
+  - ./overlays/prod/application.properties
+  - ./overlays/prod/application-prod.properties
   name: ping-cm
+
+#- ./overlays/prod/030-patch-env-dc.yaml
 patchesStrategicMerge:
-- /prod/030-patch-env-dc.yaml
-- ./prod/030-patch-env-dc.yaml
-- ./prod/020-patch-memorylimit_dc.yaml
-- ./prod/010-patch-healthcheck_dc.yaml
-#- /prod/020-patch-memorylimit_dc.yaml
-#- /prod/010-patch-healthcheck_dc.yaml
+- ./overlays/prod/030-patch-env-dc.yaml
+- ./overlays/prod/020-patch-memorylimit_dc.yaml
+- ./overlays/prod/010-patch-healthcheck_dc.yaml
+#- ./overlays/prod/020-patch-memorylimit_dc.yaml
+#- /overlays/prod/010-patch-healthcheck_dc.yaml
 namePrefix: prod-

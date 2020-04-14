@@ -15,7 +15,7 @@ spec:
   source:
     repoURL: https://github.com/bomc/hack
     targetRevision: master
-    path: "bomc-kustomize-argocd-ping/prod"
+    path: "bomc-kustomize-argocd-ping/overlays/prod"
     
   # Destination cluster and namespace to deploy the application
   destination:

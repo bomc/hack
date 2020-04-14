@@ -6,6 +6,7 @@ commonLabels:
   app: ping
 
 resources:
+- 001-namespace-base.yaml
 - 005-pre-sync-job-base.yaml
 - 010-ping-dc-base.yaml
 - 020-ping-svc-base.yaml
