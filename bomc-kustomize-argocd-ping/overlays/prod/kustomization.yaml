@@ -2,12 +2,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 bases:
-- ./base
+- ./../../base
 
 # kustomize does not have edit set label command to add a label, 
 # but one can always edit kustomization.yaml directly:
 commonLabels:
   env: prod
+
+patchesStrategicMerge:
+  - 010-patch-healthcheck_dc.yaml
 
 #configMapGenerator:
 #- files:
