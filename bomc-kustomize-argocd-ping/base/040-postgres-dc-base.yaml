@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: 172.30.1.1:5000/openshift/postgresql@sha256:2727b9b84cc03271c2c3b3cd954de1c5a4f025200b2eaff6bb7d1a7401930d2a
+        image: 172.30.1.1:5000/bomc/postgres:9.6.17
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5432
