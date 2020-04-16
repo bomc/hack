@@ -4,16 +4,16 @@ kind: Kustomization
 bases:
 - ./../../base
 
-# kustomize does not have edit set label command to add a label, 
-# but one can always edit kustomization.yaml directly:
-commonLabels:
-  env: prod
-
-patchesStrategicMerge:
-- 010-patch-healthcheck_dc.yaml
+#patchesStrategicMerge:
+#- 010-patch-healthcheck_dc.yaml
 
 #configMapGenerator:
 #- files:
 #  - ./prod/application.properties
 #  - ./prod/application-prod.properties
 #  name: ping-cm
+
+# kustomize does not have edit set label command to add a label, 
+# but one can always edit kustomization.yaml directly:
+commonLabels:
+  env: prod
