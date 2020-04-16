@@ -10,7 +10,7 @@ commonLabels:
   env: prod
 
 patchesStrategicMerge:
-  - 010-patch-healthcheck_dc.yaml
+- 010-patch-healthcheck_dc.yaml
 
 #configMapGenerator:
 #- files:
