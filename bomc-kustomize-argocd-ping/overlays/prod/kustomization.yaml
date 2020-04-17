@@ -15,5 +15,5 @@ bases:
 
 # kustomize does not have edit set label command to add a label, 
 # but one can always edit kustomization.yaml directly:
-commonLabels:
-  env: prod
+#commonLabels:
+#  env: prod
