@@ -61,3 +61,12 @@ spec:
                 name: bomc-ping-secret
                 # Specify the key associated with the value
                 key: POSTGRES_DB_SECRETS_PASSWORD
+      initContainers:
+        - command:
+            - sh
+            - '-c'
+            - >-
+              until pg_isready -h postgres-service -p 5432 -U adapter; do echo wait for database; sleep 2; done;
+          image: 172.30.1.1:5000/openshift/postgresql@sha256:2727b9b84cc03271c2c3b3cd954de1c5a4f025200b2eaff6bb7d1a7401930d2a
+          imagePullPolicy: IfNotPresent
+          name: postgres_ready_check
