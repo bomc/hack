@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: bomc-kustomize-argocd-strimzi-project
+  namespace: argocd
+spec:
+  # Project description
+  description: Poc for using argocd with kustomize
+  
+   # Allow manifests to deploy from any Git repos
+  sourceRepos:
+  - '*'
+  
+  # Only permit applications to deploy to the bomc-strimzi namespace in the same cluster
+  destinations:
+  - namespace: bomc-strimzi
+    server: 'https://kubernetes.default.svc'
+    
+  # Deny all cluster-scoped resources from being created, except for Namespace
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'

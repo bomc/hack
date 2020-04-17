@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import de.bomc.poc.ping.domain.model.PingEntity;
 import de.bomc.poc.ping.infrastructure.PingRepository;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The implementation of {@link PingService}.
@@ -25,9 +26,12 @@ import de.bomc.poc.ping.infrastructure.PingRepository;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 20.09.2019
  */
+@Slf4j
 @Service // makes it eligible for Spring Component Scan
 public class PingService {
 
+	private static final String LOG_PREFIX = PingService.class.getName() + "#";
+	
 	/* --------------------- member variables ----------------------- */
 	
 	private final PingRepository pingRepository;
@@ -47,6 +51,7 @@ public class PingService {
 	/* --------------------- methods -------------------------------- */
 
 	public String getPing() {
+		log.debug(LOG_PREFIX + "getPing");
 		
 		String pong = "not available";
 		
