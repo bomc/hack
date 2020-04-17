@@ -8,7 +8,7 @@ spec:
   replicas: 1
   selector:
     app: ping
-    deploymentconfig: ping
+    #deploymentconfig: ping
   template:
     metadata:
       labels:
