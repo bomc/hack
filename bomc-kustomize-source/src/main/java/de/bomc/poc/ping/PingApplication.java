@@ -1,7 +1,6 @@
 package de.bomc.poc.ping;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -14,17 +13,13 @@ import de.bomc.poc.ping.application.service.PingService;
 
 @SpringBootApplication(scanBasePackages = { "de.bomc.poc.*" })
 public class PingApplication {
-
-	@Value("${spring.datasource.url}")
-	private static String dataSourceUrl;
 	
 	@Autowired
 	private PingService pingService;
         
     public static void main(String[] args) {
         SpringApplication.run(PingApplication.class, args);
-        
-        System.out.println("PingApplication#main [dataSourceUrl=" + dataSourceUrl + "]");
+       
     }
 
     @Bean
