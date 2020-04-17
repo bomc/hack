@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: ping-cm
 data:
-  POSTGRES_DB_SERVICE_NAME: postgres
+  POSTGRES_DB_SERVICE_NAME: postgres-service
   POSTGRESQL_DATABASE: bomcdb
