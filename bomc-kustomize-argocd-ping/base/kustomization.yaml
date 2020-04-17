@@ -7,7 +7,7 @@ commonLabels:
 
 resources:
 #- 010-namespace-base.yaml
-#- 020-pre-sync-job-base.yaml
+- 020-pre-sync-job-base.yaml
 - 021-role-pre-sync-job-base.yaml
 - 022-rolebinding-pre-sync-job-base.yaml
 - 030-postgres-cm-base.yaml
