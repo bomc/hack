@@ -6,9 +6,9 @@ metadata:
     app: ping
 spec:
   replicas: 1
-  selector:
-    app: ping
-    deploymentconfig: postgres
+  #selector:
+  #  app: ping
+  #  deploymentconfig: postgres
   template:
     metadata:
       labels:
