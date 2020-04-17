@@ -30,7 +30,7 @@ public class PingService {
 
 	/* --------------------- member variables ----------------------- */
 	
-//	private final PingRepository pingRepository;
+	private final PingRepository pingRepository;
 	
 	/* --------------------- constructor ---------------------------- */
 
@@ -39,10 +39,10 @@ public class PingService {
 	 * 
 	 * @param pingRepository     the given ping repository to inject.
 	 */
-//	public PingService(final PingRepository pingRepository) {
-//
-//		this.pingRepository = pingRepository;
-//	}
+	public PingService(final PingRepository pingRepository) {
+
+		this.pingRepository = pingRepository;
+	}
 
 	/* --------------------- methods -------------------------------- */
 
@@ -50,11 +50,11 @@ public class PingService {
 		
 		String pong = "not available";
 		
-//		final Iterable<PingEntity> pingEntityIterable = this.pingRepository.findAll();
-//		
-//		if(pingEntityIterable.iterator().hasNext()) {
-//			pong = pingEntityIterable.iterator().next().getPong();
-//		}
+		final Iterable<PingEntity> pingEntityIterable = this.pingRepository.findAll();
+		
+		if(pingEntityIterable.iterator().hasNext()) {
+			pong = pingEntityIterable.iterator().next().getPong();
+		}
 		
 		return pong;
 	}
