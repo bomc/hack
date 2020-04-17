@@ -3,9 +3,9 @@ kind: Route
 metadata:
   labels:
     app: ping
-  name: ping
+  name: ping-route
 spec:
-  host: ping-pong.127.0.0.1.nip.io
+  host: ping-route.192.168.99.101.nip.io
   port:
     targetPort: 8080-tcp
   to:
