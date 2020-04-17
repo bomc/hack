@@ -24,9 +24,9 @@ import de.bomc.poc.ping.domain.model.basis.AbstractEntity;
 import lombok.ToString;
 
 //LOMBOK
-@ToString
-@Entity
-@Table(name = "t_ping")//, schema = "bomcdb")
+//@ToString
+//@Entity
+//@Table(name = "t_ping")//, schema = "bomcdb")
 public class PingEntity extends AbstractEntity<PingEntity> implements Serializable {
 	
 	/**

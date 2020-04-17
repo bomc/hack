@@ -25,7 +25,7 @@ import de.bomc.poc.ping.domain.model.PingEntity;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
  */
-@Repository
+//@Repository
 public interface PingRepository extends CrudRepository<PingEntity, Long> {
 	//
 }

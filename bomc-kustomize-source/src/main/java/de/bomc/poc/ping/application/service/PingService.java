@@ -50,11 +50,11 @@ public class PingService {
 		
 		String pong = "not available";
 		
-		final Iterable<PingEntity> pingEntityIterable = this.pingRepository.findAll();
-		
-		if(pingEntityIterable.iterator().hasNext()) {
-			pong = pingEntityIterable.iterator().next().getPong();
-		}
+//		final Iterable<PingEntity> pingEntityIterable = this.pingRepository.findAll();
+//		
+//		if(pingEntityIterable.iterator().hasNext()) {
+//			pong = pingEntityIterable.iterator().next().getPong();
+//		}
 		
 		return pong;
 	}

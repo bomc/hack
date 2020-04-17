@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * @author <a href="mailto:bomc@bomc.org">bomc</a>
  * @since 06.05.2019
  */
-@MappedSuperclass
+//@MappedSuperclass
 public abstract class AbstractMetadataEntity implements DomainObject {
 
     /* --------------------- constants ------------------------------ */
