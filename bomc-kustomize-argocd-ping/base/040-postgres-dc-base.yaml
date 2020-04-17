@@ -55,6 +55,16 @@ spec:
         securityContext:
           capabilities: {}
           privileged: false
+        livenessProbe:
+          exec:
+            command:
+              - /usr/libexec/check-container
+              - '--live'
+          failureThreshold: 3
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 10
       volumes:
       - name: "postgres-data"
         emptyDir:
