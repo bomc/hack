@@ -3,16 +3,16 @@ kind: DeploymentConfig
 metadata:
   name: postgres
   labels:
-    app: ping
+    app: postgres
 spec:
   replicas: 1
-  #selector:
-    #app: postgres
-    #deploymentconfig: postgres
+  selector:
+    app: postgres
+    deploymentconfig: postgres
   template:
     metadata:
       labels:
-        app: ping
+        app: postgres
         deploymentconfig: postgres
     spec:
       containers:
