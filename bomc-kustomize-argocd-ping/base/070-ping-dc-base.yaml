@@ -6,8 +6,8 @@ metadata:
   name: ping
 spec:
   replicas: 1
-  selector:
-    app: ping
+  #selector:
+    #app: ping
     #deploymentconfig: ping
   template:
     metadata:
