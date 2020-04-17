@@ -52,7 +52,6 @@ spec:
           mountPath: "/var/lib/pgsql/data"
         terminationMessagePath: "/dev/termination-log"
         imagePullPolicy: IfNotPresent
-        capabilities: {}
         securityContext:
           capabilities: {}
           privileged: false
