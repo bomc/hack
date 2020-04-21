@@ -61,10 +61,12 @@ public class PingEntity extends AbstractEntity<PingEntity> implements Serializab
 	}
 	
 	public String getPong() {
+		
 		return pong;
 	}
 
 	public void setPong(final String pong) {
+		
 		this.pong = pong;
 	}
 }

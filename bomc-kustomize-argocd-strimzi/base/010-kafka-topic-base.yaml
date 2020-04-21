@@ -2,8 +2,19 @@ apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaTopic
 metadata:
   labels:
-    strimzi.io/cluster: kafka
+    strimzi.io/cluster: bomc-cluster
   name: bomc-poc-topic
 spec:
   partitions: 2
   replicas: 1
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaTopic
+metadata:
+  labels:
+    strimzi.io/cluster: bomc-cluster
+  name: bomc-poc-failure-topic
+spec:
+  partitions: 2
+  replicas: 1
+---

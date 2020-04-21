@@ -63,7 +63,12 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
-
+		<!-- Kafka -->
+    	<dependency>
+      		<groupId>org.springframework.kafka</groupId>
+      		<artifactId>spring-kafka</artifactId>
+    	</dependency>
+    
 		<!-- Other test dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

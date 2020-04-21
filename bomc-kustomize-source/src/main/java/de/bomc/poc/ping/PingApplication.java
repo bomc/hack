@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -11,6 +13,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 import de.bomc.poc.ping.application.service.PingService;
 
+@EnableRetry // Used for kafka consumer retry, see KafkaConsumerConfiguration
+@EnableKafka
 @SpringBootApplication(scanBasePackages = { "de.bomc.poc.*" })
 public class PingApplication {
 	
