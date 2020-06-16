@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.2.6.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>de.bomc.poc</groupId>
 	<artifactId>ping</artifactId>
@@ -18,13 +19,13 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
+		<java.version>1.8</java.version>
 		<!-- Automatically run annotation processors within the incremental compilation. -->
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
-		
+
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		
+
 		<!-- NOTE: This prevents eclipse showing "Maven Configuration Problem: 
 			Unknown". the error comes with update to spring-boot 2.1.9.RELEASE. This 
 			is a downgrade from 3.1.2 in parent pom. -->
@@ -33,6 +34,7 @@
 		<dockerfile-maven-plugin.version>1.4.9</dockerfile-maven-plugin.version>
 		<!-- Used in maven compiler plugin. -->
 		<version.lombok>1.18.10</version.lombok>
+		<version.springdoc-openapi-ui>1.2.34</version.springdoc-openapi-ui>
 	</properties>
 
 	<dependencies>
@@ -50,31 +52,58 @@
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<!-- Other dependencies -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-		
+
 		<!-- PostGreSQL Database Engine. -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
 		<!-- Kafka -->
-    	<dependency>
-      		<groupId>org.springframework.kafka</groupId>
-      		<artifactId>spring-kafka</artifactId>
-    	</dependency>
-    
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
+		<!-- Jackson localDateTime -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
+		<!-- OpenApi -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>${version.springdoc-openapi-ui}</version>
+		</dependency>
+
 		<!-- Other test dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.skyscreamer</groupId>
+			<artifactId>jsonassert</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>io.projectreactor</groupId>
 			<artifactId>reactor-test</artifactId>
@@ -113,7 +142,7 @@
 					<redeploy>true</redeploy>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -129,27 +158,12 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
-<!-- 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
-				<version>${dockerfile-maven-plugin.version}</version>
-				<configuration>
-					<repository>${project.artifactId}</repository>
-					<tag>latest</tag>
-					<buildArgs>
-						<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
-					</buildArgs>
-				</configuration>
-				<executions>
-					<execution>
-						<id>build-image</id>
-						<phase>package</phase>
-						<goals>
-							<goal>build</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin> -->
+			<!-- <plugin> <groupId>com.spotify</groupId> <artifactId>dockerfile-maven-plugin</artifactId> 
+				<version>${dockerfile-maven-plugin.version}</version> <configuration> <repository>${project.artifactId}</repository> 
+				<tag>latest</tag> <buildArgs> <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE> 
+				</buildArgs> </configuration> <executions> <execution> <id>build-image</id> 
+				<phase>package</phase> <goals> <goal>build</goal> </goals> </execution> </executions> 
+				</plugin> -->
 		</plugins>
 	</build>
 

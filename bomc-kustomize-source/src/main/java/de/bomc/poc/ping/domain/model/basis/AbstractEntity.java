@@ -20,6 +20,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Objects;
 
 /**
@@ -30,6 +32,7 @@ import java.util.Objects;
  * @since 06.05.2019
  */
 @MappedSuperclass
+@JsonIgnoreProperties(value = { "isNew" })
 public abstract class AbstractEntity<T> extends AbstractMetadataEntity {
 
 	/* --------------------- constants ------------------------------ */
