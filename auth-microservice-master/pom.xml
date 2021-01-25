@@ -86,7 +86,7 @@
 
 		<version.swagger.doclet>1.1.2</version.swagger.doclet>
 		<version.slf4j.api>1.7.15</version.slf4j.api>
-		<version.mysql.connector.java>5.1.33</version.mysql.connector.java>
+		<version.mysql.connector.java>8.0.16</version.mysql.connector.java>
 		<version.org.hibernate>4.3.11.Final</version.org.hibernate>
 
 		<!-- other plugin versions -->
