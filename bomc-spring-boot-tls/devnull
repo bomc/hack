@@ -1,4 +1,0 @@
-depth=1 CN = localhost, OU = DevOps, O = BomcCloud, L = Bomc Authority, ST = Bomc Kingdom, C = DE
-verify error:num=19:self signed certificate in certificate chain
-18464:error:14094412:SSL routines:ssl3_read_bytes:sslv3 alert bad certificate:s3_pkt.c:1472:SSL alert number 42
-18464:error:140790E5:SSL routines:ssl23_write:ssl handshake failure:s23_lib.c:177:
