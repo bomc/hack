@@ -29,7 +29,7 @@
         <version.harmcrest-core>1.3</version.harmcrest-core>
         <version.hamcrest-library>1.3</version.hamcrest-library>
         <version.jaxrs-api>3.0.12.Final</version.jaxrs-api>
-        <version.resteasy-client>3.0.14.Final</version.resteasy-client>
+        <version.resteasy-client>4.5.7.Final</version.resteasy-client>
         <version.hibernate-validator-annotation-processor>5.1.3.Final</version.hibernate-validator-annotation-processor>
         <version.hibernate-validator>5.2.3.Final</version.hibernate-validator>
         <version.commons-lang>2.6</version.commons-lang>
