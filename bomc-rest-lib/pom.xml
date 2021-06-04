@@ -38,7 +38,7 @@
         <version.arquillian-jacoco>1.0.0.Alpha8</version.arquillian-jacoco>
         <version.resteasy-jaxrs>3.0.14.Final</version.resteasy-jaxrs>
         <version.commons-io>2.4</version.commons-io>
-        <version.httpclient>4.5</version.httpclient>
+        <version.httpclient>4.5.13</version.httpclient>
 
         <!-- Defines the Wildfly-dist version from nexus. -->
         <version.bomc.wildfly.dist>1.00.00-SNAPSHOT</version.bomc.wildfly.dist>
