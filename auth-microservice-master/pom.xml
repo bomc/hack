@@ -98,7 +98,7 @@
 		<version.resources.plugin>2.7</version.resources.plugin>
 		<version.pact.provider.maven>3.2.2</version.pact.provider.maven>
 		<version.maven.javadoc>2.10.3</version.maven.javadoc>
-		<version.jackson.databind>2.5.4</version.jackson.databind>
+		<version.jackson.databind>2.9.10.8</version.jackson.databind>
 		<version.hibernate.validator>5.2.3.Final</version.hibernate.validator>
 		
 		<!-- maven-compiler-plugin -->
