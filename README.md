@@ -3957,7 +3957,6 @@ private Iterable<WatchEvent<?>> createModifyEvents() {
     // Mock file modification events
     WatchEvent<Path> modifyEvent = mock(WatchEvent.class);
     when(modifyEvent.kind()).thenReturn(StandardWatchEventKinds.ENTRY_MODIFY);
-
     return List.of(modifyEvent);
 }
 In this updated test:
@@ -3966,3 +3965,108 @@ We simulate multiple file modification events by calling createModifyEvents() mu
 We expect the fileChangeHandler bean's handleFileEvent method to be called three times, corresponding to the three simulated file modification events.
 User
 show me all files test and beans and configuration classes
+
+
+
+
+
+
+
+
+
+-----
+
+@Component
+public class MQReceiver {
+
+    private static final String QUEUE_NAME = "YOUR_QUEUE_NAME"; // Replace with your queue name
+    private static final int MAX_ATTEMPTS = 5;
+    private static final int WAIT_INTERVAL = 1000; // Wait interval in milliseconds
+
+    private final MQQueueManager mqQueueManager;
+
+    @Autowired
+    public MQReceiver(MQQueueManager mqQueueManager) {
+        this.mqQueueManager = mqQueueManager;
+    }
+
+    public void receiveMessage() {
+        int attempt = 0;
+        while (true) {
+            try {
+                attempt++;
+                if (attempt > MAX_ATTEMPTS) {
+                    System.out.println("Reached maximum attempts. Giving up.");
+                    break;
+                }
+
+                int openOptions = MQConstants.MQOO_INPUT_AS_Q_DEF | MQConstants.MQOO_FAIL_IF_QUIESCING;
+                MQQueue queue = mqQueueManager.accessQueue(QUEUE_NAME, openOptions);
+
+                MQMessage mqMessage = new MQMessage();
+                MQGetMessageOptions getMessageOptions = new MQGetMessageOptions();
+                getMessageOptions.waitInterval = WAIT_INTERVAL;
+
+                queue.get(mqMessage, getMessageOptions);
+                String messageText = mqMessage.readString(mqMessage.getMessageLength());
+                System.out.println("Received message: " + messageText);
+                // Process the received message as needed
+
+                queue.close();
+                attempt = 0; // Reset attempt counter on successful message retrieval
+            } catch (MQException mqe) {
+                handleMQException(mqe);
+                // Attempt to reconnect after a delay
+                try {
+                    Thread.sleep(WAIT_INTERVAL);
+                } catch (InterruptedException ie) {
+                    // Handle interruption
+                }
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void handleMQException(MQException mqe) {
+        switch (mqe.reasonCode) {
+            case MQConstants.MQRC_HOST_NOT_AVAILABLE:
+                System.out.println("Host not available: " + mqe.getMessage());
+                break;
+            case MQConstants.MQRC_PORT_IN_USE:
+                System.out.println("Port in use: " + mqe.getMessage());
+                break;
+            case MQConstants.MQRC_CHANNEL_CONFIG_ERROR:
+                System.out.println("Channel configuration error: " + mqe.getMessage());
+                break;
+            case MQConstants.MQRC_NOT_AUTHORIZED:
+                System.out.println("Not authorized: " + mqe.getMessage());
+                break;
+            // Add more cases for handling other error codes as needed
+            default:
+                System.out.println("MQException occurred: " + mqe.getMessage() + " (Reason Code: " + mqe.reasonCode + ")");
+                break;
+        }
+    }
+}
+
+
+-----
+
+
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/hello")
+                .allowedOrigins("https://example.com", "http://localhost:8080")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*");
+    }
+}
