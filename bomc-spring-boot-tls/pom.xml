@@ -28,7 +28,7 @@
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
 		
-		<version.commons-beanutils>1.9.3</version.commons-beanutils>
+		<version.commons-beanutils>1.9.4</version.commons-beanutils>
 	</properties>
 
 	<dependencies>
