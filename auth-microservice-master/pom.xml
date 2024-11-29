@@ -81,7 +81,7 @@
 		<version.weld.core>2.1.2.Final</version.weld.core>
 
 		<version.pact.consumer.junit>3.2.2</version.pact.consumer.junit>
-		<version.httpcomponents.httpclient>4.5</version.httpcomponents.httpclient>
+		<version.httpcomponents.httpclient>4.5.13</version.httpcomponents.httpclient>
   		<version.httpcomponents.fluent.hc>4.5.1</version.httpcomponents.fluent.hc>
 
 		<version.swagger.doclet>1.1.2</version.swagger.doclet>
