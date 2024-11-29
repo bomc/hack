@@ -63,7 +63,7 @@
 		<version.jaxrs-api>3.0.12.Final</version.jaxrs-api>
 		<version.togglz-cdi>2.5.0.Final</version.togglz-cdi>
 		<version.togglz-core>2.5.0.Final</version.togglz-core>
-		<version.togglz-console>2.5.0.Final</version.togglz-console>
+		<version.togglz-console>2.9.4</version.togglz-console>
 		<version.exception-lib>1.00.00-SNAPSHOT</version.exception-lib>
 		<version.logging-lib>1.00.00-SNAPSHOT</version.logging-lib>
 		<version.rest-lib>1.00.00-SNAPSHOT</version.rest-lib>
