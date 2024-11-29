@@ -99,7 +99,7 @@
 		<version.pact.provider.maven>3.2.2</version.pact.provider.maven>
 		<version.maven.javadoc>2.10.3</version.maven.javadoc>
 		<version.jackson.databind>2.5.4</version.jackson.databind>
-		<version.hibernate.validator>5.2.3.Final</version.hibernate.validator>
+		<version.hibernate.validator>5.3.6.Final</version.hibernate.validator>
 		
 		<!-- maven-compiler-plugin -->
 		<maven.compiler.target>1.8</maven.compiler.target>
